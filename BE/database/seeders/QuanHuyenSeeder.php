@@ -13,64 +13,46 @@ class QuanHuyenSeeder extends Seeder
     public function run(): void
     {
         DB::table('quan_huyens')->insert([
-            // TP. Hồ Chí Minh (tinh_id = 1)
+            // Đà Nẵng (tinh_id = 1)
             [
-                'ten' => 'Quận 1',
+                'ten' => 'Liên Chiểu',
                 'tinh_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'ten' => 'Quận 2',
+                'ten' => 'Thanh Khê',
                 'tinh_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'ten' => 'Quận 3',
+                'ten' => 'Hải Châu',
                 'tinh_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'ten' => 'Quận 7',
+                'ten' => 'Sơn Trà',
                 'tinh_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'ten' => 'Quận Bình Thạnh',
+                'ten' => 'Ngũ Hành Sơn',
                 'tinh_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'ten' => 'Quận Tân Bình',
+                'ten' => 'Cẩm Lệ',
                 'tinh_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'ten' => 'Quận Tân Phú',
+                'ten' => 'Hòa Vang',
                 'tinh_id' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Thị xã Dĩ An',
-                'tinh_id' => 4,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Thành phố Thuận An',
-                'tinh_id' => 4,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Huyện Bắc Tân Uyên',
-                'tinh_id' => 4,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

@@ -1,4 +1,4 @@
-﻿import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   // ===== ADMIN =====
@@ -280,10 +280,20 @@ function getHomePath(role) {
   return map[role] || "/";
 }
 
-// ================= AUTH GUARD (CHỈ 1 CÁI DUY NHẤT) =================
+// ================= AUTH GUARD (CHỈ 1 CÁI DUY NHẤT) == ===============
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("auth_token");
-  const userType = localStorage.getItem("user_type");
+  const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
+  
+  let userType = localStorage.getItem("user_type");
+  if (!userType) {
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userObj = JSON.parse(userStr);
+        userType = userObj.loai_tai_khoan || userObj.role;
+      }
+    } catch(e) {}
+  }
 
   console.log("🔍 [Router Guard]", {
     path: to.path,

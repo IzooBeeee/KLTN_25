@@ -78,7 +78,7 @@ class KhachHangController extends Controller
             'ten'                 => $request->ten,
             'email'               => $request->email,
             'so_dien_thoai'       => $request->so_dien_thoai,
-            'password'            => Hash::make($request->password),
+            'password'            => bcrypt($request->password),
             'is_active' => true,
         ]);
 
@@ -194,7 +194,7 @@ class KhachHangController extends Controller
             }
 
             $data->update([
-                'password' => Hash::make($request->password),
+                'password' => bcrypt($request->password),
             ]);
 
             return response()->json([
@@ -357,7 +357,7 @@ class KhachHangController extends Controller
         $code = rand(100000, 999999);
 
         $kh->update([
-            'hash_reset' => Hash::make($code),
+            'hash_reset' => bcrypt($code),
             'hash_reset_expires_at' => now()->addMinutes(5),
         ]);
 
@@ -458,7 +458,7 @@ class KhachHangController extends Controller
         }
 
         $kh->update([
-            'password' => Hash::make($request->password),
+            'password' => bcrypt($request->password),
             'hash_reset' => null,
             'hash_reset_expires_at' => null,
         ]);

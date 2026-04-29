@@ -11,6 +11,7 @@ class LoaiBatDongSan extends Model
 
     protected $fillable = [
         'ten_loai',
+        'mo_ta',
         'is_active',
     ];
 

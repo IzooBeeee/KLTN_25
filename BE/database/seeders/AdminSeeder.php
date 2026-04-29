@@ -17,7 +17,7 @@ class AdminSeeder extends Seeder
             [
                 'ten' => 'Admin Super',
                 'email' => 'admin@bds.com',
-                'password' => Hash::make('123456789'),
+                'password' => bcrypt('123456789'),
                 'is_super' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -25,7 +25,7 @@ class AdminSeeder extends Seeder
             [
                 'ten' => 'Admin Duyệt Tin',
                 'email' => 'duyet@bds.com',
-                'password' => Hash::make('123456789'),
+                'password' => bcrypt('123456789'),
                 'is_super' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -33,7 +33,7 @@ class AdminSeeder extends Seeder
             [
                 'ten' => 'Admin Quản Lý',
                 'email' => 'quanly@bds.com',
-                'password' => Hash::make('123456789'),
+                'password' => bcrypt('123456789'),
                 'is_super' => false,
                 'created_at' => now(),
                 'updated_at' => now(),

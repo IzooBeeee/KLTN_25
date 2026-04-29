@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="broker-management p-4">
     <div class="row mb-4">
       <div class="col-12">
@@ -259,17 +259,17 @@
                   <span
                     :class="{
                       'bg-warning-subtle text-warning border-warning':
-                        v.goi_tin?.ten_goi?.includes('VIP') ||
-                        v.goi_tin?.ten_goi?.includes('Kim'),
+                        (v.ten_goi || '').includes('VIP') ||
+                        (v.ten_goi || '').includes('Kim'),
                       'bg-primary-subtle text-primary border-primary':
-                        v.goi_tin?.ten_goi?.includes('Vàng') ||
-                        v.goi_tin?.ten_goi?.includes('Bạc'),
+                        (v.ten_goi || '').includes('Vàng') ||
+                        (v.ten_goi || '').includes('Bạc'),
                       'bg-secondary-subtle text-secondary border-secondary':
-                        !v.goi_tin,
+                        !v.ten_goi || v.ten_goi === 'Chưa mua',
                     }"
                     class="badge border px-3 py-2 rounded-pill small fw-bold mb-1"
                   >
-                    {{ v.ten_goi_hien_thi }}
+                    {{ v.ten_goi || "Chưa mua" }}
                   </span>
                 </td>
                 <td class="text-center">
@@ -728,7 +728,7 @@ export default {
     //  Fix: Đếm VIP case-insensitive
     soGoiVIP() {
       return this.moiGioiList.filter((v) => {
-        const tenGoi = (v.ten_goi_hien_thi || "").toLowerCase();
+        const tenGoi = (v.ten_goi || "").toLowerCase();
         return (
           tenGoi.includes("vip") ||
           tenGoi.includes("kim cương") ||
@@ -823,9 +823,7 @@ export default {
         if (res.data?.status) {
           this.moiGioiList = res.data.data.map((v) => ({
             ...v,
-            ten_goi_hien_thi: v.goi_tin_id
-              ? `Gói #${v.goi_tin_id}`
-              : "Chưa mua",
+            ten_goi: v.ten_goi || "Chưa mua",
             so_tin: v.so_tin_con_lai || 0,
             is_active: v.is_active,
             goi: v.ngay_het_han_goi ? "VIP" : "Cơ bản",

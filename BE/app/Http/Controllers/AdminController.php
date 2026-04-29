@@ -121,7 +121,7 @@ class AdminController extends Controller
 
         $user->tokens()->where('id', '!=', $currentTokenId)->delete();
 
-        $user->password = Hash::make($request->mat_khau_moi);
+        $user->password = bcrypt($request->mat_khau_moi);
         $user->save();
 
         return response()->json([
@@ -243,7 +243,7 @@ class AdminController extends Controller
 
         $user = Admin::where('email', $request->email)->first();
 
-        $user->password = Hash::make($request->password);
+        $user->password = bcrypt($request->password);
         $user->save();
 
         DB::table('password_reset_tokens')

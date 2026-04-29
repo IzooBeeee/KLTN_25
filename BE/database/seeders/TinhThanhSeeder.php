@@ -14,7 +14,7 @@ class TinhThanhSeeder extends Seeder
     {
         DB::table('tinh_thanhs')->insert([
             [
-                'ten' => 'TP. Hồ Chí Minh',
+                'ten' => 'Đà Nẵng',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -24,7 +24,7 @@ class TinhThanhSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'ten' => 'Đà Nẵng',
+                'ten' => 'TP. Hồ Chí Minh',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

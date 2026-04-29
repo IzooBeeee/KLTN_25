@@ -22,6 +22,32 @@ class GiaoDichController extends Controller
         $this->sePay = $sePay;
     }
 
+    // ✅ Lấy danh sách giao dịch cho Admin
+    public function getData(Request $request)
+    {
+        $query = GiaoDich::with(['moiGioi:id,ten,so_dien_thoai', 'goiTin:id,ten_goi']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('ma_giao_dich', 'like', "%{$search}%")
+                ->orWhereHas('moiGioi', function ($q) use ($search) {
+                    $q->where('ten', 'like', "%{$search}%")
+                      ->orWhere('so_dien_thoai', 'like', "%{$search}%");
+                });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('trang_thai', $request->status);
+        }
+
+        $data = $query->orderBy('created_at', 'desc')->paginate($request->input('per_page', 10));
+
+        return response()->json([
+            'status' => true,
+            'data' => $data
+        ]);
+    }
+
     // ✅ GIỮ NGUYÊN: Các hàm helper
     private function resolveSePayReturnUrl(Request $request): string
     {
@@ -38,45 +64,6 @@ class GiaoDichController extends Controller
         return $code;
     }
 
-    // ✅ MỚI: Tạo QR Code với thông tin tài khoản thật
-    private function generateVietQRString($amount, $orderCode)
-    {
-        $accountNumber = '0866179631';  // Số tài khoản của bạn
-        $accountName = 'MAI SONG VIET'; // Tên chủ tài khoản
-        $bankCode = '970422';           // Mã MBBank
-
-        $amount = number_format($amount, 0, '.', '');
-        $orderCode = trim($orderCode);
-
-        $payload =
-            "000201" .
-            "010211" .
-            "29" . strlen("*" . $accountNumber) . "*" . $accountNumber .
-            "30" . strlen($bankCode) . $bankCode .
-            "37" . strlen($orderCode) . $orderCode .
-            "54" . strlen($amount) . $amount .
-            "5802VN" .
-            "6304";
-
-        $payload .= $this->calculateCRC16($payload);
-        return $payload;
-    }
-
-    private function calculateCRC16($payload)
-    {
-        $crc = 0xFFFF;
-        $polynomial = 0x1021;
-        for ($i = 0; $i < strlen($payload); $i++) {
-            $crc ^= ord($payload[$i]) << 8;
-            for ($j = 0; $j < 8; $j++) {
-                if ($crc & 0x8000) $crc = ($crc << 1) ^ $polynomial;
-                else $crc <<= 1;
-            }
-        }
-        return strtoupper(str_pad(dechex($crc & 0xFFFF), 4, '0', STR_PAD_LEFT));
-    }
-
-    // ✅ MỚI: Tạo payment với QR động
     public function createPayment(Request $request)
     {
         $user = Auth::guard('sanctum')->user();
@@ -106,24 +93,18 @@ class GiaoDichController extends Controller
                     'ma_giao_dich' => $orderCode,
                 ]);
 
-                // Tạo QR động từ VietQR.io
-                $accountNumber = '0866179631';
-                $bankCode = 'MB';
-                $amount = $goi->gia;
-                $addInfo = urlencode($orderCode);
-
-                $qrImageUrl = "https://img.vietqr.io/image/{$bankCode}-{$accountNumber}-compact.png?amount={$amount}&addInfo={$addInfo}";
+                // ✅ MỚI: Dùng SePay SDK để tạo form HTML
+                $paymentHtml = $this->sePay->createPaymentUrl(
+                    $orderCode,
+                    $goi->gia,
+                    "Thanh toan don hang {$orderCode}"
+                );
 
                 return [
                     'transaction_id' => $transaction->id,
                     'order_code' => $orderCode,
                     'amount' => $goi->gia,
-                    'qr_image_url' => $qrImageUrl,
-                    'account_info' => [
-                        'bank_name' => 'MBBank',
-                        'account_number' => $accountNumber,
-                        'content' => $orderCode
-                    ]
+                    'payment_html' => $paymentHtml
                 ];
             });
 
@@ -134,10 +115,29 @@ class GiaoDichController extends Controller
         }
     }
 
+    // ✅ MỚI: Handle URL Return từ SePay
+    public function handleSePayReturn(Request $request)
+    {
+        $status = $request->query('status', 'error');
+        $orderCode = $request->query('order_code');
+
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        
+        // Redirect về Frontend
+        return redirect()->away("{$frontendUrl}/moi-gioi/goi-tin?status={$status}&order_code={$orderCode}");
+    }
+
     // ✅ GIỮ NGUYÊN: Webhook handler
     public function handleSePayWebhook(Request $request)
     {
         Log::info('========== SEPAY WEBHOOK START ==========');
+
+        // ✅ Xác thực request webhook từ SePay (Security check)
+        if (!$this->sePay->verifyWebhook($request)) {
+            Log::error('❌ Invalid SePay webhook token');
+            return response()->json(['success' => false, 'message' => 'Invalid webhook token'], 401);
+        }
+
         $data = $request->json()->all();
 
         if (isset($data['notification_type']) && $data['notification_type'] === 'ORDER_PAID') {

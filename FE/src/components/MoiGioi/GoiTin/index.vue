@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="pricing-wrapper">
     <!-- ✅ PAYMENT RESULT MODAL (Tái sử dụng cho success/error/cancel) -->
     <div v-if="paymentResult" class="payment-result-overlay" @click.self="paymentResult = null">
@@ -804,14 +804,22 @@ const confirmPayment = async () => {
       }
     );
 
-    if (res.data?.status && res.data?.data?.qr_image_url) {
-      // ✅ HIỂN THỊ MODAL QR
-      paymentData.value = res.data.data;
+    if (res.data?.status && res.data?.data?.payment_html) {
       showModal.value = false;
-      showPaymentModal.value = true;
-
-      // ✅ Start polling (KHÔNG CẦN vẽ QR)
-      startPolling();
+      
+      // Tạo một div ẩn chứa form HTML và tự động submit sang Sepay
+      const div = document.createElement("div");
+      div.style.display = "none";
+      div.innerHTML = res.data.data.payment_html;
+      document.body.appendChild(div);
+      
+      const form = div.querySelector("form");
+      if (form) {
+        form.submit();
+      } else {
+        paymentResult.value = "error";
+        paymentErrorMessage.value = "Lỗi render cổng thanh toán";
+      }
     } else {
       paymentResult.value = "error";
       paymentErrorMessage.value = "Không tạo được thanh toán";

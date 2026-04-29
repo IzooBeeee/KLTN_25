@@ -30,7 +30,17 @@ class LoaiBatDongSanController extends Controller
             ], 403);
         }
 
-        $data = LoaiBatDongSan::all();
+        $query = LoaiBatDongSan::query();
+
+        if ($request->filled('search')) {
+            $query->where('ten_loai', 'like', "%{$request->search}%");
+        }
+
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active' ? 1 : 0);
+        }
+
+        $data = $query->orderBy('created_at', 'desc')->paginate($request->input('per_page', 5));
 
         return response()->json([
             'status' => true,
@@ -54,7 +64,8 @@ class LoaiBatDongSanController extends Controller
         }
         $data = LoaiBatDongSan::create([
             'ten_loai' => $request->ten_loai,
-            'is_active' => $request->is_active ?? true, // Mặc định là true nếu không có giá trị
+            'mo_ta' => $request->mo_ta,
+            'is_active' => $request->has('is_active') ? $request->is_active : true,
         ]);
 
         return response()->json([
@@ -81,6 +92,7 @@ class LoaiBatDongSanController extends Controller
         $data = LoaiBatDongSan::find($request->id);
         $data->update([
             'ten_loai' => $request->ten_loai,
+            'mo_ta' => $request->mo_ta,
             'is_active' => $request->is_active
         ]);
         return response()->json([

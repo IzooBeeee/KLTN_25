@@ -1,27 +1,19 @@
-﻿<template>
+<template>
   <div class="property-type-management p-4">
     <div class="row mb-4">
       <div class="col-12">
         <div class="card border-0 shadow-sm custom-header-card">
-          <div
-            class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3 gap-3"
-          >
+          <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3 gap-3">
             <div class="p-2">
               <h4 class="mb-0 fw-bold text-primary">
                 <i class="bi bi-tags-fill me-2"></i>Loại bất động sản
               </h4>
-              <small class="text-muted"
-                >Quản lý các danh mục phân loại bất động sản trên hệ
-                thống.</small
-              >
+              <small class="text-muted">Quản lý các danh mục phân loại bất động sản trên hệ thống.</small>
             </div>
 
             <div class="d-flex justify-content-center align-items-center gap-2">
               <div class="input-group" style="max-width: 200px">
-                <select
-                  v-model="statusFilter"
-                  class="form-select custom-input text-muted rounded-pill"
-                >
+                <select v-model="statusFilter" @change="applyFilter" class="form-select custom-input text-muted rounded-pill">
                   <option value="">Tất cả trạng thái</option>
                   <option value="active">Đang hoạt động</option>
                   <option value="inactive">Đã khóa</option>
@@ -29,24 +21,13 @@
               </div>
 
               <div class="input-group" style="max-width: 250px">
-                <input
-                  v-model="search"
-                  type="text"
-                  class="form-control custom-input rounded-start-pill"
-                  placeholder="Tìm tên loại BĐS..."
-                />
-                <button
-                  class="btn btn-outline-secondary shadow-none rounded-end-circle"
-                  type="button"
-                >
+                <input v-model="search" @keyup.enter="applyFilter" type="text" class="form-control custom-input rounded-start-pill" placeholder="Tìm tên loại BĐS..." />
+                <button @click="applyFilter" class="btn btn-outline-secondary shadow-none rounded-end-circle" type="button">
                   <i class="bi bi-search"></i>
                 </button>
               </div>
 
-              <button
-                @click="openAdd"
-                class="btn btn-primary text-nowrap rounded-pill btn-lg shadow-sm fw-bold d-flex align-items-center"
-              >
+              <button @click="openAdd" class="btn btn-primary text-nowrap rounded-pill btn-lg shadow-sm fw-bold d-flex align-items-center btn-hover-elevate">
                 <i class="bi bi-plus-circle me-2"></i> Thêm loại BĐS
               </button>
             </div>
@@ -55,126 +36,59 @@
       </div>
     </div>
 
-    <div class="row mb-4 g-3">
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm">
-          <div
-            class="card-body d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <small class="text-muted fw-bold">TỔNG SỐ DANH MỤC</small>
-              <h3 class="fw-bold text-primary mb-0">
-                {{ loaiBDSList.length }}
-              </h3>
-            </div>
-            <i class="bi bi-ui-radios-grid fs-1 text-primary opacity-25"></i>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm bg-success text-white">
-          <div
-            class="card-body d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <small class="opacity-75 fw-bold">ĐANG HOẠT ĐỘNG</small>
-              <h3 class="fw-bold mb-0">{{ soDangHoatDong }}</h3>
-            </div>
-            <i class="bi bi-check-circle fs-1 opacity-25"></i>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm bg-danger bg-opacity-10">
-          <div
-            class="card-body d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <small class="text-danger fw-bold">ĐÃ KHÓA</small>
-              <h3 class="fw-bold text-danger mb-0">{{ soBiKhoa }}</h3>
-            </div>
-            <i class="bi bi-lock fs-1 text-danger opacity-50"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card border-0 shadow-sm mb-4">
-      <!-- Thay thế toàn bộ <div class="card-body p-0">...</div> chứa table bằng: -->
+    <div class="card border-0 shadow-sm mb-4 glass-card">
       <div class="card-list p-3">
         <!-- Loading State -->
         <div v-if="isLoading" class="text-center py-5">
-          <div class="spinner-border text-primary" role="status"></div>
-          <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+          <div class="spinner-grow text-primary" role="status"></div>
+          <p class="mt-2 text-muted fw-bold tracking-widest">ĐANG TẢI DỮ LIỆU...</p>
         </div>
 
         <!-- Empty State -->
-        <div
-          v-else-if="filteredList.length === 0"
-          class="text-center py-5 text-muted"
-        >
-          <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-          Không có dữ liệu danh mục
+        <div v-else-if="loaiBDSList.length === 0" class="text-center py-5 text-muted empty-state-animated">
+          <i class="bi bi-inbox fs-1 d-block mb-3 text-primary opacity-50"></i>
+          <h5 class="fw-bold">Không tìm thấy dữ liệu</h5>
+          <p class="small">Hãy thử điều chỉnh lại bộ lọc hoặc thêm mới.</p>
         </div>
 
         <!-- Card Items -->
-        <div v-else class="d-flex flex-column gap-2">
-          <div
-            v-for="item in paginatedList"
-            :key="item.id"
-            class="card-item d-flex align-items-center justify-content-between p-3 bg-white border rounded-3 shadow-sm hover-shadow"
-          >
-            <!-- Left: Icon + Info -->
-            <div class="d-flex align-items-center gap-3 flex-grow-1">
-              <div
-                class="avatar-sm bg-primary bg-opacity-10 text-primary rounded-3 d-flex align-items-center justify-content-center"
-              >
-                <i class="bi bi-tag-fill"></i>
+        <div v-else class="d-flex flex-column gap-3">
+          <div v-for="(item, index) in loaiBDSList" :key="item.id" 
+               class="card-item d-flex align-items-center justify-content-between p-3 bg-white border rounded-4 shadow-sm hover-shadow-lg transition-all"
+               :style="{ animationDelay: `${index * 0.05}s` }">
+            
+            <div class="d-flex align-items-center gap-4 flex-grow-1">
+              <div class="icon-box bg-gradient-primary text-white rounded-3 shadow-sm d-flex align-items-center justify-content-center">
+                <i class="bi bi-tag-fill fs-5"></i>
               </div>
               <div>
-                <h6 class="fw-bold text-dark mb-0">
-                  {{ item.ten_loai || item.name }}
-                </h6>
-                <small class="text-muted"
-                  >ID: #{{ String(item.id).padStart(3, "0") }}</small
-                >
+                <h6 class="fw-bold text-dark mb-1 fs-5">{{ item.ten_loai }}</h6>
+                <div class="d-flex gap-3 align-items-center">
+                  <small class="text-muted"><i class="bi bi-hash"></i>{{ String(item.id).padStart(3, "0") }}</small>
+                  <small v-if="item.mo_ta" class="text-muted border-start ps-3 text-truncate" style="max-width: 300px;">
+                    {{ item.mo_ta }}
+                  </small>
+                </div>
               </div>
             </div>
 
-            <!-- Center: Status -->
-            <div class="text-center px-3">
-              <button
-                @click="changeStatus(item, !item.is_active)"
-                :class="
-                  item.is_active !== false && item.is_active !== 0
-                    ? 'badge-active'
-                    : 'badge-inactive'
-                "
-                class="badge w-100 px-3 py-2 rounded-pill small fw-bold border-0 cursor-pointer"
-              >
-                {{
-                  item.is_active !== false && item.is_active !== 0
-                    ? "Đang hoạt động"
-                    : "Đã khóa"
-                }}
-              </button>
+            <div class="text-center px-4">
+              <div class="form-check form-switch custom-switch">
+                <input class="form-check-input shadow-sm" type="checkbox" role="switch"
+                       :checked="item.is_active == 1" 
+                       @change="changeStatus(item, $event.target.checked)" />
+                <label class="form-check-label small fw-bold mt-1" :class="item.is_active == 1 ? 'text-success' : 'text-danger'">
+                  {{ item.is_active == 1 ? "Hoạt động" : "Đã khóa" }}
+                </label>
+              </div>
             </div>
 
-            <!-- Right: Actions -->
-            <div class="d-flex gap-1">
-              <button
-                @click="openEdit(item)"
-                class="btn-icon-sm btn-light-primary"
-                title="Sửa"
-              >
-                <i class="bi bi-pencil"></i>
+            <div class="d-flex gap-2">
+              <button @click="openEdit(item)" class="btn-icon btn-light-primary shadow-sm" title="Sửa">
+                <i class="bi bi-pencil-fill"></i>
               </button>
-              <button
-                @click="openDelete(item)"
-                class="btn-icon-sm btn-light-danger"
-                title="Xóa"
-              >
-                <i class="bi bi-trash"></i>
+              <button @click="openDelete(item)" class="btn-icon btn-light-danger shadow-sm" title="Xóa">
+                <i class="bi bi-trash3-fill"></i>
               </button>
             </div>
           </div>
@@ -182,185 +96,84 @@
       </div>
 
       <!-- Pagination Footer -->
-      <div class="card-footer bg-white border-0 py-3 px-4">
-        <div
-          class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3"
-        >
-          <!-- Info -->
-          <small class="text-muted fw-medium">
-            {{ paginationInfo }}
+      <div class="card-footer bg-white border-top-0 py-4 px-4 rounded-bottom-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+          <small class="text-muted fw-bold">
+            Hiển thị {{ pagination.from || 0 }} - {{ pagination.to || 0 }} của tổng số {{ pagination.total || 0 }} danh mục
           </small>
 
-          <!-- Pagination Buttons -->
-          <div class="d-flex align-items-center gap-1" v-if="totalPages > 1">
-            <!-- Previous -->
-            <button
-              @click="prevPage"
-              :disabled="currentPage === 1"
-              class="btn btn-sm btn-light border"
-              :class="{ disabled: currentPage === 1 }"
-            >
-              &laquo;
+          <div class="d-flex align-items-center gap-2" v-if="pagination.last_page > 1">
+            <button @click="goToPage(pagination.current_page - 1)" :disabled="pagination.current_page === 1" class="btn btn-sm btn-outline-primary rounded-circle pagination-btn">
+              <i class="bi bi-chevron-left"></i>
             </button>
-
-            <!-- Page Numbers -->
-            <button
-              v-for="page in visiblePages"
-              :key="page"
-              @click="goToPage(page)"
-              class="btn btn-sm btn-primary"
-              :class="
-                page === currentPage
-                  ? 'btn-primary'
-                  : 'btn-light border text-muted'
-              "
-            >
+            <button v-for="page in visiblePages" :key="page" @click="goToPage(page)" class="btn btn-sm rounded-circle pagination-btn fw-bold" :class="page === pagination.current_page ? 'btn-primary shadow' : 'btn-light text-muted'">
               {{ page }}
             </button>
-
-            <!-- Next -->
-            <button
-              @click="nextPage"
-              :disabled="currentPage === totalPages"
-              class="btn btn-sm btn-light border"
-              :class="{ disabled: currentPage === totalPages }"
-            >
-              &raquo;
+            <button @click="goToPage(pagination.current_page + 1)" :disabled="pagination.current_page === pagination.last_page" class="btn btn-sm btn-outline-primary rounded-circle pagination-btn">
+              <i class="bi bi-chevron-right"></i>
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div
-      v-if="showAdd || showEdit || showDelete"
-      class="modal-backdrop fade show"
-      style="z-index: 1040"
-    ></div>
-
-    <div
-      v-if="showAdd || showEdit"
-      class="modal fade show d-block"
-      tabindex="-1"
-      style="z-index: 1050"
-    >
+    <!-- Modal Form (Add/Edit) -->
+    <div v-if="showAdd || showEdit" class="modal-backdrop fade show" style="z-index: 1040"></div>
+    <div v-if="showAdd || showEdit" class="modal fade show d-block" tabindex="-1" style="z-index: 1050">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-          <div class="modal-header border-0 pt-4 px-4 pb-0">
-            <h5 class="fw-bold text-primary mb-0">
-              <i class="bi bi-bookmark-star-fill me-2"></i
-              >{{
-                showAdd
-                  ? "Thêm Loại Bất Động Sản"
-                  : "Cập nhật Loại Bất Động Sản"
-              }}
+        <div class="modal-content border-0 shadow-lg rounded-4 glass-modal">
+          <div class="modal-header border-0 pt-4 px-4 pb-2">
+            <h5 class="fw-bold text-primary mb-0 d-flex align-items-center gap-2">
+              <div class="icon-box-sm bg-primary text-white rounded-circle"><i class="bi bi-bookmark-star"></i></div>
+              {{ showAdd ? "Thêm Mới Danh Mục" : "Cập Nhật Danh Mục" }}
             </h5>
-            <button
-              @click="closeModals"
-              type="button"
-              class="btn-close shadow-none"
-            ></button>
+            <button @click="closeModals" type="button" class="btn-close shadow-none bg-light rounded-circle p-2"></button>
           </div>
-          <div class="modal-body px-4 py-4">
-            <div class="mb-3">
-              <label
-                class="form-label small fw-bold text-muted text-uppercase tracking-widest"
-                >Tên loại BĐS <span class="text-danger">*</span></label
-              >
-              <input
-                v-model="formData.ten_loai"
-                type="text"
-                placeholder="VD: Căn hộ chung cư"
-                class="form-control custom-input fw-bold"
-              />
+          <div class="modal-body px-4 py-3">
+            <div class="mb-4 form-floating-custom">
+              <label class="form-label small fw-bold text-muted tracking-widest mb-2">TÊN LOẠI BĐS <span class="text-danger">*</span></label>
+              <input v-model="formData.ten_loai" type="text" placeholder="VD: Căn hộ chung cư cao cấp" class="form-control custom-input fw-bold bg-light border-0" />
             </div>
-            <div class="mb-3">
-              <label
-                class="form-label small fw-bold text-muted text-uppercase tracking-widest"
-                >Mô tả</label
-              >
-              <textarea
-                v-model="formData.mo_ta"
-                rows="3"
-                placeholder="Nhập mô tả ngắn gọn..."
-                class="form-control custom-input fw-medium"
-              ></textarea>
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-muted tracking-widest mb-2">MÔ TẢ CHI TIẾT</label>
+              <textarea v-model="formData.mo_ta" rows="3" placeholder="Nhập mô tả về loại bất động sản này..." class="form-control custom-input bg-light border-0"></textarea>
             </div>
-            <div class="mb-2">
-              <label
-                class="form-label small fw-bold text-muted text-uppercase tracking-widest"
-                >Trạng thái</label
-              >
-              <div class="form-check form-switch fs-5">
-                <input
-                  v-model="formData.is_active"
-                  class="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                />
-                <label
-                  class="form-check-label fs-6 fw-medium text-dark ms-2 mt-1"
-                  >{{ formData.is_active ? "Kích hoạt" : "Tạm khóa" }}</label
-                >
+            <div class="mb-2 p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+              <div>
+                <h6 class="fw-bold mb-1">Trạng thái hoạt động</h6>
+                <small class="text-muted">Cho phép khách hàng nhìn thấy loại BĐS này</small>
+              </div>
+              <div class="form-check form-switch custom-switch fs-4 mb-0">
+                <input v-model="formData.is_active" class="form-check-input cursor-pointer" type="checkbox" role="switch" />
               </div>
             </div>
           </div>
-          <div class="modal-footer border-0 pb-4 px-4 pt-0">
-            <button
-              @click="closeModals"
-              class="btn btn-light rounded-pill px-4"
-            >
-              Hủy bỏ
-            </button>
-            <button
-              @click="saveData"
-              class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm"
-            >
-              {{ showAdd ? "Lưu thông tin" : "Lưu thay đổi" }}
+          <div class="modal-footer border-0 pb-4 px-4 pt-0 justify-content-end">
+            <button @click="closeModals" class="btn btn-light rounded-pill px-4 fw-bold">Hủy bỏ</button>
+            <button @click="saveData" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+              <i class="bi bi-check2-circle"></i> {{ showAdd ? "Lưu thông tin" : "Lưu thay đổi" }}
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div
-      v-if="showDelete"
-      class="modal fade show d-block"
-      tabindex="-1"
-      style="z-index: 1050"
-    >
+    <!-- Modal Delete -->
+    <div v-if="showDelete" class="modal fade show d-block" tabindex="-1" style="z-index: 1050">
       <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow-lg rounded-4 text-center p-4">
           <div class="mb-3">
-            <div
-              class="avatar-sm bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center mx-auto"
-              style="width: 60px; height: 60px"
-            >
-              <i class="bi bi-trash3-fill fs-1"></i>
+            <div class="avatar-lg bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 70px; height: 70px">
+              <i class="bi bi-exclamation-triangle-fill fs-1"></i>
             </div>
           </div>
-          <h5 class="fw-bold mb-3">Xác nhận xóa!</h5>
-          <p class="text-muted mb-4 small">
-            Xóa danh mục
-            <strong class="text-danger"
-              >"{{ deleteData?.ten_loai || deleteData?.name }}"</strong
-            >?<br />
-            Cảnh báo: Hành động này có thể ảnh hưởng đến các BĐS đang thuộc danh
-            mục này.
+          <h4 class="fw-bold mb-2">Xóa danh mục?</h4>
+          <p class="text-muted mb-4 small px-2">
+            Hành động này sẽ xóa danh mục <strong class="text-danger">"{{ deleteData?.ten_loai }}"</strong> vĩnh viễn. Không thể hoàn tác!
           </p>
-          <div class="d-flex justify-content-center gap-2">
-            <button
-              @click="closeModals"
-              class="btn btn-light rounded-pill px-4"
-            >
-              Hủy
-            </button>
-            <button
-              @click="confirmDelete"
-              class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm"
-            >
-              Xóa ngay
-            </button>
+          <div class="d-flex flex-column gap-2">
+            <button @click="confirmDelete" class="btn btn-danger rounded-pill fw-bold w-100 py-2 shadow-sm">Có, xóa ngay</button>
+            <button @click="closeModals" class="btn btn-light rounded-pill fw-bold w-100 py-2">Không, hủy bỏ</button>
           </div>
         </div>
       </div>
@@ -384,10 +197,14 @@ export default {
       showEdit: false,
       showDelete: false,
 
-      currentPage: 1,
-      itemsPerPage: 5,
+      pagination: {
+        current_page: 1,
+        last_page: 1,
+        total: 0,
+        from: 0,
+        to: 0,
+      },
 
-      // Model chung cho thêm & sửa
       formData: {
         id: null,
         ten_loai: "",
@@ -395,25 +212,15 @@ export default {
         is_active: true,
       },
       deleteData: null,
-
-      // Cập nhật Base URL API của bạn
     };
   },
 
   computed: {
-    paginatedList() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.filteredList.slice(start, end);
-    },
-    totalPages() {
-      return Math.ceil(this.filteredList.length / this.itemsPerPage);
-    },
     visiblePages() {
       const pages = [];
-      const maxVisible = 5; // Số nút page hiển thị tối đa
-      let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
-      let end = Math.min(this.totalPages, start + maxVisible - 1);
+      const maxVisible = 5;
+      let start = Math.max(1, this.pagination.current_page - Math.floor(maxVisible / 2));
+      let end = Math.min(this.pagination.last_page, start + maxVisible - 1);
 
       if (end - start < maxVisible - 1) {
         start = Math.max(1, end - maxVisible + 1);
@@ -424,78 +231,42 @@ export default {
       }
       return pages;
     },
-
-    // Info phân trang cho footer
-    paginationInfo() {
-      const start =
-        this.filteredList.length === 0
-          ? 0
-          : (this.currentPage - 1) * this.itemsPerPage + 1;
-      const end = Math.min(
-        this.currentPage * this.itemsPerPage,
-        this.filteredList.length
-      );
-      return `Hiển thị ${start}-${end} của ${this.filteredList.length} danh mục`;
-    },
-    
-    filteredList() {
-      let data = [...this.loaiBDSList];
-
-      // Lọc theo tên
-      if (this.search) {
-        const kw = this.search.toLowerCase();
-        data = data.filter((v) =>
-          (v.ten_loai || v.name || "").toLowerCase().includes(kw)
-        );
-      }
-
-      // Lọc theo trạng thái
-      if (this.statusFilter === "active") {
-        data = data.filter((v) => v.is_active !== false && v.is_active !== 0);
-      } else if (this.statusFilter === "inactive") {
-        data = data.filter((v) => v.is_active === false || v.is_active === 0);
-      }
-
-      return data;
-    },
-    soDangHoatDong() {
-      return this.loaiBDSList.filter(
-        (v) => v.is_active !== false && v.is_active !== 0
-      ).length;
-    },
-    soBiKhoa() {
-      return this.loaiBDSList.filter(
-        (v) => v.is_active === false || v.is_active === 0
-      ).length;
-    },
   },
 
   mounted() {
-    this.loadData();
+    this.loadData(1);
   },
 
   methods: {
-    getToken() {
-      return (
-        localStorage.getItem("token") || localStorage.getItem("auth_token")
-      );
+    applyFilter() {
+      this.loadData(1);
     },
 
-    getHeaders() {
-      const token = this.getToken();
-      return {
-        headers: { Authorization: `Bearer ${token}` },
-      };
+    goToPage(page) {
+      if (page >= 1 && page <= this.pagination.last_page) {
+        this.loadData(page);
+      }
     },
 
-    // 1. GET DATA
-    async loadData() {
+    async loadData(page = 1) {
       this.isLoading = true;
       try {
-        const res = await api.get('/admin/loai-bds/data');
+        const params = {
+          page: page,
+          search: this.search,
+          status: this.statusFilter
+        };
+        const res = await api.get('/admin/loai-bds/data', { params });
         if (res.data?.status) {
-          // Xử lý linh hoạt cấu trúc trả về của API
-          this.loaiBDSList = res.data.data?.data || res.data.data || [];
+          const paginationData = res.data.data;
+          this.loaiBDSList = paginationData.data || [];
+          this.pagination = {
+            current_page: paginationData.current_page,
+            last_page: paginationData.last_page,
+            total: paginationData.total,
+            from: paginationData.from,
+            to: paginationData.to,
+          };
         }
       } catch (err) {
         console.error("Lỗi load danh sách:", err);
@@ -504,7 +275,6 @@ export default {
       }
     },
 
-    // Xử lý giao diện Modals
     openAdd() {
       this.formData = { id: null, ten_loai: "", mo_ta: "", is_active: true };
       this.showAdd = true;
@@ -512,12 +282,11 @@ export default {
     },
 
     openEdit(item) {
-      // Map đúng tên trường trả về từ database
       this.formData = {
         id: item.id,
-        ten_loai: item.ten_loai || item.name || "",
-        mo_ta: item.mo_ta || item.description || "",
-        is_active: item.is_active !== false && item.is_active !== 0,
+        ten_loai: item.ten_loai,
+        mo_ta: item.mo_ta || "",
+        is_active: item.is_active == 1,
       };
       this.showEdit = true;
       document.body.classList.add("modal-open");
@@ -538,14 +307,12 @@ export default {
       document.body.classList.remove("modal-open");
     },
 
-    // 2. TẠO & CẬP NHẬT (Lưu thông tin)
     async saveData() {
       if (!this.formData.ten_loai.trim()) {
         alert("Vui lòng nhập tên loại BĐS!");
         return;
       }
 
-      // Format data (Chuyển boolean sang 1/0 nếu DB yêu cầu)
       const payload = {
         ten_loai: this.formData.ten_loai,
         mo_ta: this.formData.mo_ta,
@@ -554,214 +321,201 @@ export default {
 
       try {
         if (this.showAdd) {
-          // POST /create
           await api.post('/admin/loai-bds/create', payload);
-          alert("Thêm thành công!");
         } else {
-          // PUT /update/{id}
           await api.put(`/admin/loai-bds/update/${this.formData.id}`, payload);
-          alert("Cập nhật thành công!");
         }
-        this.loadData();
+        this.loadData(this.pagination.current_page);
         this.closeModals();
       } catch (err) {
-        console.error("Lỗi lưu dữ liệu:", err);
         alert(err.response?.data?.message || "Có lỗi xảy ra khi lưu dữ liệu.");
       }
     },
 
-    // 3. XÓA (DELETE /delete/{id})
     async confirmDelete() {
       if (!this.deleteData?.id) return;
       try {
         await api.delete(`/admin/loai-bds/delete/${this.deleteData.id}`);
-        alert("Xóa thành công!");
-        this.loadData();
+        this.loadData(this.pagination.current_page);
         this.closeModals();
       } catch (err) {
-        console.error("Lỗi xóa dữ liệu:", err);
         alert(err.response?.data?.message || "Không thể xóa danh mục này.");
       }
     },
 
-    //4. Thay đổi trạng thái
-    async changeStatus(customer, newStatus) {
+    async changeStatus(item, isChecked) {
+      const originalStatus = item.is_active;
       try {
-        const token = this.getToken();
-        if (!token) return;
-        const res = await api.post('/admin/loai-bds/change-status', { id: customer.id, is_active: newStatus ? 1 : 0 });
-        if (res.data?.status) {
-          customer.is_active = newStatus;
-          this.showToast(newStatus ? "Đã kích hoạt" : "Đã khóa", "success");
-        }
+        item.is_active = isChecked ? 1 : 0; 
+        const res = await api.post('/admin/loai-bds/change-status', { 
+          id: item.id, 
+          is_active: isChecked ? 1 : 0 
+        });
+        if (!res.data?.status) throw new Error("Cập nhật thất bại");
       } catch (err) {
-        this.handleError(err, "Cập nhật trạng thái thất bại");
+        item.is_active = originalStatus; 
+        alert("Cập nhật trạng thái thất bại");
       }
-    },
-
-    // Chuyển trang
-    goToPage(page) {
-      if (page < 1 || page > this.totalPages || page === this.currentPage)
-        return;
-      this.currentPage = page;
-      // Scroll lên đầu danh sách khi đổi trang
-      document
-        .querySelector(".card-list")
-        ?.scrollIntoView({ behavior: "smooth" });
-    },
-
-    // Trang trước / sau
-    prevPage() {
-      this.goToPage(this.currentPage - 1);
-    },
-    nextPage() {
-      this.goToPage(this.currentPage + 1);
-    },
-
-    // Reset về trang 1 khi filter/search thay đổi
-    resetPagination() {
-      this.currentPage = 1;
     },
   },
 };
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 .property-type-management {
-  font-family: "Inter", sans-serif;
-  background-color: #f8f9fa;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background-color: #f4f7fe;
   min-height: 100vh;
 }
 
-/* Custom UI Core */
-.card {
-  border-radius: 16px;
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
 }
+
+.tracking-widest {
+  letter-spacing: 1.5px;
+}
+
+.card {
+  border-radius: 20px;
+}
+
 .custom-header-card {
   background: white;
 }
-.avatar-sm {
-  width: 40px;
-  height: 40px;
-  font-size: 1.2rem;
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
 }
 
-/* Input Fields */
-.custom-input {
-  border-radius: 10px;
-  padding: 10px 15px;
-  border: 1px solid #dee2e6;
-  background-color: #fcfcfc;
-  transition: all 0.2s;
+.glass-modal {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
 }
+
+.icon-box {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.icon-box-sm {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-input {
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .custom-input:focus {
   border-color: #0d6efd;
-  background-color: white;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
 }
 
-/* Switch Toggle (Thay đổi style form-switch của bootstrap) */
-.form-switch .form-check-input {
-  width: 2.5em;
-  height: 1.25em;
-  cursor: pointer;
+.btn-hover-elevate {
+  transition: all 0.3s ease;
 }
-.form-switch .form-check-input:checked {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
+.btn-hover-elevate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(13, 110, 253, 0.3) !important;
 }
 
-/* Buttons Icon */
+.card-item {
+  animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes slideInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.hover-shadow-lg:hover {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+  transform: translateY(-2px);
+}
+
+.custom-switch .form-check-input {
+  width: 3em;
+  height: 1.5em;
+  border-radius: 2em;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.custom-switch .form-check-input:checked {
+  background-color: #10b981;
+  border-color: #10b981;
+}
+
 .btn-icon {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  transition: all 0.2s;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: none;
 }
+
 .btn-light-primary {
-  background: #e7f1ff;
-  color: #0d6efd;
-  border: none;
+  background: #eef2ff;
+  color: #4f46e5;
 }
+
 .btn-light-danger {
-  background: #fff5f5;
-  color: #dc3545;
-  border: none;
+  background: #fef2f2;
+  color: #ef4444;
 }
+
+.btn-icon:hover {
+  transform: translateY(-2px) scale(1.05);
+}
+
 .btn-light-primary:hover {
-  background: #0d6efd;
+  background: #4f46e5;
   color: white;
-  transform: translateY(-1px);
 }
+
 .btn-light-danger:hover {
-  background: #dc3545;
+  background: #ef4444;
   color: white;
-  transform: translateY(-1px);
 }
 
-/* Table Styling */
-.table thead th {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  font-weight: 700;
-  color: #6c757d;
-  background-color: #fcfcfc;
-  padding: 15px;
-  border: none;
-}
-.table tbody td {
-  padding: 15px;
-  border-bottom: 1px solid #f1f1f1;
-}
-
-/* Status Badges */
-.badge-active {
-  background-color: #e6fcf5;
-  color: #087f5b;
-}
-.badge-inactive {
-  background-color: #fff5f5;
-  color: #dc3545;
-}
-
-/* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #dee2e6;
-  border-radius: 10px;
-}
-
-/* Pagination Button Styles */
-.btn-sm.rounded-circle {
-  width: 32px;
-  height: 32px;
+.pagination-btn {
+  width: 36px;
+  height: 36px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.875rem;
   transition: all 0.2s;
 }
 
-.btn-sm.rounded-circle:hover:not(.disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.empty-state-animated i {
+  animation: float 3s ease-in-out infinite;
 }
 
-.btn-sm.rounded-circle.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
 }
-
-/* Reset pagination khi filter thay đổi */
-/* Thêm watch để auto reset */
 </style>

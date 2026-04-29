@@ -75,7 +75,7 @@ class MoiGioiController extends Controller
 
         $user->tokens()->where('id', '!=', $currentTokenId)->delete();
 
-        $user->password = Hash::make($request->password);
+        $user->password = bcrypt($request->password);
         $user->save();
 
         return response()->json([
@@ -116,7 +116,7 @@ class MoiGioiController extends Controller
             'ten' => $request->ten,
             'email' => $request->email,
             'so_dien_thoai' => $request->so_dien_thoai,
-            'password' => Hash::make($request->input('password')),
+            'password' => bcrypt($request->input('password')),
             'zalo_link' => $request->zalo_link ?? '',
             'mo_ta' => $request->mo_ta ?? '',
             'is_active' => true,
@@ -410,7 +410,7 @@ class MoiGioiController extends Controller
         $code = rand(100000, 999999);
 
         $mg->update([
-            'hash_reset' => Hash::make($code),
+            'hash_reset' => bcrypt($code),
             'hash_reset_expires_at' => now()->addMinutes(5),
         ]);
 
@@ -507,7 +507,7 @@ class MoiGioiController extends Controller
         }
 
         $mg->update([
-            'password' => Hash::make($request->password),
+            'password' => bcrypt($request->password),
             'hash_reset' => null,
             'hash_reset_expires_at' => null,
         ]);

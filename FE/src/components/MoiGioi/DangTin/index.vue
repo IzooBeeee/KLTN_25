@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="property-posting-wrapper">
     <!-- Progress Steps -->
     <div class="progress-header">
@@ -682,6 +682,7 @@ watch(
     } catch (error) {
       console.error("Load districts error:", error);
     }
+    debouncedForwardGeocode();
   },
 );
 
@@ -708,6 +709,7 @@ watch(
     } catch (error) {
       console.error("❌ Lỗi load phường xã:", error);
     }
+    debouncedForwardGeocode();
   },
 );
 
@@ -727,6 +729,7 @@ watch(
     if (phuong) {
       showWardBoundary(phuong.ten);
     }
+    debouncedForwardGeocode();
   },
 );
 
@@ -1032,9 +1035,78 @@ const debouncedReverseGeocode = (lat, lng) => {
 };
 
 const updateDiaChiChiTiet = () => {
-  form.dia_chi_chi_tiet = soNha.value
-    ? `${soNha.value}, ${addressFromMap.value}`
-    : addressFromMap.value;
+  // Khi người dùng gõ số nhà, ta kết hợp với chuỗi địa chỉ từ map hoặc chuỗi từ dropdown
+  if (addressFromMap.value) {
+    form.dia_chi_chi_tiet = soNha.value
+      ? `${soNha.value}, ${addressFromMap.value}`
+      : addressFromMap.value;
+  } else {
+    form.dia_chi_chi_tiet = getFullAddressString();
+  }
+  debouncedForwardGeocode();
+};
+
+const getFullAddressString = () => {
+  const tinh = tinhThanhList.value.find(t => t.id === form.tinh_id)?.ten || "";
+  const quan = quanHuyenList.value.find(q => q.id === form.quan_id)?.ten || "";
+  const phuong = phuongList.value.find(p => p.id === form.phuong_id)?.ten || "";
+  
+  let parts = [];
+  if (soNha.value) parts.push(soNha.value);
+  if (phuong) parts.push(phuong);
+  if (quan) parts.push(quan);
+  if (tinh) parts.push(tinh);
+  
+  return parts.join(", ");
+};
+
+const forwardGeocode = async () => {
+  const addressQuery = getFullAddressString();
+  // Chỉ tìm kiếm khi đã chọn ít nhất Tỉnh và Quận
+  if (!form.tinh_id || !form.quan_id || !mapInstance.value) return;
+
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressQuery)}`);
+    const data = await response.json();
+    if (data && data.length > 0) {
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      
+      form.latitude = lat;
+      form.longitude = lon;
+      
+      if (!markerInstance.value) {
+        markerInstance.value = L.marker([lat, lon], {
+          icon: customLeafletIcon,
+          draggable: true,
+        }).addTo(mapInstance.value);
+        
+        markerInstance.value.on("dragend", (e) => {
+          const pos = e.target.getLatLng();
+          form.latitude = pos.lat;
+          form.longitude = pos.lng;
+          debouncedReverseGeocode(pos.lat, pos.lng);
+        });
+      } else {
+        markerInstance.value.setLatLng([lat, lon]);
+      }
+      mapInstance.value.setView([lat, lon], 16);
+      
+      if (!addressFromMap.value) {
+         form.dia_chi_chi_tiet = addressQuery;
+      }
+    }
+  } catch (error) {
+    console.warn("Forward geocoding failed:", error);
+  }
+};
+
+let forwardGeocodeTimer = null;
+const debouncedForwardGeocode = () => {
+  if (forwardGeocodeTimer) clearTimeout(forwardGeocodeTimer);
+  forwardGeocodeTimer = setTimeout(() => {
+    forwardGeocode();
+  }, 1000);
 };
 
 // Watch step changes to init/destroy map

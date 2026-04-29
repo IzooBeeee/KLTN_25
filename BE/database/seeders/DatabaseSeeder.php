@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             'loai_bat_dong_sans', 'trang_thai_bat_dong_sans',
             'unmatched_payments', 'phuong_xas',
             'quan_huyens', 'tinh_thanhs',
+            'users',
         ];
         foreach ($tables as $table) {
             \DB::table($table)->truncate();

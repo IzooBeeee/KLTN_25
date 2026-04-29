@@ -13,17 +13,17 @@ class PhuongXaSeeder extends Seeder
     public function run(): void
     {
         PhuongXa::create([
-            'ten' => 'Phường Bến Nghé',
-            'slug' => 'phuong-ben-nghe',
+            'ten' => 'Phường Thạch Thang',
+            'slug' => 'phuong-thach-thang',
             'loai' => 'phuong',
-            'quan_huyen_id' => 1,
+            'quan_huyen_id' => 3, // Hải Châu
         ]);
 
         PhuongXa::create([
-            'ten' => 'Xã Bình Hưng',
-            'slug' => 'xa-binh-hung',
-            'loai' => 'xa',
-            'quan_huyen_id' => 2,
+            'ten' => 'Phường An Hải Bắc',
+            'slug' => 'phuong-an-hai-bac',
+            'loai' => 'phuong',
+            'quan_huyen_id' => 4, // Sơn Trà
         ]);
     }
 }

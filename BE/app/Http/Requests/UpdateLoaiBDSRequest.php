@@ -14,11 +14,10 @@ class UpdateLoaiBDSRequest extends FormRequest
     public function rules()
     {
         return [
-            'ten_loai' => 'required|string|max:255|unique:loai_bat_dong_sans,ten_loai,'
-                . $this->id, // Loại trừ bản ghi hiện tại khi kiểm tra unique
-                'is_active' => 'boolean',
-
-            ];
+            'ten_loai' => 'required|string|max:255|unique:loai_bat_dong_sans,ten_loai,' . $this->id,
+            'mo_ta' => 'nullable|string',
+            'is_active' => 'boolean',
+        ];
     }
 
     public function messages()

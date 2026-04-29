@@ -15,6 +15,8 @@ class CreateLoaiBDSRequest extends FormRequest
     {
         return [
             'ten_loai' => 'required|string|max:255|unique:loai_bat_dong_sans,ten_loai',
+            'mo_ta' => 'nullable|string',
+            'is_active' => 'boolean',
         ];
     }
 
