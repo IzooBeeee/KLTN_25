@@ -10,20 +10,16 @@
       <div class="content">
         <router-view />
       </div>
-      <!-- Footer -->
-      <MoiGioiFooter />
-    </div>
-
-    <!-- Chat Support -->
-    <ChatSupport />
+    <!-- Footer -->
+    <MoiGioiFooter />
   </div>
+</div>
 </template>
 
 <script>
 import MoiGioiMenu from "../../components/MoiGioi/Menu.vue";
 import MoiGioiHeader from "../../components/MoiGioi/Header.vue";
 import MoiGioiFooter from "../../components/MoiGioi/Footer.vue";
-import ChatSupport from "../../../components/Chat/index.vue";
 
 export default {
   name: "MoiGioiLayout",
@@ -31,7 +27,6 @@ export default {
     MoiGioiMenu,
     MoiGioiHeader,
     MoiGioiFooter,
-    ChatSupport,
   },
 
   mounted() {

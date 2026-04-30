@@ -437,19 +437,26 @@ function listenRealtime(conversationId) {
 onMounted(async () => {
   await loadConversations();
   
-  // 🔥 Kiểm tra nếu có active_chat_id từ URL (do nhấn từ thông báo)
+  // 🔥 Kiểm tra nếu có active_chat_id hoặc customer_id từ URL
   const queryChatId = route.query.active_chat_id;
+  const queryCustomerId = route.query.customer_id;
+
   if (queryChatId) {
     const convId = Number(queryChatId);
-    // Kiểm tra xem conversation này có trong list không
     const exists = conversations.value.find(c => c.id === convId);
-    if (exists) {
-      selectChat(convId);
-    } else {
-      // Nếu là chat mới toanh chưa load kịp sidebar, ta vẫn load nội dung
+    if (exists) selectChat(convId);
+    else {
       activeConversationId.value = convId;
       await loadMessages();
       listenRealtime(convId);
+    }
+  } else if (queryCustomerId) {
+    // Tìm conversation của khách hàng này
+    const customerId = Number(queryCustomerId);
+    const conv = conversations.value.find(c => c.khach_hang?.id === customerId);
+    if (conv) selectChat(conv.id);
+    else {
+        console.warn('Không tìm thấy cuộc hội thoại với khách hàng ID:', customerId);
     }
   }
 });

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="min-h-screen bg-[#f0f4f8] font-['Inter'] p-6">
 
     <!-- Page Header -->
@@ -122,22 +122,26 @@
 
         <!-- List -->
         <div v-else class="space-y-3 flex-1 overflow-y-auto max-h-72 pr-1">
-          <div v-for="(customer, index) in customers" :key="index"
-            class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-blue-50 transition-colors cursor-pointer group">
+          <router-link 
+            v-for="(customer, index) in customers" 
+            :key="index"
+            :to="{ path: '/moi-gioi/quan-ly-khach-hang', query: { customer_id: customer.khach_hang?.id } }"
+            class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-blue-50 transition-colors cursor-pointer group no-underline"
+          >
             <img
               :src="customer.khach_hang?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(customer.khach_hang?.ten || 'KH') + '&background=dbeafe&color=3b82f6'"
               class="w-10 h-10 rounded-full object-cover flex-shrink-0 border-2 border-white shadow-sm"
               alt="Customer"
             />
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-gray-800 truncate">{{ customer.khach_hang?.ten }}</p>
-              <p class="text-xs text-blue-500 truncate">{{ customer.bat_dong_san?.tieu_de || 'Quan tâm BĐS' }}</p>
-              <div class="flex items-center justify-between mt-1">
+            <div class="flex-1 min-w-0 text-left">
+              <p class="text-sm font-semibold text-gray-800 truncate mb-0">{{ customer.khach_hang?.ten }}</p>
+              <p class="text-xs text-blue-500 truncate mb-1">{{ customer.bat_dong_san?.tieu_de || 'Quan tâm BĐS' }}</p>
+              <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-400">{{ formatRelativeTime(customer.last_contact) }}</span>
                 <span class="text-xs text-gray-400">{{ customer.contact_count }} lần</span>
               </div>
             </div>
-          </div>
+          </router-link>
         </div>
 
         <router-link to="/moi-gioi/khach-hang"
@@ -257,6 +261,11 @@ export default {
     this.fetchAllStats();
     this.fetchChartData();
     this.fetchCustomers();
+    this.subscribeEcho();
+  },
+
+  beforeUnmount() {
+    // Cleanup nếu cần
   },
 
   methods: {
@@ -376,8 +385,37 @@ export default {
     },
 
     showError(message) {
-      alert(message);
+      if (this.$toast) this.$toast.error(message);
+      else alert(message);
     },
+
+    // ✅ ECHO REALTIME
+    subscribeEcho() {
+      const userStr = localStorage.getItem("moi_gioi_user_info");
+      if (!userStr) return;
+      const user = JSON.parse(userStr);
+      
+      import("@/js/services/echo").then(({ subscribeUser }) => {
+        subscribeUser(user.id, (data) => {
+          console.log("[Dashboard] New notification received:", data);
+          
+          // 1. Tăng số lượt yêu thích trên card
+          this.stats.totalFavorites += 1;
+          
+          // 2. Thêm vào danh sách "Khách hàng liên hệ" (unshift)
+          if (data.khach_hang) {
+            this.customers.unshift({
+              khach_hang: data.khach_hang,
+              bat_dong_san: { id: data.bat_dong_san_id, tieu_de: "Vừa tương tác" },
+              last_contact: new Date().toISOString(),
+              contact_count: 1
+            });
+            // Giới hạn 10 item
+            if (this.customers.length > 10) this.customers.pop();
+          }
+        });
+      });
+    }
   },
 };
 </script>

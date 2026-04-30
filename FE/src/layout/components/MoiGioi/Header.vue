@@ -414,8 +414,16 @@ export default {
         this.unreadCount += 1;
         this.hasNewNotifications = true;
 
-        // ✅ Hiển thị Toast thông báo real-time
-        this.triggerToast(data.tieu_de || "Bạn có thông báo mới!");
+        // ✅ Dùng VueToaster (Global) để hiển thị thông báo
+        if (this.$toast) {
+          this.$toast.info(data.tieu_de || "Bạn có thông báo mới!", {
+            position: "top-right",
+            duration: 5000,
+          });
+        }
+        
+        // Cập nhật lại stats ở dropdown nếu đang mở
+        this.fetchDropdownStats();
 
         // Nếu đang mở dropdown thì refresh list để sync dữ liệu chính xác từ DB nếu cần
         if (this.showNotifications) {
