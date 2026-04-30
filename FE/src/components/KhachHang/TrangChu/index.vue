@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div
     class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen font-['Inter']"
   >
@@ -535,6 +535,7 @@
 
 <script>
 import api from "@/axios/config";
+import { getToken } from "@/js/auth";
 
 export default {
   name: "HomePage",
@@ -795,9 +796,8 @@ export default {
     },
 
     viewProperty(id) {
-      const token = localStorage.getItem("auth_token");
-      const userType = localStorage.getItem("user_type");
-      if (!token || userType !== "khach-hang") {
+      const token = getToken("khach-hang");
+      if (!token) {
         this.showToast("Vui lòng đăng nhập để xem chi tiết", "warning");
         setTimeout(() => this.$router.push("/khach-hang/dang-nhap"), 800);
         return;
@@ -809,7 +809,7 @@ export default {
     async toggleFavorite(id, ev) {
       ev.stopPropagation();
 
-      const token = localStorage.getItem("auth_token");
+      const token = getToken("khach-hang");
       if (!token) {
         this.showToast("Vui lòng đăng nhập để lưu tin", "warning");
         setTimeout(() => this.$router.push("/khach-hang/dang-nhap"), 800);

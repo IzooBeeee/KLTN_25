@@ -164,7 +164,7 @@ beforeUnmount() {
   // 🔥 LOAD TIN NHẮN
   async loadMessages() {
     try {
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("khach_hang_auth_token");
 
       const res = await api.get(`/khach-hang/chat/${this.conversationId}/messages`);
 
@@ -189,7 +189,7 @@ beforeUnmount() {
     const content = this.text.trim();
 
     try {
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("khach_hang_auth_token");
 
       await api.post(`/khach-hang/chat/${this.conversationId}/message`, { content });
 

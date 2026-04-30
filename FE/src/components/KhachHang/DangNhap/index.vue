@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100 p-6">
     <div
       class="flex w-full max-w-6xl bg-white rounded-[40px] shadow-2xl overflow-hidden min-h-[650px]"
@@ -192,6 +192,7 @@
 
 <script>
 import api from "@/axios/config";
+import { setAuth, getToken, clearAuth } from "@/js/auth";
 import { createToaster } from "@meforma/vue-toaster";
 
 const toaster = createToaster({ position: "top-right", duration: 3000 });
@@ -220,7 +221,6 @@ export default {
       this.isLoading = true;
 
       try {
-        // ✅ Login TRỰC TIẾP - KHÔNG gọi /sanctum/csrf-cookie
         const res = await api.post("/khach-hang/dang-nhap", {
           email: this.email,
           password: this.password,
@@ -228,14 +228,13 @@ export default {
 
         if (res.data.status) {
           const token = res.data.token;
-          const role = res.data.data?.role || "khach-hang";
           const userInfo = res.data.data;
 
-          // ✅ Lưu vào localStorage
-          localStorage.setItem("auth_token", token);
-          localStorage.setItem("user_type", role);
-          localStorage.setItem("user_info", JSON.stringify(userInfo));
+          // ✅ Lưu vào key riêng cho khách hàng (không ảnh hưởng admin/moi-gioi)
+          setAuth("khach-hang", token, userInfo);
 
+          // ✅ Thông báo cho Header biết auth đã thay đổi (cùng tab)
+          window.dispatchEvent(new Event("khach-hang-auth-changed"));
 
           toaster.success("Đăng nhập thành công");
 
@@ -262,30 +261,23 @@ export default {
     },
 
     async checkLogin() {
-      const token = localStorage.getItem("auth_token");
+      // ✅ Chỉ kiểm tra token của khách hàng
+      const token = getToken("khach-hang");
       if (!token) return;
 
       try {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         const res = await api.get("/khach-hang/check-token");
 
-        if (res.data.status) {
+        if (res.data.status === "success" || res.data.status === true) {
           if (this.$route.path.includes("dang-nhap")) {
             this.$router.replace("/khach-hang/trang-chu");
           }
         }
       } catch (error) {
         if (error.response?.status === 401) {
-          this.clearAuth();
+          clearAuth("khach-hang");
         }
       }
-    },
-
-    clearAuth() {
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("user_type");
-      localStorage.removeItem("user_info");
-      delete api.defaults.headers.common["Authorization"];
     },
 
     loginGoogle() {

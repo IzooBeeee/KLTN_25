@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100 p-6">
     <div class="flex w-full max-w-6xl bg-white rounded-[40px] shadow-2xl overflow-hidden min-h-[650px]">
 
@@ -172,6 +172,7 @@
 <script>
 import api from '@/axios/config';
 import { createToaster } from "@meforma/vue-toaster";
+import { setAuth } from "@/js/auth";
 
 const toaster = createToaster({ position: "top-right" });
 
@@ -229,9 +230,8 @@ export default {
           const userData = response.data.data?.moi_gioi;
 
           if (token && userData) {
-            localStorage.setItem("auth_token", token);
-            localStorage.setItem("user_type", "moi-gioi");
-            localStorage.setItem("user_info", JSON.stringify(userData));
+            // ✅ Lưu vào key riêng của môi giới (không ảnh hưởng admin/khách hàng)
+            setAuth("moi-gioi", token, userData);
           }
 
           toaster.success("Đăng ký thành công! Chào mừng bạn 🎉");

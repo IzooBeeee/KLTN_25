@@ -400,7 +400,7 @@ export default {
   methods: {
     getToken() {
       return (
-        localStorage.getItem("token") || localStorage.getItem("auth_token")
+        localStorage.getItem("token") || localStorage.getItem("admin_auth_token")
       );
     },
 
@@ -645,7 +645,7 @@ export default {
         return;
       }
 
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("admin_auth_token");
       if (!token) {
         this.showToast("Vui lòng đăng nhập lại!", "error");
         return;

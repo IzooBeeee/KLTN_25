@@ -20,7 +20,15 @@ import Pusher from 'pusher-js';
 
 window.Pusher = Pusher;
 
-const _initToken = localStorage.getItem('auth_token') || '';
+// ✅ Khởi tạo Echo token theo role của URL hiện tại
+// (Mỗi role dùng key riêng để không xung đột khi mở 3 tab cùng lúc)
+const _currentPath = window.location.pathname;
+const _tokenKey = _currentPath.startsWith('/admin')
+  ? 'admin_auth_token'
+  : _currentPath.startsWith('/moi-gioi')
+    ? 'moi_gioi_auth_token'
+    : 'khach_hang_auth_token';
+const _initToken = localStorage.getItem(_tokenKey) || '';
 
 window.Echo = new Echo({
     broadcaster: 'reverb',

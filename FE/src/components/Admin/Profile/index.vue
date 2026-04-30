@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="admin-profile-page">
     <div class="page-header">
       <h1>Hồ sơ admin</h1>
@@ -278,6 +278,7 @@
 import { ref, reactive, onMounted, getCurrentInstance } from "vue";
 import api from "@/axios/config";
 import Swal from "sweetalert2";
+import { clearAuth } from "@/js/auth";
 const showLogoutAllModal = ref(false);
 import { useRouter } from "vue-router";
 const router = useRouter();
@@ -303,10 +304,12 @@ const passwordForm = reactive({
 const logoutCurrent = async () => {
   try {
     await api.get("/admin/dang-xuat");
-    localStorage.removeItem("auth_token");
+    clearAuth("admin");
     router.push("/admin/dang-nhap");
   } catch (error) {
     console.error("Logout error:", error);
+    clearAuth("admin");
+    router.push("/admin/dang-nhap");
   }
 };
 
@@ -316,10 +319,8 @@ const logoutAll = async () => {
     const response = await api.post("/admin/dang-xuat-tat-ca");
 
     if (response.data.status === "success") {
-      // ✅ XÓA LOCAL STORAGE
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("user_type");
-      localStorage.removeItem("user_info");
+      // ✅ XÓA TOKEN ADMIN (không ảnh hưởng role khác)
+      clearAuth("admin");
 
       Swal.fire({
         icon: "success",
@@ -338,9 +339,7 @@ const logoutAll = async () => {
     console.error("Logout error:", error);
 
     // ✅ VẪN XÓA TOKEN NẾU CÓ LỖI
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user_type");
-    localStorage.removeItem("user_info");
+    clearAuth("admin");
 
     Swal.fire({
       icon: "error",

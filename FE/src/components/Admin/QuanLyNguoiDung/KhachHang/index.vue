@@ -473,7 +473,7 @@ export default {
     },
     getToken() {
       return (
-        localStorage.getItem("token") || localStorage.getItem("auth_token")
+        localStorage.getItem("token") || localStorage.getItem("admin_auth_token")
       );
     },
     closeModals() {

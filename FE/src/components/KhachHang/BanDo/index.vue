@@ -94,7 +94,7 @@ const nearby = ref({ lat: "", lng: "", radius: 5 });
 let map = null;
 let markersLayer = null;
 
-const isLoggedIn = !!localStorage.getItem("auth_token");
+const isLoggedIn = !!localStorage.getItem("khach_hang_auth_token");
 
 const initMap = () => {
   map = L.map("ban-do-leaflet").setView([10.7769, 106.7009], 12);

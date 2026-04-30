@@ -213,7 +213,7 @@ const activeContact = computed(() => {
 });
 
 // ===== HELPERS =====
-const getAuthToken = () => localStorage.getItem('auth_token');
+const getAuthToken = () => localStorage.getItem('moi_gioi_auth_token');
 
 const getAvatarUrl = (user) => {
   if (user?.avatar) {

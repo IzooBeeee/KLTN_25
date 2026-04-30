@@ -133,6 +133,7 @@
 import api from "@/axios/config";
 import { createToaster } from "@meforma/vue-toaster";
 import { updateEchoToken, subscribeUser } from '@/js/services/echo';
+import { setAuth, getToken, clearAuth } from "@/js/auth";
 
 const toaster = createToaster({ position: "top-right", duration: 3000 });
 
@@ -174,29 +175,27 @@ export default {
 
         if (res.data.status) {
           const token = res.data.token;
-          const role = res.data.data?.role || "moi-gioi";
+          const userInfo = res.data.data;
 
-          console.log("✅ [Login] Success! Role:", role);
+          console.log("✅ [Login] Success!");
 
-          // ✅ LƯU VÀO LOCALSTORAGE
-          localStorage.setItem("auth_token", token);
-          localStorage.setItem("user_type", role);
-          localStorage.setItem("user_info", JSON.stringify(res.data.data));
+          // ✅ LƯU VÀO KEY RIÊNG cho môi giới (không ảnh hưởng admin/khách hàng)
+          setAuth("moi-gioi", token, userInfo);
+
+          // ✅ Thông báo cho Header biết auth đã thay đổi
+          window.dispatchEvent(new Event("moi-gioi-auth-changed"));
 
           // ✅ UPDATE ECHO AUTH
           updateEchoToken(token);
-          if (res.data.data?.id) {
-            subscribeUser(res.data.data.id);
+          if (userInfo?.id) {
+            subscribeUser(userInfo.id);
           }
-
-          // ✅ SET AUTHORIZATION HEADER
-          api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
           // Remember me
           if (this.rememberMe) {
-            localStorage.setItem("remember_me", "true");
+            localStorage.setItem("moi_gioi_remember_email", this.email);
           } else {
-            localStorage.removeItem("remember_me");
+            localStorage.removeItem("moi_gioi_remember_email");
           }
 
           toaster.success("Đăng nhập thành công");
@@ -224,12 +223,11 @@ export default {
     },
 
     async checkLogin() {
-      const token = localStorage.getItem("auth_token");
-      const userType = localStorage.getItem("user_type");
+      // ✅ Chỉ check token của môi giới
+      const token = getToken("moi-gioi");
 
       console.log("🔍 [Broker CheckLogin]", {
         hasToken: !!token,
-        userType,
         currentPath: this.$route.path,
       });
 
@@ -239,36 +237,26 @@ export default {
         return;
       }
 
-      if (!token || userType !== "moi-gioi") {
-        console.log("❌ No valid broker auth");
+      if (!token) {
+        console.log("❌ No valid broker token");
         return;
       }
 
       try {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
         console.log("🔍 Verifying broker token...");
         const res = await api.get("moi-gioi/check-token");
 
         console.log("✅ Token valid:", res.data);
 
-        if (res.data.status) {
+        if (res.data.status === "success" || res.data.status === true) {
           this.$router.replace("/moi-gioi/trang-chu");
         }
       } catch (error) {
         console.error("❌ Token invalid:", error);
         if (error.response?.status === 401) {
-          this.clearAuth();
+          clearAuth("moi-gioi");
         }
       }
-    },
-
-    clearAuth() {
-      console.log("🗑️ [ClearAuth] Removing auth data...");
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("user_type");
-      localStorage.removeItem("user_info");
-      delete api.defaults.headers.common["Authorization"];
     },
 
     loginGoogle() {

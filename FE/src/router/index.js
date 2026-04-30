@@ -280,34 +280,58 @@ function getHomePath(role) {
   return map[role] || "/";
 }
 
-// ================= AUTH GUARD (CHỈ 1 CÁI DUY NHẤT) == ===============
+// ================= ROLE-SPECIFIC TOKEN KEYS =================
+// Mỗi role dùng localStorage key riêng để có thể đăng nhập đồng thời 3 tab
+const ROLE_TOKEN_KEYS = {
+  admin: "admin_auth_token",
+  "moi-gioi": "moi_gioi_auth_token",
+  "khach-hang": "khach_hang_auth_token",
+};
+
+/**
+ * Lấy token theo role cụ thể
+ */
+function getTokenForRole(role) {
+  const key = ROLE_TOKEN_KEYS[role];
+  return key ? localStorage.getItem(key) : null;
+}
+
+/**
+ * Đoán role từ path đang truy cập
+ */
+function getRoleFromPath(path) {
+  if (path.startsWith("/admin")) return "admin";
+  if (path.startsWith("/moi-gioi")) return "moi-gioi";
+  return "khach-hang";
+}
+
+/**
+ * Lấy token của role tương ứng với path đang truy cập
+ */
+function getTokenForPath(path) {
+  const role = getRoleFromPath(path);
+  return getTokenForRole(role);
+}
+
+// ================= AUTH GUARD =================
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-  
-  let userType = localStorage.getItem("user_type");
-  if (!userType) {
-    try {
-      const userStr = localStorage.getItem("user");
-      if (userStr) {
-        const userObj = JSON.parse(userStr);
-        userType = userObj.loai_tai_khoan || userObj.role;
-      }
-    } catch(e) {}
-  }
+  // ✅ Lấy token theo path đang vào (KHÔNG dùng chung 1 token nữa)
+  const role = getRoleFromPath(to.path);
+  const token = getTokenForRole(role);
 
   console.log("🔍 [Router Guard]", {
     path: to.path,
-    userType,
+    role,
     hasToken: !!token,
     meta: to.meta,
     from: from.path
   });
 
-  // ✅ 1. TRANG LOGIN (GUEST)
+  // ✅ 1. TRANG LOGIN/REGISTER (GUEST) — đã đăng nhập rồi thì redirect về home
   if (to.meta.guest) {
-    if (token && userType) {
-      console.log("✅ Already logged in → redirect to:", getHomePath(userType));
-      return next({ path: getHomePath(userType) });
+    if (token) {
+      console.log("✅ Already logged in as", role, "→ redirect to:", getHomePath(role));
+      return next({ path: getHomePath(role) });
     }
     console.log("⏭️ Guest route, no token → proceed");
     return next();
@@ -315,16 +339,16 @@ router.beforeEach((to, from, next) => {
 
   // ✅ 2. ROUTE CẦN AUTH (CÓ ROLES)
   if (to.meta.roles) {
-    if (!token || !userType) {
-      console.log("❌ No auth → redirect to:", getLoginPath(to.path));
+    if (!token) {
+      console.log("❌ No token for role", role, "→ redirect to:", getLoginPath(to.path));
       return next({ path: getLoginPath(to.path) });
     }
 
     const allowedRoles = Array.isArray(to.meta.roles) ? to.meta.roles : [to.meta.roles];
 
-    if (!allowedRoles.includes(userType)) {
-      console.log("❌ Wrong role:", userType, "allowed:", allowedRoles);
-      return next({ path: getHomePath(userType) });
+    if (!allowedRoles.includes(role)) {
+      console.log("❌ Wrong role:", role, "allowed:", allowedRoles);
+      return next({ path: getHomePath(role) });
     }
 
     console.log("✅ Auth OK → proceed");

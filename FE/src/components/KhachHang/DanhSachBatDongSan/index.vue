@@ -503,7 +503,7 @@ export default {
     },
 
     // 🔐 Auth
-    isAuthenticated() { return !!(localStorage.getItem('auth_token') && localStorage.getItem('user_type') === 'khach-hang'); },
+    isAuthenticated() { return !!(localStorage.getItem('khach_hang_auth_token')); },
     requireAuth(redirectUrl = null) {
       if (!this.isAuthenticated()) {
         this.showToast('Vui lòng đăng nhập để tiếp tục', 'warning');
@@ -520,7 +520,7 @@ export default {
       ev.stopPropagation();
       if (!this.requireAuth()) return;
 
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('khach_hang_auth_token');
       const property = this.properties.find(p => p.id === bdsId);
       const wasFavorite = property?.isFavorite || false;
       const action = wasFavorite ? 'remove' : 'add';
@@ -545,7 +545,7 @@ export default {
     // ✅ Sync favorite list
     async syncFavoriteList() {
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('khach_hang_auth_token');
         if (!token) { this.favoriteIds = []; return; }
 
         const res = await api.get('/khach-hang/bds/yeu-thich/data');

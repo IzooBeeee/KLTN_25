@@ -364,15 +364,19 @@ export default {
     document.addEventListener("click", this.handleClickOutside);
     window.addEventListener("storage", this.checkLogin);
     window.addEventListener("focus", this.checkLogin);
+    // ✅ Lắng nghe auth thay đổi trong cùng tab
+    window.addEventListener("moi-gioi-auth-changed", this.checkLogin);
     this.$router.afterEach(() => {
       this.showMenu = false;
       this.showNotifications = false;
+      this.checkLogin(); // ✅ Re-check sau mỗi navigate
     });
   },
   beforeUnmount() {
     document.removeEventListener("click", this.handleClickOutside);
     window.removeEventListener("storage", this.checkLogin);
     window.removeEventListener("focus", this.checkLogin);
+    window.removeEventListener("moi-gioi-auth-changed", this.checkLogin);
     if (this.menuTimer) clearTimeout(this.menuTimer);
     if (this.pollingInterval) clearInterval(this.pollingInterval);
     // ✅ Leave Echo channel khi unmount
@@ -445,14 +449,14 @@ export default {
     },
     // ========== AUTH ==========
     checkLogin() {
-      const token = localStorage.getItem("auth_token");
-      const userStr = localStorage.getItem("user_info");
-      const role = localStorage.getItem("user_type");
-      if (token && userStr && role === "moi-gioi") {
+      const token = localStorage.getItem("moi_gioi_auth_token");
+      // ✅ Dùng key riêng moi_gioi_user_info
+      const userStr = localStorage.getItem("moi_gioi_user_info");
+      if (token) {
         try {
           this.token = token;
-          this.user = JSON.parse(userStr);
-          this.userType = role;
+          this.user = userStr ? JSON.parse(userStr) : (this.user || { ten: "Môi giới" });
+          this.userType = "moi-gioi";
         } catch (e) {
           console.error("Parse user error:", e);
           this.clearData();
@@ -474,9 +478,8 @@ export default {
       this.$router.push("/moi-gioi/dang-ky");
     },
     handleLogout() {
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("user_info");
-      localStorage.removeItem("user_type");
+      localStorage.removeItem("moi_gioi_auth_token");
+      localStorage.removeItem("moi_gioi_user_info");
       this.clearData();
       this.triggerToast("Đăng xuất thành công!");
       setTimeout(() => {
@@ -486,7 +489,7 @@ export default {
     // ========== NOTIFICATIONS ==========
     async fetchNotifications() {
       this.loadingNotifications = true;
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("moi_gioi_auth_token");
       if (!token) return;
       try {
         const res = await api.get("/moi-gioi/thong-bao");
@@ -567,7 +570,7 @@ export default {
     },
     async markAsRead(id) {
       try {
-        const token = localStorage.getItem("auth_token");
+        const token = localStorage.getItem("moi_gioi_auth_token");
         await api.post(`/moi-gioi/thong-bao/${id}/da-doc`);
       } catch (error) {
         console.error(error);
@@ -575,7 +578,7 @@ export default {
     },
     async markAllAsRead() {
       try {
-        const token = localStorage.getItem("auth_token");
+        const token = localStorage.getItem("moi_gioi_auth_token");
         const response = await api.post("/moi-gioi/thong-bao/doc-tat-ca");
         if (response.data) {
           this.notifications.forEach((n) => (n.da_doc = true));
@@ -591,7 +594,7 @@ export default {
       const removed = this.notifications.splice(index, 1)[0];
       if (!removed.da_doc) this.unreadCount = Math.max(0, this.unreadCount - 1);
       try {
-        const token = localStorage.getItem("auth_token");
+        const token = localStorage.getItem("moi_gioi_auth_token");
         await api.delete(`/moi-gioi/thong-bao/${id}`);
       } catch (e) {
         console.error("Delete error:", e);
@@ -636,7 +639,7 @@ export default {
       if (!this.isLoggedIn) return;
 
       this.loadingPosts = true;
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("moi_gioi_auth_token");
 
       try {
         const res = await api.get("/moi-gioi/thong-ke/tin-con-lai");

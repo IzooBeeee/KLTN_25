@@ -507,7 +507,7 @@ export default {
       }
     },
     hideToast() { this.toast.visible = false; if (this.toast.timer) { clearTimeout(this.toast.timer); this.toast.timer = null; } },
-    isAuthenticated() { return !!(localStorage.getItem('auth_token') && localStorage.getItem('user_type') === 'khach-hang'); },
+    isAuthenticated() { return !!(localStorage.getItem('khach_hang_auth_token')); },
     requireAuth(redirectUrl = null) {
       if (!this.isAuthenticated()) {
         this.showToast('Vui lòng đăng nhập để tiếp tục', 'warning');
@@ -519,7 +519,7 @@ export default {
     async toggleFavorite(bdsId, ev) {
       ev?.stopPropagation();
       if (!this.requireAuth()) return;
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('khach_hang_auth_token');
       const wasFavorite = this.isPropertyFavorite;
       const action = wasFavorite ? 'remove' : 'add';
       const propertyName = this.property?.tieu_de || 'Bất động sản';
@@ -535,7 +535,7 @@ export default {
     },
     async syncFavoriteList() {
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('khach_hang_auth_token');
         if (!token) { this.favoriteIds = []; return; }
         const res = await api.get('/khach-hang/bds/yeu-thich/data');
         const favorites = res.data?.data || [];
@@ -601,7 +601,7 @@ export default {
     async startChat() {
       if (!this.requireAuth()) return;
       if (!this.brokerId) { this.showToast("Chưa có môi giới", "warning"); return; }
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("khach_hang_auth_token");
       try {
         const res = await api.post("/khach-hang/chat/start", { moi_gioi_id: this.brokerId, bat_dong_san_id: this.property.id });
         const conversation = res.data.data;

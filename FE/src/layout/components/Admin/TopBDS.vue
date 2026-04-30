@@ -153,8 +153,8 @@ const markAllRead = () => {
 // Logout
 const logout = () => {
   showProfileDropdown.value = false;
-  localStorage.removeItem("auth_token");
-  localStorage.removeItem("user_type");
+  localStorage.removeItem("admin_auth_token");
+  localStorage.removeItem("admin_user_info");
 
   toast.success("Đăng xuất thành công 👋");
 
@@ -164,35 +164,36 @@ const logout = () => {
   }, 1000);
 };
 
-// Load admin info from token
+  // Load admin info from token or admin_user_info
 onMounted(() => {
-  const token = localStorage.getItem("auth_token");
-  
-  // ✅ Check token có hợp lệ không
-  if (token && typeof token === 'string' && token.includes('.')) {
+  const token = localStorage.getItem("admin_auth_token");
+  // ✅ Ưu tiên lấy tên từ admin_user_info
+  const savedUserInfo = localStorage.getItem("admin_user_info");
+  if (savedUserInfo) {
+    try {
+      const ui = JSON.parse(savedUserInfo);
+      if (ui.ten || ui.name) adminName.value = ui.ten || ui.name;
+    } catch (_) {}
+  } else if (token && typeof token === 'string' && token.includes('.')) {
+    // Fallback: giải mã JWT
     try {
       const parts = token.split('.');
-      // ✅ JWT chuẩn có 3 phần: header.payload.signature
       if (parts.length >= 2 && parts[1]) {
         const payload = JSON.parse(atob(parts[1]));
-        if (payload.name) {
-          adminName.value = payload.name;
-        }
+        if (payload.name) adminName.value = payload.name;
       }
     } catch (e) {
       console.error("Error decoding token:", e);
-      // ✅ Xóa token lỗi để tránh lặp lại
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user_type');
-      localStorage.removeItem('user_info');
+      localStorage.removeItem("admin_auth_token");
+      localStorage.removeItem("admin_user_info");
     }
   }
 
   // Add click outside listener
   document.addEventListener("click", handleClickOutside);
 
-  // ✅ Subscribe Echo admin channel
-  const userInfoStr = localStorage.getItem("user_info");
+  // ✅ Subscribe Echo admin channel - dùng admin_user_info
+  const userInfoStr = localStorage.getItem("admin_user_info");
   const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
   const id = userInfo?.id;
   if (id) {
@@ -208,10 +209,22 @@ onMounted(() => {
       unreadCount.value += 1;
     });
   }
+
+  // ✅ Lắng nghe admin-auth-changed
+  window.addEventListener("admin-auth-changed", () => {
+    const newUserStr = localStorage.getItem("admin_user_info");
+    if (newUserStr) {
+      try {
+        const ui = JSON.parse(newUserStr);
+        if (ui.ten || ui.name) adminName.value = ui.ten || ui.name;
+      } catch (_) {}
+    }
+  });
 });
 
 onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
+  window.removeEventListener("admin-auth-changed", () => {});
   leaveAllChannels();
 });
 

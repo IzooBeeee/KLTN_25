@@ -99,10 +99,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, getCurrentInstance } from "vue";
+import { ref, onMounted } from "vue";
 import api from "@/axios/config";
 import { useRouter } from "vue-router";
 import { subscribeAdmin, updateEchoToken } from "../../../js/services/echo";
+import { setAuth, getToken, clearAuth } from "@/js/auth";
+import { getCurrentInstance } from "vue";
 
 const email = ref("");
 const password = ref("");
@@ -116,12 +118,32 @@ const toaster = internalInstance.appContext.config.globalProperties.$toast;
 
 
 onMounted(() => {
-  const savedEmail = localStorage.getItem("saved_admin_email");
+  // Khôi phục email nếu có
+  const savedEmail = localStorage.getItem("admin_saved_email");
   if (savedEmail) {
     email.value = savedEmail;
     rememberMe.value = true;
   }
+
+  // ✅ Check token admin riêng biệt
+  checkAdminLogin();
 });
+
+const checkAdminLogin = async () => {
+  const token = getToken("admin");
+  if (!token) return;
+
+  try {
+    const res = await api.get("/admin/check-token");
+    if (res.data.status === "success" || res.data.status === true) {
+      router.replace("/admin/dashboard");
+    }
+  } catch (error) {
+    if (error.response?.status === 401) {
+      clearAuth("admin");
+    }
+  }
+};
 
 const xuLyDangNhap = async () => {
   if (!email.value || !password.value) {
@@ -140,12 +162,8 @@ const xuLyDangNhap = async () => {
     if (res.data?.token) {
       const user = res.data.user;
 
-      localStorage.setItem("auth_token", res.data.token);
-      localStorage.setItem("user_type", "admin");
-
-      if (user) {
-        localStorage.setItem("user_info", JSON.stringify(user));
-      }
+      // ✅ Lưu vào key riêng của admin (không ảnh hưởng moi-gioi/khach-hang)
+      setAuth("admin", res.data.token, user);
 
       updateEchoToken(res.data.token);
 
@@ -154,9 +172,9 @@ const xuLyDangNhap = async () => {
       }
 
       if (rememberMe.value) {
-        localStorage.setItem("saved_admin_email", email.value);
+        localStorage.setItem("admin_saved_email", email.value);
       } else {
-        localStorage.removeItem("saved_admin_email");
+        localStorage.removeItem("admin_saved_email");
       }
 
       toaster.success("Đăng nhập thành công 👋");

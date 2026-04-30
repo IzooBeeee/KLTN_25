@@ -482,7 +482,7 @@ const checkPaymentStatus = async () => {
   if (!paymentData.value.order_code) return;
 
   try {
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem("moi_gioi_auth_token");
     const { data } = await api.get(`/moi-gioi/giao-dich/${paymentData.value.order_code}/status`);
 
     // ✅ CHẶN LẦN 2: Trong lúc chờ API, nếu user đã đóng modal thì bỏ qua
@@ -648,7 +648,7 @@ const loadPlans = async (silent = false) => {
   error.value = null;
 
   try {
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem("moi_gioi_auth_token");
     const { data } = await api.get(`/moi-gioi/goi-tin/data`);
 
     if (data?.status && data?.data) {
@@ -674,7 +674,7 @@ const loadPlans = async (silent = false) => {
 const checkOrderStatus = async (code) => {
   if (!code) return null;
   try {
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem("moi_gioi_auth_token");
     const { data } = await api.get(`/moi-gioi/giao-dich/${code}/status`);
     return data?.data?.trang_thai;
   } catch (err) {
@@ -767,7 +767,7 @@ const buyExtraCredits = async (extra) => {
   )
     return;
   try {
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem("moi_gioi_auth_token");
     const { data } = await api.post(
       `/moi-gioi/credit/mua`,
       { count: extra.count, price: extra.price },
@@ -785,7 +785,7 @@ const buyExtraCredits = async (extra) => {
 // ✅ Confirm payment & redirect to Sepay
 // ✅ Confirm payment & show QR modal
 const confirmPayment = async () => {
-  const token = localStorage.getItem("auth_token");
+  const token = localStorage.getItem("moi_gioi_auth_token");
   if (!selectedId.value) {
     alert("Vui lòng chọn gói");
     return;

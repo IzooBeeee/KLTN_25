@@ -270,7 +270,7 @@ export default {
     async fetchAllStats() {
       this.loading.stats = true;
       try {
-        const token = localStorage.getItem("auth_token");
+        const token = localStorage.getItem("moi_gioi_auth_token");
         const [postedRes, remainingRes, favoritesRes, paymentRes] =
           await Promise.all([
             api.get("/moi-gioi/thong-ke/tong-tin-da-dang"),

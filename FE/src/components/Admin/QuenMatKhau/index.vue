@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100 p-6">
     <div
       class="flex w-full max-w-6xl bg-white rounded-[40px] shadow-2xl overflow-hidden min-h-[650px]"
@@ -129,6 +129,7 @@
 <script>
 import api from "@/axios/config";
 import { createToaster } from "@meforma/vue-toaster";
+import { setAuth, getToken, clearAuth } from "@/js/auth";
 
 const toaster = createToaster({ position: "top-right", duration: 3000 });
 
@@ -197,10 +198,8 @@ export default {
           const role = res.data.data?.role || "admin";
           const userInfo = res.data.data;
 
-          // ✅ Lưu vào localStorage
-          localStorage.setItem("auth_token", token);
-          localStorage.setItem("user_type", role);
-          localStorage.setItem("user_info", JSON.stringify(userInfo));
+          // ✅ Lưu vào key riêng của admin
+          setAuth("admin", token, userInfo);
 
           // ✅ Set Authorization header
           api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -230,29 +229,26 @@ export default {
     },
 
     async checkLogin() {
-      const token = localStorage.getItem("auth_token");
+      const token = getToken("admin");
       if (!token) return;
 
       try {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         const res = await api.get("/admin/check-token");
 
-        if (res.data.status) {
-          if (this.$route.path.includes("dang-nhap")) {
+        if (res.data.status === "success" || res.data.status === true) {
+          if (this.$route.path.includes("dang-nhap") || this.$route.path.includes("quen-mat-khau")) {
             this.$router.replace("/admin/dashboard");
           }
         }
       } catch (error) {
         if (error.response?.status === 401) {
-          this.clearAuth();
+          clearAuth("admin");
         }
       }
     },
 
     clearAuth() {
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("user_type");
-      localStorage.removeItem("user_info");
+      clearAuth("admin");
       delete api.defaults.headers.common["Authorization"];
     },
 

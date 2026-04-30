@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="min-h-screen bg-[#f0f4f8] font-['Inter']">
 
     <!-- Hero Banner -->
@@ -232,6 +232,7 @@
 import api from "@/axios/config";
 import Swal from "sweetalert2";
 import { useRouter } from "vue-router";
+import { clearAuth, getToken } from "@/js/auth";
 
 export default {
   data() {
@@ -266,7 +267,8 @@ export default {
 
       defaultAvatar:
         "https://ui-avatars.com/api/?name=Moi+Gioi&background=0a0a4d&color=fff&rounded=true&size=200",
-      token: localStorage.getItem("auth_token"),
+      // ✅ Lấy token từ key riêng của môi giới
+      token: getToken("moi-gioi"),
     };
   },
 
@@ -370,9 +372,8 @@ export default {
         const response = await api.post("/moi-gioi/dang-xuat-tat-ca");
 
         if (response.data.status === "success") {
-          localStorage.removeItem("auth_token");
-          localStorage.removeItem("user_type");
-          localStorage.removeItem("user_info");
+          // ✅ XÓA TOKEN MÔI GIỚI (không ảnh hưởng admin/khách hàng)
+          clearAuth("moi-gioi");
 
           Swal.fire({
             icon: "success",
@@ -389,9 +390,8 @@ export default {
       } catch (error) {
         console.error("Logout error:", error);
 
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("user_type");
-        localStorage.removeItem("user_info");
+        // ✅ VẪN XÓA TOKEN
+        clearAuth("moi-gioi");
 
         Swal.fire({
           icon: "error",

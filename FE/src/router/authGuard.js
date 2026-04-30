@@ -1,5 +1,9 @@
-﻿// src/router/authGuard.js
+// src/router/authGuard.js
+// ⚠️ File này hiện ít được dùng (router/index.js đã có guard riêng)
+// Giữ lại để backward compatibility
+
 import { createToaster } from "@meforma/vue-toaster";
+import { getToken, getRoleFromPath, clearAuth } from "@/js/auth";
 
 const toaster = createToaster({ 
   position: "top-right",
@@ -8,16 +12,16 @@ const toaster = createToaster({
 });
 
 export default function authGuard(to, from, next) {
-  const token = localStorage.getItem("auth_token");
-  const userType = localStorage.getItem("user_type"); // 'admin' | 'moi-gioi' | 'khach-hang'
+  // ✅ Đọc token theo role của path đang truy cập
+  const role = getRoleFromPath(to.path);
+  const token = getToken(role);
 
   // ===== 1. GUEST ROUTES (Login/Register pages) =====
   if (to.meta.guest) {
-    if (token && userType) {
-      // ✅ Đã login → redirect về home đúng role
-      return next({ path: getHomePath(userType) });
+    if (token) {
+      return next({ path: getHomePath(role) });
     }
-    return next(); // ✅ Chưa login → cho vào trang login
+    return next();
   }
 
   // ===== 2. PUBLIC ROUTES (Không cần auth) =====
@@ -27,32 +31,24 @@ export default function authGuard(to, from, next) {
   }
 
   // ===== 3. CHƯA LOGIN → Redirect to login =====
-  if (!token || !userType) {
+  if (!token) {
     const loginPath = getLoginPath(to.path);
-    // ✅ Vue Router 4: dùng object { path } thay vì string
     return next({ path: loginPath, query: { redirect: to.fullPath } });
   }
 
   // ===== 4. CHECK ROLE PERMISSION =====
- // ===== 4. CHECK ROLE PERMISSION =====
-if (to.meta.roles) {
-  const allowedRoles = Array.isArray(to.meta.roles) 
-    ? to.meta.roles 
-    : [to.meta.roles];
-  
-  if (!allowedRoles.includes(userType)) {
-    // ✅ Check toaster tồn tại trước khi gọi
-    if (typeof toaster !== 'undefined' && toaster.error) {
-      toaster.error("❌ Bạn không có quyền truy cập trang này");
+  if (to.meta.roles) {
+    const allowedRoles = Array.isArray(to.meta.roles) 
+      ? to.meta.roles 
+      : [to.meta.roles];
+    
+    if (!allowedRoles.includes(role)) {
+      if (typeof toaster !== 'undefined' && toaster.error) {
+        toaster.error("❌ Bạn không có quyền truy cập trang này");
+      }
+      return next({ path: getHomePath(role) });
     }
-    return next({ path: getHomePath(userType) });
   }
-}
-  // ===== 5. OPTIONAL: Check token expiry (nếu cần) =====
-  // if (isTokenExpired(token)) {
-  //   clearAuth();
-  //   return next({ path: getLoginPath(to.path) });
-  // }
 
   // ✅ All checks passed
   next();
@@ -76,12 +72,8 @@ function getHomePath(role) {
   return map[role] || "/";
 }
 
-// ✅ Utility: Clear auth data (dùng khi logout hoặc token expired)
-export function clearAuth() {
-  localStorage.removeItem("auth_token");
-  localStorage.removeItem("user_type");
-  localStorage.removeItem("user_info");
-}
+// ✅ Utility: Clear auth data — dùng role-specific key
+export { clearAuth };
 
 // ✅ Utility: Check if token is expired (optional)
 export function isTokenExpired(token) {

@@ -409,7 +409,7 @@ const isSubmitting = ref(false);
 
 // CHECK AUTH
 const token =
-  localStorage.getItem("auth_token") || localStorage.getItem("token");
+  localStorage.getItem("moi_gioi_auth_token");
 
 // LOAD DATA
 const loadBatDongSan = async (page = 1) => {

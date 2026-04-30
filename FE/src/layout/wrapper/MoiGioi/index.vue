@@ -41,7 +41,7 @@ export default {
   methods: {
     checkBrokerAuth() {
       const role = localStorage.getItem("user_type");
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("moi_gioi_auth_token");
 
       if (!token || role !== "moi-gioi") {
         this.$router.push("/moi-gioi/dang-nhap");

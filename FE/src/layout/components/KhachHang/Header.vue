@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div>
     <nav class="header">
       <div class="container">
@@ -324,6 +324,16 @@ export default {
     };
   },
 
+  watch: {
+    // ✅ Re-check auth mỗi khi route thay đổi (sau khi login redirect)
+    $route: {
+      immediate: true,
+      handler() {
+        this.checkLogin();
+      },
+    },
+  },
+
   computed: {
     isLoggedIn() {
       return !!(this.token && this.user);
@@ -373,6 +383,9 @@ export default {
     window.addEventListener("favorite-updated", this.loadSavedNotifications);
     document.addEventListener("selectstart", this.preventSelect);
 
+    // ✅ Lắng nghe sự kiện login/logout trong cùng tab
+    window.addEventListener("khach-hang-auth-changed", this.onAuthChanged);
+
     // 🔥 Chat event listener
     window.addEventListener("new-chat-message", this.handleNewMessage);
   },
@@ -383,6 +396,7 @@ export default {
     window.removeEventListener("storage", this.checkLogin);
     window.removeEventListener("favorite-updated", this.loadSavedNotifications);
     document.removeEventListener("selectstart", this.preventSelect);
+    window.removeEventListener("khach-hang-auth-changed", this.onAuthChanged);
     window.removeEventListener("new-chat-message", this.handleNewMessage);
 
     if (this.menuTimer) {
@@ -394,24 +408,38 @@ export default {
   methods: {
     // ===== AUTH METHODS =====
     checkLogin() {
-      const token = localStorage.getItem("auth_token");
-      const userStr = localStorage.getItem("user_info");
-      const role = localStorage.getItem("user_type");
+      // ✅ Đọc từ key riêng của khách hàng
+      const token = localStorage.getItem("khach_hang_auth_token");
+      const userStr = localStorage.getItem("khach_hang_user_info");
 
       if (token && userStr) {
         try {
           this.token = token;
           this.user = JSON.parse(userStr);
-          this.userType = role;
+          this.userType = "khach-hang";
           return true;
         } catch (e) {
           console.error("Parse user error:", e);
           this.clearData();
         }
+      } else if (token) {
+        // Có token nhưng không có user info → vẫn coi là logged in
+        this.token = token;
+        this.userType = "khach-hang";
+        this.user = this.user || { ten: "Khách hàng" };
+        return true;
       } else {
         this.clearData();
       }
       return false;
+    },
+
+    // ✅ Handler khi có auth thay đổi trong cùng tab
+    async onAuthChanged() {
+      const isLogged = this.checkLogin();
+      if (isLogged) {
+        await this.loadSavedNotifications();
+      }
     },
 
     clearData() {
@@ -478,7 +506,7 @@ export default {
     },
 
     switchToBrokerLogin() {
-      localStorage.removeItem("auth_token");
+      localStorage.removeItem("khach_hang_auth_token");
       localStorage.removeItem("user_info");
       localStorage.removeItem("user_type");
       this.clearData();
@@ -490,7 +518,7 @@ export default {
     },
 
     handleLogout() {
-      localStorage.removeItem("auth_token");
+      localStorage.removeItem("khach_hang_auth_token");
       localStorage.removeItem("user_info");
       localStorage.removeItem("user_type");
       this.clearData();
@@ -511,19 +539,13 @@ export default {
 
     // ===== NOTIFICATION METHODS =====
     async loadSavedNotifications() {
-      const token = localStorage.getItem("auth_token");
-      const userType = localStorage.getItem("user_type");
+      const token = localStorage.getItem("khach_hang_auth_token");
 
-      // ✅ CHỈ LOAD NẾU LÀ CUSTOMER
-      if (userType !== "khach-hang" || !token) {
-        console.log(
-          "⏭️ Not customer (type:",
-          userType,
-          ") → skip load notifications"
-        );
+      // ✅ CHỈ LOAD NẾU LÀ CUSTOMER (token khach hang)
+      if (!token) {
+        console.log("⏭️ No khach-hang token → skip load notifications");
         return;
       }
-      if (!token) return;
 
       this.loadingNotifs = true;
       try {
@@ -646,7 +668,7 @@ export default {
     },
 
     async deleteSavedItem(item) {
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("khach_hang_auth_token");
       if (!token) return;
 
       try {
@@ -677,7 +699,7 @@ export default {
 
     // ===== 🔥 CHAT METHODS =====
     async loadConversations() {
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("khach_hang_auth_token");
       if (!token) return;
 
       this.loadingChat = true;
