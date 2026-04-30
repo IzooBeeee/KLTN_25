@@ -118,12 +118,26 @@ class GiaoDichController extends Controller
     // ✅ MỚI: Handle URL Return từ SePay
     public function handleSePayReturn(Request $request)
     {
-        $status = $request->query('status', 'error');
+        $status    = $request->query('status', 'error');
         $orderCode = $request->query('order_code');
-
         $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
-        
-        // Redirect về Frontend
+
+        // ✅ FALLBACK: Nếu status=success và webhook chưa xử lý → tự kích hoạt
+        if ($status === 'success' && $orderCode) {
+            $transaction = GiaoDich::where('ma_giao_dich', $orderCode)->first();
+
+            if ($transaction && $transaction->trang_thai === GiaoDich::STATUS_PENDING) {
+                DB::transaction(function () use ($transaction) {
+                    $transaction->update([
+                        'trang_thai' => GiaoDich::STATUS_SUCCESS,
+                        'paid_at'    => now(),
+                    ]);
+                    $this->activatePackage($transaction);
+                });
+                Log::info("✅ Return URL fallback activated: {$orderCode}");
+            }
+        }
+
         return redirect()->away("{$frontendUrl}/moi-gioi/goi-tin?status={$status}&order_code={$orderCode}");
     }
 
@@ -256,6 +270,48 @@ class GiaoDichController extends Controller
     }
 
     // ✅ GIỮ NGUYÊN: Các hàm helper khác (getTransactionStatus, export, etc.)
+    public function kichHoatThuCong($id)
+    {
+        $transaction = GiaoDich::find($id);
+
+        if (!$transaction) {
+            return response()->json(['status' => false, 'message' => 'Giao dịch không tồn tại'], 404);
+        }
+
+        if ($transaction->trang_thai === GiaoDich::STATUS_SUCCESS) {
+            return response()->json(['status' => false, 'message' => 'Giao dịch đã được xử lý trước đó']);
+        }
+
+        DB::transaction(function () use ($transaction) {
+            $transaction->update(['trang_thai' => GiaoDich::STATUS_SUCCESS, 'paid_at' => now()]);
+            $this->activatePackage($transaction);
+        });
+
+        $transaction->load(['moiGioi:id,ten,email,so_tin_con_lai,ngay_het_han_goi', 'goiTin:id,ten_goi']);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Đã kích hoạt gói tin thành công',
+            'data' => $transaction
+        ]);
+    }
+
+    public function lichSuGiaoDich(Request $request)
+    {
+        $user = Auth::guard('sanctum')->user();
+
+        $data = GiaoDich::with(['goiTin:id,ten_goi,so_ngay,so_luong_tin'])
+            ->where('moi_gioi_id', $user->id)
+            ->when($request->filled('trang_thai'), fn($q) => $q->where('trang_thai', $request->trang_thai))
+            ->orderBy('created_at', 'desc')
+            ->paginate($request->input('per_page', 10));
+
+        return response()->json([
+            'status' => true,
+            'data' => $data
+        ]);
+    }
+
     public function getTransactionStatus($orderCode)
     {
         $transaction = GiaoDich::where('ma_giao_dich', $orderCode)->first();

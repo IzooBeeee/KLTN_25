@@ -204,22 +204,21 @@ class MoiGioiController extends Controller
         }
     }
 
+
     public function logoutAll()
     {
-        /** @var Admin|null $user */
         $user = Auth::guard('sanctum')->user();
         if ($user) {
-            $user->currentAccessToken()->delete();
+            $user->tokens()->delete();
             return response()->json([
                 'status' => 'success',
-                'message' => 'Đăng xuất thành công'
+                'message' => 'Đã đăng xuất khỏi tất cả thiết bị'
             ], 200);
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Không tìm thấy người dùng hoặc token không hợp lệ'
-            ], 401);
         }
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Không tìm thấy người dùng hoặc token không hợp lệ'
+        ], 401);
     }
 
     // Admin lấy danh sách môi giới
@@ -507,7 +506,7 @@ class MoiGioiController extends Controller
         }
 
         $mg->update([
-            'password' => bcrypt($request->password),
+            'password' => $request->password,
             'hash_reset' => null,
             'hash_reset_expires_at' => null,
         ]);

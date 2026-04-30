@@ -151,7 +151,7 @@
                   </router-link>
 
                   <!-- Quản lý tin đăng -->
-                  <router-link to="/moi-gioi/quan-ly-tin" class="dropdown-item-new" role="menuitem"
+                  <router-link to="/moi-gioi/quan-ly-bat-dong-san" class="dropdown-item-new" role="menuitem"
                     @click="showMenu = false">
                     <span class="item-icon-new">📋</span>
                     <span class="item-label-new">Quản lý tin đăng</span>
@@ -159,7 +159,7 @@
                   </router-link>
 
                   <!-- Danh sách khách hàng -->
-                  <router-link to="/moi-gioi/khach-hang" class="dropdown-item-new" role="menuitem"
+                  <router-link to="/moi-gioi/quan-ly-khach-hang" class="dropdown-item-new" role="menuitem"
                     @click="showMenu = false">
                     <span class="item-icon-new">👥</span>
                     <span class="item-label-new">Danh sách khách hàng</span>
@@ -174,7 +174,7 @@
                   </div>
 
                   <!-- Thống kê -->
-                  <router-link to="/moi-gioi/thong-ke" class="dropdown-item-new" role="menuitem"
+                  <router-link to="/moi-gioi/trang-chu" class="dropdown-item-new" role="menuitem"
                     @click="showMenu = false">
                     <span class="item-icon-new">📊</span>
                     <span class="item-label-new">Thống kê hiệu suất</span>
@@ -187,7 +187,7 @@
 
                 <!-- Footer: Settings + Logout -->
                 <div class="dropdown-footer-new">
-                  <router-link to="/moi-gioi/ca-nhan" class="dropdown-item-new settings-item" role="menuitem"
+                  <router-link to="/moi-gioi/ho-so-ca-nhan" class="dropdown-item-new settings-item" role="menuitem"
                     @click="showMenu = false">
                     <span class="item-icon-new">⚙️</span>
                     <span class="item-label-new">Cài đặt tài khoản</span>
@@ -305,6 +305,8 @@ export default {
       remainingPosts: null, // null = đang loading, -1 = không giới hạn
       loadingPosts: false,
       hasNewNotifications: false, // ✅ Theo dõi thông báo mới
+      statsListings: 0,
+      statsCustomers: 0,
     };
   },
   computed: {
@@ -331,13 +333,14 @@ export default {
       return name ? name.charAt(0).toUpperCase() : "M";
     },
     userCode() {
-      return this.user?.ma_moi_gioi || this.user?.code || "---";
+      if (!this.user?.id) return '---';
+      return this.user?.ma_moi_gioi || this.user?.code || `MG-${String(this.user.id).padStart(4, '0')}`;
     },
     totalListings() {
-      return this.user?.tong_tin || this.user?.total_listings || 0;
+      return this.statsListings;
     },
     totalCustomers() {
-      return this.user?.tong_khach || this.user?.total_customers || 0;
+      return this.statsCustomers;
     },
     // ✅ Hiển thị số tin: "5 tin", "Hết", hoặc "∞"
     postsDisplay() {
@@ -359,6 +362,7 @@ export default {
     this.checkLogin();
     this.fetchNotifications();
     this.fetchRemainingPosts();
+    this.fetchDropdownStats();
     this.startPolling();
     this.subscribeEcho();   // ✅ Real-time notifications
     document.addEventListener("click", this.handleClickOutside);
@@ -469,6 +473,7 @@ export default {
           // ✅ Refresh dữ liệu mỗi khi check login (chuyển trang, storage change)
           this.fetchRemainingPosts();
           this.fetchNotifications();
+          this.fetchDropdownStats();
         } catch (e) {
           console.error("Parse user error:", e);
           this.clearData();
@@ -693,12 +698,27 @@ export default {
       this.$router.push("/moi-gioi/dang-tin");
     },
 
+    async fetchDropdownStats() {
+      if (!this.isLoggedIn) return;
+      try {
+        const [listingsRes, customersRes] = await Promise.all([
+          api.get('/moi-gioi/thong-ke/tong-tin-da-dang'),
+          api.get('/moi-gioi/thong-ke/tong-khach-hang'),
+        ]);
+        this.statsListings = listingsRes.data?.data ?? 0;
+        this.statsCustomers = customersRes.data?.data ?? 0;
+      } catch (e) {
+        console.error('fetchDropdownStats error:', e);
+      }
+    },
+
     // ✅ Cập nhật polling để refresh số tin mỗi 30s
     startPolling() {
       this.pollingInterval = setInterval(() => {
         if (this.isLoggedIn) {
           this.fetchNotifications();
           this.fetchRemainingPosts(); // ✅ Refresh số tin cùng lúc
+          this.fetchDropdownStats();
         }
       }, 30000);
     },
@@ -1339,6 +1359,7 @@ export default {
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

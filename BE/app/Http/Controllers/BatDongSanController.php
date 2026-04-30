@@ -79,24 +79,17 @@ class BatDongSanController extends Controller
         $noi_dung = '%' . $keyword . '%';
 
         // Tìm kiếm
-        $data = BatDongSan::where('tieu_de', 'like', $noi_dung)
-            ->orWhere('mo_ta', 'like', $noi_dung)
-            ->orWhere('gia', 'like', $noi_dung)
-            ->orWhere('loai_id', 'like', $noi_dung)
-            ->orWhere('dia_chi_id', 'like', $noi_dung)
-            ->get();
-
-        // Kiểm tra nếu không có kết quả
-        if ($data->isEmpty()) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Không tìm thấy bất động sản nào phù hợp',
-                'data' => []
-            ]);
-        }
+        $data = BatDongSan::with(['loai', 'moiGioi', 'diaChi.tinh', 'diaChi.quan', 'hinhAnh'])
+            ->where(function ($q) use ($noi_dung) {
+                $q->where('tieu_de', 'like', $noi_dung)
+                  ->orWhere('mo_ta', 'like', $noi_dung)
+                  ->orWhereHas('moiGioi', fn($mq) => $mq->where('ten', 'like', $noi_dung));
+            })
+            ->paginate(10);
 
         return response()->json([
             'status' => true,
+            'message' => $data->total() === 0 ? 'Không tìm thấy bất động sản nào phù hợp' : null,
             'data' => $data
         ]);
     }

@@ -87,6 +87,8 @@ Route::post('client/tim-kiem', [ClientHomeController::class, 'search']);
 Route::post('client/tim-kiem-nang-cao', [ClientHomeController::class, 'searchAdvanced']);
 // Loại BĐS
 Route::get('client/loai-bat-dong-san', [ClientHomeController::class, 'getLoaiBDS']);
+// Chi tiết môi giới (public)
+Route::get('client/moi-gioi/{id}', [ClientHomeController::class, 'getChiTietMoiGioi']);
 // Tìm Kiếm Địa Chỉ
 Route::get('/phuong-xa-by-quan-huyen', [PhuongXaController::class, 'getPhuongXaByQuanHuyen']);
 Route::get('/phuong-xa', [PhuongXaController::class, 'getAll']);
@@ -194,6 +196,7 @@ Route::prefix('admin')->middleware('AdminMiddleware')->group(function () {
     Route::get('/unmatched-payments', [LichSuGoiTinController::class, 'index']);
     Route::post('/unmatched-payments/{id}/match', [LichSuGoiTinController::class, 'match']);
     Route::post('/unmatched-payments/{id}/ignore', [LichSuGoiTinController::class, 'ignore']);
+    Route::post('/giao-dich/{id}/kich-hoat', [GiaoDichController::class, 'kichHoatThuCong']);
 
     //CHỨC VỤ
     Route::prefix('chuc-vu')->group(function () {
@@ -260,6 +263,7 @@ Route::prefix('moi-gioi')->middleware('MoiGioiMiddleware')->group(function () {
 
     //GIAO DỊCH
     Route::post('/payment/create', [GiaoDichController::class, 'createPayment']); //đã test postman
+    Route::get('/giao-dich/lich-su', [GiaoDichController::class, 'lichSuGiaoDich']);
     Route::get('/giao-dich/{orderCode}/status', [GiaoDichController::class, 'getTransactionStatus']);
 
     Route::prefix('thong-ke')->group(function () {
@@ -269,6 +273,7 @@ Route::prefix('moi-gioi')->middleware('MoiGioiMiddleware')->group(function () {
         Route::get('/tong-tien', [ThongKeMoGioiController::class, 'tongTien']);
         Route::get('/bieu-do-bai-dang', [ThongKeMoGioiController::class, 'bieuDoBaiDang']);
         Route::get('/khach-hang-lien-he', [ThongKeMoGioiController::class, 'khachHangLienHe']);
+        Route::get('/tong-khach-hang', [ThongKeMoGioiController::class, 'tongKhachHang']);
     });
 
     //---------------------------CHAT---------------------------

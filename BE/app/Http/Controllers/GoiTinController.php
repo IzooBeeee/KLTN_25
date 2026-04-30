@@ -193,23 +193,33 @@ class GoiTinController extends Controller
             ];
         });
 
-        // ✅ MỚI: TRẢ VỀ GÓI HIỆN TẠI CỦA USER
+        // Trả về thông tin gói hiện tại + số tin còn lại + hạn dùng
         $currentPlan = null;
-        if ($user && $user->goi_tin_id) {
-            $currentPlanData = GoiTin::find($user->goi_tin_id);
-            if ($currentPlanData) {
-                $currentPlan = [
-                    'id' => $currentPlanData->id,
-                    'used_posts' => 0, // hoặc logic đếm số tin đã dùng
-                    'postLimit' => $currentPlanData->so_luong_tin,
-                ];
-            }
+        if ($user) {
+            $isExpired = $user->ngay_het_han_goi
+                ? $user->ngay_het_han_goi->isPast()
+                : true;
+
+            $currentPlanData = $user->goi_tin_id
+                ? GoiTin::find($user->goi_tin_id)
+                : null;
+
+            $currentPlan = [
+                'id'             => $user->goi_tin_id,
+                'so_tin_con_lai' => $user->so_tin_con_lai ?? 0,
+                'ngay_het_han'   => $user->ngay_het_han_goi
+                    ? $user->ngay_het_han_goi->format('d/m/Y')
+                    : null,
+                'het_han'        => $isExpired,
+                'postLimit'      => $currentPlanData ? $currentPlanData->so_luong_tin : 0,
+                'gia_hien_tai'   => $currentPlanData ? (int) $currentPlanData->gia : 0,
+            ];
         }
 
         return response()->json([
-            'status' => true,
-            'data' => $formattedPlans,
-            'current_plan' => $currentPlan  // ✅ QUAN TRỌNG
+            'status'       => true,
+            'data'         => $formattedPlans,
+            'current_plan' => $currentPlan,
         ]);
     }
 

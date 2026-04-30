@@ -241,6 +241,12 @@ const routes = [
     name: "MoiGioiThongBao",
     meta: { layout: "moi-gioi", roles: ["moi-gioi"] }
   },
+  {
+    path: "/moi-gioi/lich-su-mua-tin",
+    component: () => import("../components/MoiGioi/LichSuMuaTin/index.vue"),
+    name: "MoiGioiLichSuMuaTin",
+    meta: { layout: "moi-gioi", roles: ["moi-gioi"] }
+  },
 
   // ===== ADMIN THÊM =====
   {

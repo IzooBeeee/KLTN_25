@@ -28,6 +28,8 @@ class MoiGioi extends Authenticatable
         'goi_tin_id',
         'so_tin_con_lai',
         'ngay_het_han_goi',
+        'hash_reset',
+        'hash_reset_expires_at',
     ];
 
     protected $hidden = [
@@ -41,6 +43,7 @@ class MoiGioi extends Authenticatable
         'is_active' => 'boolean',
         'so_tin_con_lai' => 'integer',
         'ngay_het_han_goi' => 'datetime',
+        'hash_reset_expires_at' => 'datetime',
     ];
 
     public function batDongSans(): HasMany

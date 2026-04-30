@@ -39,10 +39,11 @@ class ClientHomeController extends Controller
             'diaChi.quan',
         ])
             ->where('is_duyet', true)
+            ->where('status', 'published')
             // ✅ Đẩy tin "Đã bán" (trang_thai_id = 3) xuống dưới cùng
             ->orderByRaw("CASE WHEN trang_thai_id = 3 THEN 1 ELSE 0 END")
             ->latest()
-            ->paginate(6);
+            ->paginate($request->input('per_page', 6));
 
         if (!Auth::guard('sanctum')->check()) {
             $data->getCollection()->transform(fn($item) => $this->prepareData($item));
@@ -92,13 +93,14 @@ class ClientHomeController extends Controller
     {
         $query = BatDongSan::query();
 
-        $query->when($request->tinh_id, fn($q) => $q->where('tinh_id', $request->tinh_id));
+        $query->when($request->tinh_id, fn($q) => $q->whereHas('diaChi', fn($d) => $d->where('tinh_id', $request->tinh_id)));
+        $query->when($request->quan_id, fn($q) => $q->whereHas('diaChi', fn($d) => $d->where('quan_id', $request->quan_id)));
         $query->when($request->loai_id, fn($q) => $q->where('loai_id', $request->loai_id));
         $query->when($request->gia_min, fn($q) => $q->where('gia', '>=', $request->gia_min));
         $query->when($request->gia_max, fn($q) => $q->where('gia', '<=', $request->gia_max));
         $query->when($request->tieu_de, fn($q) => $q->where('tieu_de', 'like', '%' . $request->tieu_de . '%'));
 
-        $query->where('is_duyet', true);
+        $query->where('is_duyet', true)->where('status', 'published');
 
         $data = $query->with([
             'loai',
@@ -131,6 +133,39 @@ class ClientHomeController extends Controller
     }
 
         // FIX: Tìm kiếm nâng cao cho trang client theo nhiều bộ lọc
+    public function getChiTietMoiGioi($id)
+    {
+        $moiGioi = \App\Models\MoiGioi::where('id', $id)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$moiGioi) {
+            return response()->json(['status' => false, 'message' => 'Không tìm thấy môi giới'], 404);
+        }
+
+        $bds = BatDongSan::with(['loai', 'hinhAnh', 'anhDaiDien', 'diaChi.tinh', 'diaChi.quan'])
+            ->where('moi_gioi_id', $id)
+            ->where('is_duyet', true)
+            ->where('status', 'published')
+            ->orderByRaw("CASE WHEN trang_thai_id = 3 THEN 1 ELSE 0 END")
+            ->latest()
+            ->paginate(6);
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'id'             => $moiGioi->id,
+                'ten'            => $moiGioi->ten,
+                'email'          => $moiGioi->email,
+                'so_dien_thoai'  => $moiGioi->so_dien_thoai,
+                'avatar'         => $moiGioi->avatar,
+                'mo_ta'          => $moiGioi->mo_ta,
+                'zalo_link'      => $moiGioi->zalo_link,
+                'bat_dong_sans'  => $bds,
+            ]
+        ]);
+    }
+
         public function searchAdvanced(Request $request)
         {
             $query = BatDongSan::with([

@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen bg-[#f0f4f8] font-['Inter']">
+  <div class="profile-page font-['Inter']">
 
     <!-- Hero Banner -->
-    <div class="relative h-36 bg-gradient-to-r from-[#0a0e27] via-[#1e3a8a] to-[#1d4ed8] overflow-hidden">
-      <div class="absolute inset-0 opacity-20" style="background-image:url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1600&q=60');background-size:cover;background-position:center"></div>
-      <div class="absolute bottom-0 left-0 right-0 h-14 bg-[#f0f4f8]" style="clip-path:ellipse(55% 100% at 50% 100%)"></div>
+    <div class="profile-banner">
+      <div class="banner-bg"></div>
+      <div class="banner-curve"></div>
     </div>
 
-    <div class="container mx-auto max-w-6xl px-4 -mt-12 pb-12">
+    <div class="container mx-auto max-w-6xl px-4 -mt-12 pb-12 relative z-10">
 
       <!-- Profile Header -->
       <div class="bg-white rounded-3xl shadow-xl p-6 mb-6 flex flex-col sm:flex-row items-center sm:items-end gap-5">
@@ -492,3 +492,37 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.profile-page {
+  background: #f0f4f8;
+  min-height: 100%;
+}
+
+.profile-banner {
+  position: relative;
+  height: 160px;
+  background: linear-gradient(to right, #0a0e27, #1e3a8a, #1d4ed8);
+  overflow: hidden;
+  margin: 0 -16px 0;
+}
+
+.banner-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image: url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1600&q=60');
+  background-size: cover;
+  background-position: center;
+}
+
+.banner-curve {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: #f0f4f8;
+  clip-path: ellipse(55% 100% at 50% 100%);
+}
+</style>

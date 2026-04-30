@@ -229,7 +229,7 @@ export default {
     // Trong DatLaiMatKhau.vue
     async datLaiMatKhau() {
       try {
-        const res = await api.post("/quen-mat-khau/dat-lai", {
+        const res = await api.post("/moi-gioi/quen-mat-khau/dat-lai", {
           email: this.email,
           code: this.code,
           password: this.password,

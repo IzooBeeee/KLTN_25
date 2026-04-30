@@ -256,7 +256,7 @@ export default {
       if (this.countdown > 0) return;
 
       try {
-        const res = await api.post("/quen-mat-khau/gui-ma", {
+        const res = await api.post("/moi-gioi/quen-mat-khau/gui-ma", {
           email: this.email,
         });
 
@@ -286,7 +286,7 @@ export default {
       this.error = "";
 
       try {
-        const res = await api.post("/quen-mat-khau/xac-thuc", {
+        const res = await api.post("/moi-gioi/quen-mat-khau/xac-thuc", {
           email: this.email,
           code: this.otpCode,
         });

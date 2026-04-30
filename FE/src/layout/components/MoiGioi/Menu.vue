@@ -125,10 +125,16 @@ const secondaryItems = ref([
     badge: null,
   },
   {
-    id: "packages",
-    label: "Gói tin",
-    icon: "auto_awesome",
-    route: "/moi-gioi/goi-tin",
+    id: 'packages',
+    label: 'Gói tin',
+    icon: 'auto_awesome',
+    route: '/moi-gioi/goi-tin',
+  },
+  {
+    id: 'lich-su-mua-tin',
+    label: 'Lịch sử mua tin',
+    icon: 'receipt_long',
+    route: '/moi-gioi/lich-su-mua-tin',
   },
   {
     id: "profile",

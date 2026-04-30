@@ -157,7 +157,7 @@ export default {
       this.isLoading = true;
 
       try {
-        const res = await api.post("/quen-mat-khau/gui-ma", {
+        const res = await api.post("/moi-gioi/quen-mat-khau/gui-ma", {
           email: this.email,
         });
 

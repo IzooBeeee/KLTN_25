@@ -111,16 +111,22 @@
       <div v-for="plan in sortedPlans" :key="plan.id" class="pricing-card" :class="{
         popular: plan.isPopular,
         'border-emerald': plan.isPopular,
-        'current-plan': plan.id === currentPlanId,
+        'current-plan': plan.id === currentPlanId && !brokerInfo.het_han,
+        'expired-plan': plan.id === currentPlanId && brokerInfo.het_han,
       }">
-        <!-- Badge gói đang dùng -->
-        <!-- <div v-if="plan.id === currentPlanId" class="current-plan-badge-top">
-          <i class="bx bx-check-circle"></i>
-          <span>Gói đang dùng</span>
-        </div> -->
 
-        <!-- Popular badge -->
-        <div v-if="plan.isPopular" class="popular-badge">
+        <!-- Badge: Đang dùng -->
+        <div v-if="plan.id === currentPlanId && !brokerInfo.het_han" class="current-plan-badge">
+          <i class="bx bx-check-circle me-1"></i> Đang sử dụng
+        </div>
+
+        <!-- Badge: Hết hạn -->
+        <div v-else-if="plan.id === currentPlanId && brokerInfo.het_han" class="expired-plan-badge">
+          <i class="bx bx-time-five me-1"></i> Đã hết hạn
+        </div>
+
+        <!-- Popular badge (chỉ hiện khi không phải current) -->
+        <div v-else-if="plan.isPopular" class="popular-badge">
           <i class="bx bx-star me-1"></i> PHỔ BIẾN NHẤT
         </div>
 
@@ -132,29 +138,29 @@
         </div>
 
         <div class="card-price" :class="{ 'text-emerald': plan.isPopular }">
-          <!-- ✅ Nếu là gói đang dùng → gạch ngang giá + hiện 0 -->
-          <template v-if="plan.id === currentPlanId">
-            <span class="amount original-price">
-              {{ formatPrice(getPrice(plan)) }}
-            </span>
-            <span class="amount current-price">0</span>
-          </template>
-
-          <!-- ✅ Bình thường → hiển thị giá gốc -->
-          <template v-else>
-            <span class="amount">{{ formatPrice(getPrice(plan)) }}</span>
-          </template>
-
+          <span class="amount">{{ formatPrice(getPrice(plan)) }}</span>
           <span class="period">/{{ cycle === "monthly" ? "tháng" : "năm" }}</span>
         </div>
 
+        <!-- Số tin & thông tin còn lại -->
         <div class="post-allowance">
           <i class="bx bx-file me-2"></i>
           <strong>{{ plan.postLimit }}</strong> tin đăng /
           {{ cycle === "monthly" ? "tháng" : "năm" }}
-          <small v-if="plan.postLimit < 999" class="d-block text-muted">
-            {{ getRemainingText(plan) }}
-          </small>
+        </div>
+
+        <!-- Thông tin tổng credits + hạn dùng (chỉ hiện khi đây là gói hiện tại) -->
+        <div v-if="plan.id === currentPlanId" class="credits-info-box"
+          :class="brokerInfo.het_han ? 'credits-expired' : 'credits-active'">
+          <template v-if="brokerInfo.het_han">
+            <i class="bx bx-error-circle me-1"></i>
+            Gói đã hết hạn · Mua lại để tiếp tục đăng tin
+          </template>
+          <template v-else>
+            <i class="bx bx-coin-stack me-1"></i>
+            Còn <strong>{{ brokerInfo.so_tin_con_lai }}</strong> tin
+            <span v-if="brokerInfo.ngay_het_han"> · Hết hạn <strong>{{ brokerInfo.ngay_het_han }}</strong></span>
+          </template>
         </div>
 
         <ul class="feature-list">
@@ -164,7 +170,6 @@
           </li>
         </ul>
 
-        <!-- ✅ MỚI: Nút với logic check -->
         <button class="btn w-100 mt-auto" :class="getButtonClass(plan)" @click="selectPlan(plan)"
           :disabled="!canPurchase(plan)">
           {{ getButtonText(plan) }}
@@ -281,6 +286,7 @@ const plans = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const currentPlanId = ref(null);
+const brokerInfo = ref({ so_tin_con_lai: 0, ngay_het_han: null, het_han: true, gia_hien_tai: 0 });
 const userPostUsage = ref({ used: 0, limit: 0 });
 const selectedId = ref(null);
 const selectedPlan = ref(null);
@@ -395,26 +401,37 @@ const canBuyExtra = computed(
   () => userPostUsage.value.used >= userPostUsage.value.limit * 0.8
 );
 
-// ✅ COMPUTED: Kiểm tra có thể thanh toán gói này không
+// Kiểm tra có thể thanh toán không
 const canPurchase = (plan) => {
-  // Nếu đang dùng gói này rồi → KHÔNG CHO MUA
-  if (plan.id === currentPlanId.value) return false;
-  // Nếu đang trong quá trình thanh toán → KHÔNG CHO MUA
   if (paymentLoading.value && selectedId.value === plan.id) return false;
-  return true;
+  return true; // Tất cả gói đều mua được (credits stack)
+};
+
+// Phân loại gói so với gói hiện tại
+const getPlanRelation = (plan) => {
+  const hasActivePlan = !!currentPlanId.value && !brokerInfo.value.het_han;
+  if (!hasActivePlan) return 'new';             // Chưa có gói
+  if (plan.id === currentPlanId.value) return 'current'; // Gói đang dùng
+  if (plan.monthlyPrice > brokerInfo.value.gia_hien_tai) return 'upgrade'; // Nâng cấp
+  return 'addon';                               // Mua thêm
 };
 
 const getButtonClass = (plan) => {
-  if (!canPurchase(plan)) return "btn-secondary";
-  if (plan.isPopular) return "btn-emerald";
-  return "btn-outline-emerald";
+  if (paymentLoading.value && selectedId.value === plan.id) return 'btn-secondary';
+  const rel = getPlanRelation(plan);
+  if (rel === 'current') return 'btn-outline-emerald';
+  if (rel === 'upgrade') return 'btn-emerald';
+  if (plan.isPopular) return 'btn-emerald';
+  return 'btn-outline-emerald';
 };
 
 const getButtonText = (plan) => {
-  if (plan.id === currentPlanId.value) return "Đang sử dụng";
-  if (paymentLoading.value && selectedId.value === plan.id)
-    return "Đang xử lý...";
-  return plan.btnText || "Chọn gói";
+  if (paymentLoading.value && selectedId.value === plan.id) return 'Đang xử lý...';
+  const rel = getPlanRelation(plan);
+  if (rel === 'current') return 'Gia hạn';
+  if (rel === 'upgrade') return 'Nâng cấp';
+  if (rel === 'addon') return 'Mua thêm';
+  return plan.btnText || 'Chọn gói';
 };
 
 // Hàm gọi API và vẽ QR
@@ -602,8 +619,11 @@ const formatPrice = (val) => new Intl.NumberFormat("vi-VN").format(val);
 
 const getRemainingText = (plan) => {
   if (plan.id !== currentPlanId.value) return "";
-  const remaining = plan.postLimit - userPostUsage.value.used;
-  return `Còn ${remaining} tin chưa dùng trong kỳ này`;
+  if (brokerInfo.value.het_han) return "Gói đã hết hạn";
+  const remaining = brokerInfo.value.so_tin_con_lai;
+  const ngayHetHan = brokerInfo.value.ngay_het_han;
+  if (ngayHetHan) return `Còn ${remaining} tin · Hết hạn ${ngayHetHan}`;
+  return `Còn ${remaining} tin đăng`;
 };
 
 // ✅ Handle modal close
@@ -655,9 +675,15 @@ const loadPlans = async (silent = false) => {
       plans.value = data.data;
       if (data.current_plan) {
         currentPlanId.value = data.current_plan.id;
+        brokerInfo.value = {
+          so_tin_con_lai: data.current_plan.so_tin_con_lai ?? 0,
+          ngay_het_han:   data.current_plan.ngay_het_han ?? null,
+          het_han:        data.current_plan.het_han ?? true,
+          gia_hien_tai:   data.current_plan.gia_hien_tai ?? 0,
+        };
         userPostUsage.value = {
-          used: data.current_plan.used_posts,
-          limit: data.current_plan.postLimit,
+          used:  0,
+          limit: data.current_plan.postLimit ?? 0,
         };
       }
     } else {
@@ -734,19 +760,8 @@ const handlePaymentRedirect = async () => {
   }
 };
 
-// ✅ Select plan & show confirmation modal
+// Select plan & show confirmation modal
 const selectPlan = (plan) => {
-  // Nếu đang dùng gói này → Alert và return
-  if (plan.id === currentPlanId.value) {
-    Swal.fire({
-      icon: "info",
-      title: "Bạn đang sử dụng gói này",
-      text: "Gói hiện tại của bạn vẫn còn hiệu lực. Vui lòng đợi hết hạn hoặc nâng cấp lên gói cao hơn.",
-      confirmButtonText: "Đóng",
-    });
-    return;
-  }
-
   selectedPlan.value = plan;
   selectedId.value = plan.id;
   showModal.value = true;
@@ -898,6 +913,57 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
   position: relative;
   overflow: hidden;
+}
+
+.pricing-card.expired-plan {
+  border: 3px solid #f59e0b;
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.current-plan-badge {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 7px 12px;
+  letter-spacing: 0.04em;
+}
+
+.expired-plan-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 7px 12px;
+  letter-spacing: 0.04em;
+}
+
+.credits-info-box {
+  margin: 0 1rem 0.75rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.credits-active {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.credits-expired {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
 }
 
 .current-plan-badge-top {
@@ -1111,6 +1177,7 @@ onUnmounted(() => {
   font-weight: 800;
   background: linear-gradient(45deg, #10b981, #059669);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -1130,6 +1197,7 @@ onUnmounted(() => {
   font-weight: 800;
   background: linear-gradient(45deg, #10b981, #059669);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

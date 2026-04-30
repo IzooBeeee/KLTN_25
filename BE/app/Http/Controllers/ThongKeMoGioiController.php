@@ -185,4 +185,23 @@ class ThongKeMoGioiController extends Controller
             ], 500);
         }
     }
+
+    public function tongKhachHang()
+    {
+        try {
+            $user = auth('sanctum')->user();
+
+            $count = ThongBao::where('moi_gioi_id', $user->id)
+                ->whereNotNull('khach_hang_id')
+                ->distinct('khach_hang_id')
+                ->count('khach_hang_id');
+
+            return response()->json([
+                'status' => true,
+                'data'   => $count
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
 }
