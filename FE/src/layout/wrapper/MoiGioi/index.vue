@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="broker-layout">
     <!-- Menu -->
     <MoiGioiMenu />
@@ -6,7 +6,7 @@
     <!-- Content -->
     <div class="main">
       <MoiGioiHeader />
-      
+
       <div class="content">
         <router-view />
       </div>
@@ -40,10 +40,9 @@ export default {
 
   methods: {
     checkBrokerAuth() {
-      const role = localStorage.getItem("user_type");
+      // ✅ Chỉ kiểm tra token đúng key — không dùng "user_type" cũ nữa
       const token = localStorage.getItem("moi_gioi_auth_token");
-
-      if (!token || role !== "moi-gioi") {
+      if (!token) {
         this.$router.push("/moi-gioi/dang-nhap");
       }
     },
@@ -59,13 +58,14 @@ export default {
   background-color: #f8fafc;
 }
 
-.main{
+.main {
   margin-left: 260px;
   width: calc(100% - 260px);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
+
 .content {
   flex: 1;
   padding: 92px 16px 24px;

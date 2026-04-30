@@ -216,7 +216,8 @@
                   :class="bds.isFavorite ? 'bg-gradient-to-br from-pink-500 to-rose-500' : ''"
                   :aria-label="bds.isFavorite ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'" title="Yêu thích">
                   <span class="material-symbols-outlined text-lg transition-all duration-300"
-                    :class="bds.isFavorite ? 'text-white fill-current' : 'text-gray-400 group-hover/btn:text-pink-500'">
+                    :style="{ fontVariationSettings: bds.isFavorite ? `'FILL' 1` : `'FILL' 0` }"
+                    :class="bds.isFavorite ? 'text-white' : 'text-gray-400 group-hover/btn:text-pink-500'">
                     favorite
                   </span>
                 </button>
@@ -415,11 +416,24 @@ export default {
     },
     hasActiveFilters() { return Object.values(this.filters).some(v => v !== '' && v !== 'newest'); },
     activeFilters() {
-      const active = {}, labels = { tinh: 'Tỉnh', quan: 'Quận', loai: 'Loại', gia: 'Giá', dien_tich: 'Diện tích', phong_ngu: 'Phòng ngủ', phong_tam: 'Phòng tắm' };
+      const active = {}, labels = { tinh: 'Tỉnh', quan: 'Quận', loai: 'Loại', gia: 'Giá', dien_tich: 'Diện tích', phong_ngu: 'Phòng ngủ', phong_tam: 'Phòng tắm', search: 'Từ khóa' };
       for (const [k, v] of Object.entries(this.filters)) {
         if (v && v !== 'newest') active[k] = { label: labels[k], value: this.getFilterValueLabel(k, v) };
       }
       return active;
+    }
+  },
+  watch: {
+    '$route.query': {
+      handler(newQuery) {
+        if (newQuery.keyword !== undefined) this.filters.search = newQuery.keyword;
+        if (newQuery.loai !== undefined) this.filters.loai = newQuery.loai;
+        if (newQuery.gia !== undefined) this.filters.gia = newQuery.gia;
+        this.currentPage = 1;
+        this.loadProperties();
+      },
+      deep: true,
+      immediate: true
     }
   },
   async mounted() {
@@ -557,7 +571,7 @@ export default {
 
         this.properties = this.properties.map(p => ({
           ...p,
-          isFavorite: this.favoriteIds.includes(p.id)
+          isFavorite: this.favoriteIds.map(Number).includes(Number(p.id))
         }));
 
       } catch (err) {
@@ -587,17 +601,18 @@ export default {
       if (this.properties.length > 0) this.loading = true;
 
       try {
-        const params = { page: this.currentPage, per_page: this.perPage };
+        const params = { page: this.currentPage, limit: this.perPage };
+        if (this.filters.search) params.keyword = this.filters.search;
         if (this.filters.tinh) params.tinh_id = this.filters.tinh;
         if (this.filters.quan) params.quan_id = this.filters.quan;
         if (this.filters.loai) params.loai_id = this.filters.loai;
         if (this.filters.gia) { const [mn, mx] = this.filters.gia.split('-'); params.gia_min = Number(mn) * 1e9; params.gia_max = Number(mx) * 1e9; }
-        if (this.filters.dien_tich) { const [mn, mx] = this.filters.dien_tich.split('-'); params.dt_min = Number(mn); params.dt_max = Number(mx); }
-        if (this.filters.phong_ngu) params.phong_ngu = this.filters.phong_ngu;
-        if (this.filters.phong_tam) params.phong_tam = this.filters.phong_tam;
+        if (this.filters.dien_tich) { const [mn, mx] = this.filters.dien_tich.split('-'); params.dien_tich_min = Number(mn); params.dien_tich_max = Number(mx); }
+        if (this.filters.phong_ngu) params.so_phong_ngu = this.filters.phong_ngu;
+        if (this.filters.phong_tam) params.so_phong_tam = this.filters.phong_tam;
         if (this.filters.sort) params.sort = this.filters.sort;
 
-        const res = await api.get('/client/bat-dong-san', { params });
+        const res = await api.post('/client/tim-kiem-nang-cao', params);
         if (res.data?.status) {
           const raw = res.data.data?.data || res.data.data || [];
           this.properties = raw.map(it => {

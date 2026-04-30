@@ -40,6 +40,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             TinhThanhSeeder::class,
             QuanHuyenSeeder::class,
+            PhuongXaSeeder::class,
             ChucVuSeeder::class,
             ChucNangSeeder::class,
             PhanQuyenSeeder::class,

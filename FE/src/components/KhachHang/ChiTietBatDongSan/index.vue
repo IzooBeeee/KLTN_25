@@ -48,11 +48,11 @@
             
             <!-- Favorite Floating -->
             <button @click.stop="toggleFavorite(property.id, $event)" 
-              class="absolute top-6 right-6 w-14 h-14 rounded-2xl backdrop-blur-xl flex items-center justify-center transition-all duration-500 hover:scale-110 active:scale-95 z-20 shadow-2xl overflow-hidden"
-              :class="isPropertyFavorite ? 'bg-rose-500 shadow-rose-500/40' : 'bg-white/80 text-gray-800 hover:bg-white'">
-              <span class="material-symbols-outlined text-[32px] transition-all duration-300" 
-                :style="isPropertyFavorite ? 'font-variation-settings: \'FILL\' 1' : ''"
-                :class="isPropertyFavorite ? 'text-white' : 'text-gray-700'">
+              class="absolute top-6 right-6 w-12 h-12 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 z-20 shadow-lg"
+              :class="isPropertyFavorite ? 'bg-gradient-to-br from-pink-500 to-rose-500 shadow-rose-500/30' : 'bg-white/95 text-gray-800 hover:bg-white'">
+              <span class="material-symbols-outlined text-2xl transition-all duration-300" 
+                :style="{ fontVariationSettings: isPropertyFavorite ? `'FILL' 1` : `'FILL' 0` }"
+                :class="isPropertyFavorite ? 'text-white' : 'text-gray-400 hover:text-rose-500'">
                 favorite
               </span>
             </button>
@@ -379,6 +379,16 @@ export default {
       map: null
     };
   },
+  watch: {
+    '$route.params.id': {
+      handler(newId, oldId) {
+        if (newId && this.$route.name === 'KhachHangChiTietBatDongSan' && newId !== oldId) {
+          this.loadPropertyDetail(newId);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    }
+  },
   computed: {
     images() { return this.property?.hinhAnh || this.property?.hinh_anh || []; },
     mainImage() { 
@@ -390,7 +400,7 @@ export default {
       const f = this.property?.tien_ich || this.property?.tien_nghi || '';
       return f ? f.split(',').map(x => x.trim()).filter(x => x) : [];
     },
-    isPropertyFavorite() { return this.favoriteIds.includes(this.property?.id); },
+    isPropertyFavorite() { return this.favoriteIds.map(Number).includes(Number(this.property?.id)); },
     broker() { return this.property?.moi_gioi || null; },
     brokerId() { return this.property?.moi_gioi?.id || null; },
     brokerName() { return this.property?.moi_gioi?.ten || 'Chuyên viên IzooBee'; }

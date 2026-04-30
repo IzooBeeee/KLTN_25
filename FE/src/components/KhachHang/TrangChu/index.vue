@@ -1,532 +1,277 @@
 <template>
-  <div
-    class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen font-['Inter']"
-  >
-    <!-- Hero Section -->
-    <section
-      class="relative h-[600px] lg:h-[700px] flex items-center overflow-hidden"
-    >
-      <div class="absolute inset-0">
+  <div class="bg-slate-50 min-h-screen font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
+    
+    <!-- 1. HERO SECTION -->
+    <section class="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+      <!-- Background Image -->
+      <div class="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-          class="w-full h-full object-cover"
-          alt="Luxury Real Estate"
+          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2500&q=80"
+          class="w-full h-full object-cover animate-hero-scale"
+          alt="Bất động sản cao cấp"
         />
-        <div
-          class="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-transparent"
-        ></div>
+        <!-- Elegant dark overlay -->
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/60 to-slate-900/90"></div>
       </div>
 
-      <div class="relative z-10 container mx-auto px-6 lg:px-12">
-        <div class="max-w-3xl">
-          <div
-            class="inline-block px-4 py-2 bg-blue-600/20 backdrop-blur-sm border border-blue-400/30 rounded-full mb-6"
-          >
-            <span class="text-blue-300 text-sm font-semibold tracking-wide"
-              >BẤT ĐỘNG SẢN CAO CẤP</span
-            >
-          </div>
-          <h1
-            class="font-['Be_Vietnam_Pro'] text-5xl lg:text-7xl font-bold text-white leading-tight mb-6"
-          >
-            Kiến tạo không gian<br />
-            <span
-              class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300"
-              >sống thượng lưu</span
-            >
-          </h1>
-          <p class="text-lg text-gray-300 mb-10 max-w-xl leading-relaxed">
-            Khám phá những bất động sản đẳng cấp nhất, được tuyển chọn kỹ lưỡng
-            cho phong cách sống đặc quyền.
-          </p>
-
-          <!-- Quick Stats -->
-          <div class="flex gap-8">
-            <div
-              v-for="(stat, index) in stats"
-              :key="`stat-${stat.id}`"
-              class="contents"
-            >
-              <div>
-                <div class="text-3xl font-bold text-white uppercase">
-                  {{ stat.current }}{{ stat.suffix }}
-                </div>
-                <div class="text-sm text-gray-400">{{ stat.label }}</div>
-              </div>
-              <div
-                v-if="index < stats.length - 1"
-                class="w-px bg-gray-600"
-              ></div>
-            </div>
-          </div>
-        </div>
+      <!-- Hero Content -->
+      <div class="relative z-10 container mx-auto px-6 lg:px-12 text-center reveal-item">
+        <span class="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-widest rounded-full mb-6 border border-white/20">
+          Nền tảng giao dịch BĐS uy tín
+        </span>
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 tracking-tight">
+          Tìm Kiếm Tổ Ấm <br class="hidden md:block"/>
+          <span class="text-blue-400">Hoàn Hảo Của Bạn</span>
+        </h1>
+        <p class="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-12">
+          Khám phá hàng ngàn bất động sản xác thực với thông tin minh bạch, định giá chính xác và hỗ trợ chuyên nghiệp 24/7.
+        </p>
       </div>
     </section>
 
-    <!-- Search Section -->
-    <section class="relative -mt-20 z-20 px-6">
+    <!-- 2. SEARCH BAR -->
+    <section class="relative z-20 -mt-20 px-6 reveal-item delay-100">
       <div class="container mx-auto max-w-5xl">
-        <div class="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="relative">
-              <label
-                class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2"
-                >Vị trí</label
-              >
-              <div class="relative">
-                <span
-                  class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                  >location_on</span
-                >
+        <div class="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-100 overflow-hidden">
+          <div class="flex flex-col md:flex-row items-stretch divide-y md:divide-y-0 md:divide-x divide-slate-100">
+            
+            <!-- Vị trí -->
+            <div class="w-full flex-1 px-6 py-4 flex flex-col justify-center group hover:bg-slate-50/50 transition-colors">
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 group-hover:text-blue-500 transition-colors">Khu vực</label>
+              <div class="flex items-center">
+                <span class="material-symbols-outlined text-slate-400 mr-3 text-xl group-focus-within:text-blue-500">location_on</span>
                 <input
                   v-model="search.location"
-                  placeholder="Quận, thành phố..."
-                  class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  placeholder="Nhập quận, thành phố..."
+                  class="w-full bg-transparent border-0 border-transparent shadow-none focus:ring-0 text-slate-700 text-base font-medium focus:outline-none placeholder:text-slate-300 placeholder:font-normal p-0"
                 />
               </div>
             </div>
 
-            <div class="relative">
-              <label
-                class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2"
-                >Loại hình</label
-              >
-              <div class="relative">
-                <span
-                  class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                  >category</span
-                >
-                <select
-                  v-model="search.type"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all cursor-pointer"
-                >
-                  <option value="">Tất cả</option>
-                  <option
-                    v-for="loai in propertyTypes"
-                    :key="loai.id"
-                    :value="loai.id"
-                  >
-                    {{ loai.ten_loai }}
-                  </option>
+            <!-- Loại hình -->
+            <div class="w-full flex-1 px-6 py-4 flex flex-col justify-center group hover:bg-slate-50/50 transition-colors">
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 group-hover:text-blue-500 transition-colors">Loại hình</label>
+              <div class="flex items-center relative">
+                <span class="material-symbols-outlined text-slate-400 mr-3 text-xl">real_estate_agent</span>
+                <select v-model="search.type" class="w-full bg-transparent border-0 border-transparent shadow-none focus:ring-0 p-0 text-slate-700 text-base font-medium appearance-none focus:outline-none cursor-pointer">
+                  <option value="">Tất cả loại hình</option>
+                  <option v-for="loai in propertyTypes" :key="loai.id" :value="loai.id">{{ loai.ten_loai }}</option>
                 </select>
+                <span class="material-symbols-outlined absolute right-0 text-slate-400 pointer-events-none text-xl">expand_more</span>
               </div>
             </div>
 
-            <div class="relative">
-              <label
-                class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2"
-                >Khoảng giá</label
-              >
-              <div class="relative">
-                <span
-                  class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                  >payments</span
-                >
-                <select
-                  v-model="search.price"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all cursor-pointer"
-                >
-                  <option value="">Mức giá</option>
+            <!-- Mức giá -->
+            <div class="w-full flex-1 px-6 py-4 flex flex-col justify-center group hover:bg-slate-50/50 transition-colors">
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 group-hover:text-blue-500 transition-colors">Mức giá</label>
+              <div class="flex items-center relative">
+                <span class="material-symbols-outlined text-slate-400 mr-3 text-xl">payments</span>
+                <select v-model="search.price" class="w-full bg-transparent border-0 border-transparent shadow-none focus:ring-0 p-0 text-slate-700 text-base font-medium appearance-none focus:outline-none cursor-pointer">
+                  <option value="">Mọi mức giá</option>
                   <option value="duoi-10">Dưới 10 tỷ</option>
                   <option value="10-30">10 - 30 tỷ</option>
                   <option value="tren-30">Trên 30 tỷ</option>
                 </select>
+                <span class="material-symbols-outlined absolute right-0 text-slate-400 pointer-events-none text-xl">expand_more</span>
               </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="w-full md:w-auto p-2 flex items-stretch">
+              <button @click="handleSearch" style="background-color: #2563eb; color: white; border-radius: 0.75rem;" class="w-full md:w-auto px-10 hover:opacity-90 font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98]">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span>Tìm kiếm</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Properties Section -->
-    <section class="py-5 px-6">
+    <!-- 3. PROPERTIES SECTION -->
+    <section id="properties-section" class="py-24 px-6">
       <div class="container mx-auto max-w-7xl">
-        <div class="flex justify-between items-end mb-4">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 reveal-item">
           <div>
-            <h2
-              class="font-['Be_Vietnam_Pro'] text-4xl font-bold text-slate-800 mt-4"
-            >
-              Bất động sản nổi bật
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+              {{ isSearchMode ? 'Kết quả Tìm kiếm' : 'Dự án Nổi bật' }}
             </h2>
-            <p class="text-gray-500">Những cơ hội đầu tư sinh lời cao nhất</p>
+            <p class="text-slate-500 text-base">
+              {{ isSearchMode ? `Tìm thấy ${totalResults} bất động sản phù hợp với yêu cầu của bạn.` : 'Những bất động sản được đánh giá cao nhất trong tuần.' }}
+            </p>
           </div>
           <router-link
             to="/khach-hang/danh-sach-bat-dong-san"
-            class="hidden md:flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors"
+            class="text-blue-600 font-semibold hover:text-blue-700 flex items-center gap-1 group transition-colors"
           >
-            Xem tất cả
-            <span class="material-symbols-outlined">arrow_forward</span>
+            Xem tất cả dự án
+            <span class="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
           </router-link>
         </div>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div v-for="i in 3" :key="`loading-${i}`" class="animate-pulse">
-            <div class="bg-white rounded-2xl overflow-hidden h-[450px]">
-              <div class="h-64 bg-gray-200"></div>
-              <div class="p-6 space-y-4">
-                <div class="h-6 bg-gray-200 rounded w-3/4"></div>
-                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
-                <div class="h-8 bg-gray-200 rounded w-1/3 mt-4"></div>
-              </div>
+        <!-- Loading Skeleton -->
+        <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div v-for="i in 3" :key="`loading-${i}`" class="animate-pulse bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+            <div class="aspect-[4/3] bg-slate-200"></div>
+            <div class="p-6">
+              <div class="h-4 bg-slate-200 rounded w-1/4 mb-4"></div>
+              <div class="h-6 bg-slate-200 rounded w-3/4 mb-6"></div>
+              <div class="h-5 bg-slate-200 rounded w-1/2"></div>
             </div>
           </div>
         </div>
 
         <!-- Properties Grid -->
-        <div
-          v-else-if="properties.length > 0"
-          class="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
-        >
+        <div v-else-if="properties.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div
-            v-for="item in properties"
+            v-for="(item, index) in properties"
             :key="item.id"
-            class="group block bg-white rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_rgba(37,99,235,0.1)] transition-all duration-500 cursor-pointer border border-gray-100/50 hover:-translate-y-3"
+            class="reveal-item group bg-white border border-slate-100/60 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-400 cursor-pointer"
+            :style="`transition-delay: ${index * 100}ms`"
             @click.prevent="viewProperty(item.id)"
           >
-            <div class="relative h-80 overflow-hidden">
+            <!-- Image Area -->
+            <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
               <img
                 :src="item.image"
-                class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                :alt="item.name || 'Bất động sản'"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                :alt="item.name"
                 @error="handleImageError"
                 loading="lazy"
               />
-              <div
-                class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500 pointer-events-none"
-              ></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
 
-              <!-- Badge Exclusive -->
-              <div class="absolute top-5 left-5 pointer-events-none">
-                <span
-                  class="px-4 py-1.5 bg-white/90 backdrop-blur-md text-slate-900 text-[10px] font-black uppercase tracking-[0.15em] rounded-full shadow-sm"
-                >
-                  Exclusive
+              <!-- Badges -->
+              <div class="absolute top-4 left-4 flex gap-2">
+                <span class="px-3 py-1 bg-white/95 backdrop-blur text-slate-800 text-[11px] font-bold uppercase tracking-wider rounded-md shadow-sm">
+                  {{ item.loai }}
+                </span>
+                <span v-if="item.isExclusive" class="px-3 py-1 bg-rose-500 text-white text-[11px] font-bold uppercase tracking-wider rounded-md shadow-sm">
+                  Hot
                 </span>
               </div>
 
-              <!-- ❤️ Icon Trái Tim - Nút Favorite -->
+              <!-- Heart Button -->
               <button
                 @click.stop="toggleFavorite(item.id, $event)"
-                class="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/95 backdrop-blur-md shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group/btn"
-                :class="
-                  item.isFavorite
-                    ? 'bg-gradient-to-br from-pink-500 to-rose-500'
-                    : ''
-                "
-                :aria-label="
-                  item.isFavorite ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'
-                "
+                class="absolute top-4 right-4 w-10 h-10 bg-white/95 backdrop-blur-md rounded-full shadow-sm flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300"
               >
                 <span
-                  class="material-symbols-outlined text-xl transition-all duration-300"
-                  :class="
-                    item.isFavorite
-                      ? 'text-white fill-current'
-                      : 'text-gray-400 group-hover/btn:text-pink-500'
-                  "
+                  class="material-symbols-outlined text-[20px] transition-colors duration-300"
+                  :style="{ fontVariationSettings: item.isFavorite ? `'FILL' 1` : `'FILL' 0` }"
+                  :class="item.isFavorite ? 'text-rose-500' : 'text-slate-400 group-hover/btn:text-rose-400'"
                 >
                   favorite
                 </span>
               </button>
-            </div>
 
-            <div class="p-8">
-              <div class="flex items-center gap-2 mb-3">
-                <span
-                  class="text-blue-600 font-bold text-[11px] uppercase tracking-widest"
-                  >{{ item.loai }}</span
-                >
-                <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
-                <span
-                  class="text-gray-400 text-[11px] font-medium uppercase tracking-widest"
-                >
-                  {{ (item.location || "Việt Nam").split(",")[0] }}
+              <!-- Image Footer overlay (Price) -->
+              <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+                <span class="text-white font-bold text-2xl tracking-tight drop-shadow-md">
+                  {{ formatPriceDisplay(item.gia) }}
                 </span>
               </div>
+            </div>
 
-              <h3
-                class="font-['Be_Vietnam_Pro'] text-2xl font-bold text-slate-800 mb-6 leading-tight group-hover:text-blue-600 transition-colors line-clamp-2 h-[67px]"
-              >
+            <!-- Content Area -->
+            <div class="p-6">
+              <div class="flex items-center gap-1.5 text-slate-400 mb-2">
+                <span class="material-symbols-outlined text-[16px]">location_on</span>
+                <span class="text-sm font-medium">{{ item.location }}</span>
+              </div>
+              <h3 class="text-lg font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors min-h-[56px] mb-2">
                 {{ item.name }}
               </h3>
-
-              <div class="flex items-baseline justify-between">
-                <div>
-                  <p
-                    class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold mb-1"
-                  >
-                    Giá đặc quyền
-                  </p>
-                  <p class="text-2xl font-black text-slate-900">
-                    {{ formatPriceDisplay(item.gia) }}
-                  </p>
-                </div>
-
-                <div
-                  class="flex items-center gap-2 text-blue-600 font-semibold text-sm group/btn"
-                >
-                  <span>Chi tiết</span>
-                  <span
-                    class="material-symbols-outlined transition-transform group-hover/btn:translate-x-1"
-                    >arrow_right_alt</span
-                  >
-                </div>
-              </div>
             </div>
           </div>
         </div>
 
         <!-- Empty State -->
-        <div
-          v-else-if="!loading && properties.length === 0"
-          class="text-center py-20"
-        >
-          <div
-            class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <span class="material-symbols-outlined text-gray-400 text-5xl"
-              >search_off</span
-            >
+        <div v-else-if="!loading && properties.length === 0" class="py-24 text-center reveal-item">
+          <div class="w-20 h-20 mx-auto bg-slate-50 rounded-full flex items-center justify-center mb-6 text-slate-300">
+            <span class="material-symbols-outlined text-4xl">search_off</span>
           </div>
-          <h3 class="text-xl font-bold text-gray-700 mb-2">
-            Không tìm thấy bất động sản
-          </h3>
-          <p class="text-gray-500">
-            Hãy thử điều chỉnh tiêu chí tìm kiếm của bạn
-          </p>
+          <h3 class="text-xl font-bold text-slate-700 mb-2">Không tìm thấy bất động sản</h3>
+          <p class="text-slate-500">Xin vui lòng thay đổi bộ lọc tìm kiếm của bạn.</p>
         </div>
       </div>
     </section>
 
-    <!-- Why Choose Us Section -->
-    <section class="py-5  border-gray-100">
-      <div class="container mx-auto max-w-7xl px-6">
-        <div class="text-center max-w-2xl mx-auto">
-          <h2
-            class="font-['Be_Vietnam_Pro'] text-[32px] md:text-[38px] font-bold text-[#0a0e27] mb-3"
-          >
-            Tại sao chọn Architectural Curator?
-          </h2>
-          <p class="text-gray-500 text-[16px] leading-relaxed mb-4 text-center">
-            Chúng tôi không chỉ là một mô hình bất động sản bình thường, mà là
-            hệ sinh thái toàn diện dành cho giới thượng lưu.
-          </p>
+    <!-- 4. FEATURES SECTION -->
+    <section class="py-24 px-6 bg-white border-y border-slate-100">
+      <div class="container mx-auto max-w-7xl">
+        <div class="text-center max-w-2xl mx-auto mb-16 reveal-item">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Tại sao chọn ArchiEstate?</h2>
+          <p class="text-slate-500 text-lg">Chúng tôi cung cấp dịch vụ chuyên nghiệp, minh bạch và an toàn nhất trên thị trường bất động sản.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div
-            class="bg-white p-8 rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_40px_rgba(10,14,39,0.08)] hover:-translate-y-2 transition-all duration-500 group border border-gray-100"
-          >
-            <div
-              class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-500"
-            >
-              <span
-                class="material-symbols-outlined text-[32px] text-blue-600 group-hover:text-white transition-colors duration-500"
-                >verified</span
-              >
+          <div class="reveal-item text-center group" style="transition-delay: 100ms">
+            <div class="w-16 h-16 mx-auto bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+              <span class="material-symbols-outlined text-3xl">shield_locked</span>
             </div>
-            <h3
-              class="font-['Be_Vietnam_Pro'] text-[20px] font-bold text-[#0a0e27] mb-3"
-            >
-              Pháp lý chuẩn mực
-            </h3>
-            <p class="text-gray-500 text-[14px] leading-relaxed">
-              100% dự án được kiểm định pháp lý bởi đội ngũ luật sư chuyên
-              nghiệp, đảm bảo an toàn tuyệt đối.
-            </p>
+            <h3 class="text-lg font-bold text-slate-900 mb-3">Pháp lý an toàn</h3>
+            <p class="text-slate-500 text-sm leading-relaxed px-4">100% bất động sản được kiểm tra sổ đỏ và tình trạng quy hoạch minh bạch.</p>
           </div>
 
-          <div
-            class="bg-white p-8 rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_40px_rgba(10,14,39,0.08)] hover:-translate-y-2 transition-all duration-500 group border border-gray-100"
-          >
-            <div
-              class="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-600 transition-colors duration-500"
-            >
-              <span
-                class="material-symbols-outlined text-[32px] text-purple-600 group-hover:text-white transition-colors duration-500"
-                >diamond</span
-              >
+          <div class="reveal-item text-center group" style="transition-delay: 200ms">
+            <div class="w-16 h-16 mx-auto bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
+              <span class="material-symbols-outlined text-3xl">verified_user</span>
             </div>
-            <h3
-              class="font-['Be_Vietnam_Pro'] text-[20px] font-bold text-[#0a0e27] mb-3"
-            >
-              Sản phẩm độc quyền
-            </h3>
-            <p class="text-gray-500 text-[14px] leading-relaxed">
-              Tuyển chọn kỹ lưỡng những BĐS hạng sang tại các vị trí kim cương
-              của thành phố.
-            </p>
+            <h3 class="text-lg font-bold text-slate-900 mb-3">Định giá chính xác</h3>
+            <p class="text-slate-500 text-sm leading-relaxed px-4">Sử dụng dữ liệu thị trường thực tế để đưa ra mức giá tư vấn tốt nhất.</p>
           </div>
 
-          <div
-            class="bg-white p-8 rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_40px_rgba(10,14,39,0.08)] hover:-translate-y-2 transition-all duration-500 group border border-gray-100"
-          >
-            <div
-              class="w-16 h-16 bg-cyan-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-cyan-600 transition-colors duration-500"
-            >
-              <span
-                class="material-symbols-outlined text-[32px] text-cyan-600 group-hover:text-white transition-colors duration-500"
-                >support_agent</span
-              >
+          <div class="reveal-item text-center group" style="transition-delay: 300ms">
+            <div class="w-16 h-16 mx-auto bg-cyan-50 text-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-cyan-600 group-hover:text-white transition-colors duration-300">
+              <span class="material-symbols-outlined text-3xl">support_agent</span>
             </div>
-            <h3
-              class="font-['Be_Vietnam_Pro'] text-[20px] font-bold text-[#0a0e27] mb-3"
-            >
-              Tư vấn tận tâm
-            </h3>
-            <p class="text-gray-500 text-[14px] leading-relaxed">
-              Đội ngũ chuyên viên am hiểu thị trường, hỗ trợ 24/7 với thái độ
-              phục vụ đẳng cấp 5 sao.
-            </p>
+            <h3 class="text-lg font-bold text-slate-900 mb-3">Hỗ trợ tận tâm</h3>
+            <p class="text-slate-500 text-sm leading-relaxed px-4">Đội ngũ chuyên viên túc trực 24/7 để giải đáp mọi quy trình mua bán.</p>
           </div>
 
-          <div
-            class="bg-white p-8 rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_40px_rgba(10,14,39,0.08)] hover:-translate-y-2 transition-all duration-500 group border border-gray-100"
-          >
-            <div
-              class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-600 transition-colors duration-500"
-            >
-              <span
-                class="material-symbols-outlined text-[32px] text-orange-600 group-hover:text-white transition-colors duration-500"
-                >chart_data</span
-              >
+          <div class="reveal-item text-center group" style="transition-delay: 400ms">
+            <div class="w-16 h-16 mx-auto bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300">
+              <span class="material-symbols-outlined text-3xl">handshake</span>
             </div>
-            <h3
-              class="font-['Be_Vietnam_Pro'] text-[20px] font-bold text-[#0a0e27] mb-3"
-            >
-              Tiềm năng sinh lời
-            </h3>
-            <p class="text-gray-500 text-[14px] leading-relaxed">
-              Phân tích dữ liệu thị trường chuyên sâu, tối ưu hóa lợi nhuận đầu
-              tư cho khách hàng.
-            </p>
+            <h3 class="text-lg font-bold text-slate-900 mb-3">Giao dịch nhanh gọn</h3>
+            <p class="text-slate-500 text-sm leading-relaxed px-4">Thủ tục giấy tờ được tối ưu hóa, tiết kiệm tối đa thời gian của khách hàng.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-5">
-      <div class="container mx-auto max-w-7xl px-6">
-        <div
-          class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0a0e27] via-[#0d1542] to-[#0a0e27] px-8 md:px-16 py-12 md:py-16"
-        >
-          <div
-            class="absolute top-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"
-          ></div>
-          <div
-            class="absolute bottom-0 left-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"
-          ></div>
-
-          <div class="relative z-10 grid lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <h2
-                class="font-['Be_Vietnam_Pro'] text-[32px] md:text-[40px] font-bold text-white leading-tight mb-5"
-              >
-                Trở thành đối tác<br />
-                <span class="text-blue-400">môi giới chuyên nghiệp</span>
-              </h2>
-
-              <p
-                class="text-[#94a3b8] text-[15px] md:text-[16px] leading-relaxed max-w-xl mb-8"
-              >
-                Gia nhập đội ngũ ArchiEstate để tiếp cận nguồn khách hàng cao
-                cấp và hệ thống quản lý bất động sản hiện đại nhất.
-              </p>
-
-              <button
-                style="border-radius: 20px"
-                class="bg-white hover:bg-gray-100 text-[#0a0e27] px-8 py-4 rounded-full font-['Be_Vietnam_Pro'] font-bold text-[14px] tracking-wide shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 flex items-center gap-2.5 group"
-              >
-                <span>Đăng ký ngay</span>
-                <span
-                  class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform duration-300"
-                >
-                  arrow_forward
-                </span>
-              </button>
-            </div>
-
-            <div class="flex lg:justify-end">
-              <div
-                class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[24px] px-8 py-7 max-w-sm w-full"
-              >
-                <div class="flex items-start gap-4 mb-6">
-                  <div
-                    class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0"
-                  >
-                    <span
-                      class="material-symbols-outlined text-blue-400 text-[24px]"
-                      >trending_up</span
-                    >
-                  </div>
-                  <div>
-                    <div class="text-white font-bold text-[18px] mb-0.5">
-                      Tăng trưởng 45%
-                    </div>
-                    <div class="text-[#64748b] text-[13px] font-medium">
-                      Doanh thu trung bình đối tác
-                    </div>
-                  </div>
-                </div>
-
-                <div class="flex items-start gap-4">
-                  <div
-                    class="w-12 h-12 rounded-xl bg-cyan-400/20 flex items-center justify-center flex-shrink-0"
-                  >
-                    <span
-                      class="material-symbols-outlined text-cyan-400 text-[24px]"
-                      >groups</span
-                    >
-                  </div>
-                  <div>
-                    <div class="text-white font-bold text-[18px] mb-0.5">
-                      1,200+ Môi giới
-                    </div>
-                    <div class="text-[#64748b] text-[13px] font-medium">
-                      Đang hoạt động trên toàn quốc
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <!-- 5. CTA SECTION -->
+    <section class="py-24 px-6">
+      <div class="container mx-auto max-w-6xl reveal-item">
+        <div class="relative bg-blue-600 rounded-3xl p-12 lg:p-20 overflow-hidden shadow-2xl shadow-blue-600/20 text-center">
+          <!-- Geometric background pattern -->
+          <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-white rounded-full mix-blend-overlay blur-3xl translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full mix-blend-overlay blur-3xl -translate-x-1/2 translate-y-1/2"></div>
+          </div>
+          
+          <div class="relative z-10 max-w-3xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">Trở Thành Đối Tác Chuyên Nghiệp</h2>
+            <p class="text-blue-100 text-lg md:text-xl mb-10 font-medium">
+              Đăng ký để tiếp cận hàng triệu khách hàng tiềm năng và sử dụng công cụ quản lý bất động sản hàng đầu.
+            </p>
+            <router-link to="/khach-hang/nang-cap-moi-gioi" class="bg-white text-blue-600 hover:bg-slate-50 px-12 py-5 rounded-xl font-bold text-lg transition-colors shadow-lg active:scale-95 inline-block cursor-pointer relative z-20">
+              Đăng Ký Ngay
+            </router-link>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 🍞 Enhanced Vue Toast Notification -->
-    <transition name="toast-slide">
-      <div
-        v-if="toast.visible"
-        class="fixed top-5 right-5 z-[9999] pointer-events-auto"
-      >
-        <div
-          class="flex items-center gap-3 px-5 py-3.5 text-white rounded-2xl shadow-2xl backdrop-blur-md border border-white/20 min-w-[280px] max-w-sm"
-          :class="getToastClass(toast.type)"
-        >
-          <!-- Icon với animation pulse khi add favorite -->
-          <span
-            class="material-symbols-outlined text-xl flex-shrink-0"
-            :class="{ 'animate-heart-pulse': toast.type === 'favorite-add' }"
-          >
-            {{ toast.icon || getToastIcon(toast.type) }}
+    <!-- 6. TOAST NOTIFICATION -->
+    <transition name="fade-toast">
+      <div v-if="toast.visible" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[9999]">
+        <div class="flex items-center gap-3 px-6 py-4 bg-slate-900/95 backdrop-blur text-white rounded-xl shadow-2xl">
+          <span class="material-symbols-outlined text-xl" :class="toast.type === 'favorite-add' ? 'text-rose-500 font-variation-settings:\'FILL\' 1' : 'text-blue-400'">
+            {{ toast.icon || 'info' }}
           </span>
-
-          <!-- Message -->
-          <span class="font-medium text-sm flex-1 leading-tight">
-            {{ toast.message }}
-          </span>
-
-          <!-- Close button -->
-          <button
-            @click="hideToast"
-            class="ml-2 hover:opacity-80 transition-opacity p-1 rounded-full hover:bg-white/20"
-            aria-label="Đóng thông báo"
-          >
-            <span class="material-symbols-outlined text-lg">close</span>
-          </button>
+          <span class="font-medium">{{ toast.message }}</span>
         </div>
       </div>
     </transition>
@@ -546,16 +291,11 @@ export default {
       propertyTypes: [],
       search: { location: "", type: "", price: "" },
       properties: [],
-      stats: [
-        { id: 1, label: "Dự án", value: 5000, suffix: "+", current: 0 },
-        { id: 2, label: "Khách hàng", value: 10, suffix: "K+", current: 0 },
-        { id: 3, label: "Năm kinh nghiệm", value: 15, suffix: "+", current: 0 },
-      ],
-      defaultImage:
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+      favoriteIds: [],
+      isSearchMode: false,
+      totalResults: 0,
+      defaultImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
       searchTimer: null,
-
-      // ✅ Vue Reactive Toast System
       toast: {
         visible: false,
         message: "",
@@ -563,6 +303,7 @@ export default {
         icon: null,
         timer: null,
       },
+      observer: null,
     };
   },
 
@@ -577,48 +318,67 @@ export default {
   },
 
   mounted() {
-    this.loadProperties();
+    this.loadProperties().then(() => {
+      if (getToken("khach-hang")) {
+        this.syncFavoriteList();
+      }
+      this.$nextTick(() => this.initScrollAnimations());
+    });
     this.loadPropertyTypes();
-    this.animateStats();
+    window.addEventListener("favorite-updated", this.handleFavoriteUpdated);
   },
 
   beforeUnmount() {
-    // ✅ Cleanup toast timer khi unmount
-    if (this.toast.timer) {
-      clearTimeout(this.toast.timer);
-      this.toast.timer = null;
-    }
+    if (this.toast.timer) clearTimeout(this.toast.timer);
     if (this.searchTimer) clearTimeout(this.searchTimer);
+    if (this.observer) this.observer.disconnect();
+    window.removeEventListener("favorite-updated", this.handleFavoriteUpdated);
   },
 
   methods: {
-    // 🍞 Toast helpers - Enhanced với favorite-add/remove
-    getToastClass(type) {
-      const classes = {
-        success: "bg-gradient-to-r from-emerald-500 to-teal-500",
-        error: "bg-gradient-to-r from-red-500 to-rose-500",
-        warning: "bg-gradient-to-r from-amber-500 to-orange-500",
-        "favorite-add":
-          "bg-gradient-to-r from-pink-500 via-rose-500 to-red-500 shadow-pink-500/30",
-        "favorite-remove":
-          "bg-gradient-to-r from-gray-500 via-slate-500 to-gray-600 shadow-gray-500/30",
-      };
-      return classes[type] || classes.warning;
+    async syncFavoriteList() {
+      try {
+        if (!getToken("khach-hang")) return;
+        const res = await api.get("/khach-hang/bds/yeu-thich/data");
+        const favorites = res.data?.data || [];
+        this.favoriteIds = favorites.map(item => item.bat_dong_san_id || item.bds_id || item.batDongSan?.id).filter(id => id);
+        
+        this.properties = this.properties.map(p => ({
+          ...p,
+          isFavorite: this.favoriteIds.map(Number).includes(Number(p.id))
+        }));
+      } catch (err) {
+        console.error("Sync favorite error:", err);
+      }
     },
 
-    getToastIcon(type) {
-      const icons = {
-        success: "check_circle",
-        error: "error",
-        warning: "warning",
-        "favorite-add": "favorite",
-        "favorite-remove": "heart_broken",
+    handleFavoriteUpdated() {
+      if (getToken("khach-hang")) {
+        this.syncFavoriteList();
+      }
+    },
+    // Scroll Animation Logic
+    initScrollAnimations() {
+      const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15
       };
-      return icons[type] || icons.warning;
+
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            this.observer.unobserve(entry.target); // Trigger only once
+          }
+        });
+      }, options);
+
+      const elements = document.querySelectorAll('.reveal-item');
+      elements.forEach(el => this.observer.observe(el));
     },
 
-    // ✅ Toast cơ bản cho các thông báo chung
-    showToast(msg, type = "warning", duration = 2500) {
+    showToast(msg, type = "warning", duration = 3000) {
       if (this.toast.timer) clearTimeout(this.toast.timer);
       this.toast = {
         visible: true,
@@ -629,32 +389,16 @@ export default {
       };
     },
 
-    // ❤️ Toast chuyên biệt cho favorite - Phân biệt THÊM vs XÓA
     showFavoriteToast(action, propertyName) {
-      const shortName =
-        propertyName.length > 30
-          ? propertyName.substring(0, 27) + "..."
-          : propertyName;
-
+      const shortName = propertyName.length > 25 ? propertyName.substring(0, 22) + "..." : propertyName;
       if (this.toast.timer) clearTimeout(this.toast.timer);
-
-      if (action === "add") {
-        this.toast = {
-          visible: true,
-          message: `❤️ Đã lưu "${shortName}" vào yêu thích`,
-          type: "favorite-add",
-          icon: "favorite",
-          timer: setTimeout(() => this.hideToast(), 3000),
-        };
-      } else {
-        this.toast = {
-          visible: true,
-          message: `💔 Đã xóa "${shortName}" khỏi yêu thích`,
-          type: "favorite-remove",
-          icon: "heart_broken",
-          timer: setTimeout(() => this.hideToast(), 2500),
-        };
-      }
+      this.toast = {
+        visible: true,
+        message: action === "add" ? `Đã lưu "${shortName}"` : `Đã bỏ lưu "${shortName}"`,
+        type: action === "add" ? "favorite-add" : "favorite-remove",
+        icon: action === "add" ? "favorite" : "heart_broken",
+        timer: setTimeout(() => this.hideToast(), 2500),
+      };
     },
 
     hideToast() {
@@ -665,20 +409,18 @@ export default {
       }
     },
 
+    handleImageError(e) {
+      if (e.target.src !== this.defaultImage) {
+        e.target.src = this.defaultImage;
+      }
+    },
+
     async loadPropertyTypes() {
       try {
         const res = await api.get("/client/loai-bat-dong-san");
-
-        if (Array.isArray(res.data)) {
-          this.propertyTypes = res.data;
-        } else if (res.data?.data) {
-          this.propertyTypes = res.data.data;
-        } else {
-          this.propertyTypes = [];
-        }
+        this.propertyTypes = Array.isArray(res.data) ? res.data : (res.data?.data || []);
       } catch (error) {
-        console.error("Lỗi loại BĐS:", error);
-        this.propertyTypes = [];
+        console.error("Lỗi tải loại BĐS:", error);
       }
     },
 
@@ -693,18 +435,10 @@ export default {
       this.loading = true;
       try {
         const res = await api.get("/client/bat-dong-san");
-        let raw = [];
-        if (Array.isArray(res.data)) {
-          raw = res.data;
-        } else if (res.data?.data?.data) {
-          raw = res.data.data.data;
-        } else if (res.data?.data) {
-          raw = res.data.data;
-        }
+        let raw = Array.isArray(res.data) ? res.data : (res.data?.data?.data || res.data?.data || []);
         this.properties = this.mapProperties(raw);
       } catch (error) {
-        console.error("Load lỗi:", error);
-        this.properties = [];
+        console.error("Lỗi tải BĐS:", error);
       } finally {
         this.loading = false;
       }
@@ -713,36 +447,22 @@ export default {
     mapProperties(rawData) {
       return rawData.map((item) => {
         let imageUrl = this.defaultImage;
+        const isValidUrl = (u) => typeof u === "string" && u.trim() !== "" && u !== "null" && u !== "undefined";
 
-        const isValidUrl = (u) => {
-          return (
-            typeof u === "string" &&
-            u.trim() !== "" &&
-            u !== "null" &&
-            u !== "undefined"
-          );
-        };
-
-        // 🔥 ƯU TIÊN hinh_anh trước (FIX LẶP)
-        if (Array.isArray(item.hinhAnh)) {
-          const img = item.hinhAnh.find((i) => i && isValidUrl(i.url));
-          if (img) {
-            imageUrl = this.getImageUrl(img.url.trim());
-          }
-        }
-
-        // 🔥 fallback mới dùng anh_dai_dien
-        else if (item.anh_dai_dien && isValidUrl(item.anh_dai_dien.url)) {
+        if (isValidUrl(item.anh_dai_dien_url)) {
+          imageUrl = this.getImageUrl(item.anh_dai_dien_url.trim());
+        } else if (Array.isArray(item.hinh_anh) && item.hinh_anh.length > 0) {
+          const img = item.hinh_anh.find((i) => i && isValidUrl(i.url));
+          if (img) imageUrl = this.getImageUrl(img.url.trim());
+        } else if (item.anh_dai_dien && isValidUrl(item.anh_dai_dien.url)) {
           imageUrl = this.getImageUrl(item.anh_dai_dien.url.trim());
         }
 
         let location = "Đang cập nhật";
         if (item.dia_chi) {
-          if (item.dia_chi.ten_quan && item.dia_chi.ten_tinh) {
-            location = `${item.dia_chi.ten_quan}, ${item.dia_chi.ten_tinh}`;
-          } else if (item.dia_chi.ten_tinh) {
-            location = item.dia_chi.ten_tinh;
-          }
+          const quan = item.dia_chi.quan?.ten || item.dia_chi.ten_quan;
+          const tinh = item.dia_chi.tinh?.ten || item.dia_chi.ten_tinh;
+          location = (quan && tinh) ? `${quan}, ${tinh}` : (tinh || "Việt Nam");
         }
 
         return {
@@ -753,106 +473,75 @@ export default {
           gia: item.gia_display || item.gia,
           image: imageUrl,
           isFavorite: item.is_favorite || false,
+          isExclusive: Math.random() > 0.8 // Random logic for mockup exclusive badge
         };
       });
     },
 
     async handleSearch() {
       this.loading = true;
+      this.isSearchMode = true;
       try {
-        let gia_min = null,
-          gia_max = null;
-        switch (this.search.price) {
-          case "duoi-10":
-            gia_max = 10000000000;
-            break;
-          case "10-30":
-            gia_min = 10000000000;
-            gia_max = 30000000000;
-            break;
-          case "tren-30":
-            gia_min = 30000000000;
-            break;
-        }
-        const payload = {
-          tieu_de: this.search.location || "",
-          loai_id: this.search.type || "",
-          gia_min,
-          gia_max,
-        };
+        let gia_min = null, gia_max = null;
+        if (this.search.price === "duoi-10") gia_max = 10000000000;
+        else if (this.search.price === "10-30") { gia_min = 10000000000; gia_max = 30000000000; }
+        else if (this.search.price === "tren-30") gia_min = 30000000000;
+
+        const payload = { tieu_de: this.search.location || "", loai_id: this.search.type || "", gia_min, gia_max };
         const res = await api.post("/client/tim-kiem", payload);
-        if (res.data?.status) {
-          const raw = res.data.data?.data || [];
-          this.properties = this.mapProperties(raw);
-        } else {
-          this.properties = [];
-        }
+        const raw = res.data?.status ? (res.data.data?.data || []) : [];
+        this.properties = this.mapProperties(raw);
+        this.totalResults = res.data?.data?.total || this.properties.length;
+        
+        // Re-init animations for new items
+        this.$nextTick(() => {
+          this.initScrollAnimations();
+          const section = document.getElementById("properties-section");
+          if (section) {
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
       } catch (error) {
-        console.error("Search lỗi:", error);
+        console.error("Lỗi tìm kiếm:", error);
         this.properties = [];
+        this.totalResults = 0;
       } finally {
         this.loading = false;
       }
     },
 
     viewProperty(id) {
-      const token = getToken("khach-hang");
-      if (!token) {
-        this.showToast("Vui lòng đăng nhập để xem chi tiết", "warning");
+      if (!getToken("khach-hang")) {
+        this.showToast("Vui lòng đăng nhập để xem chi tiết");
         setTimeout(() => this.$router.push("/khach-hang/dang-nhap"), 800);
         return;
       }
       this.$router.push(`/khach-hang/chi-tiet-bat-dong-san/${id}`);
     },
 
-    // ❤️ Toggle Favorite - ✅ VỚI TOAST ĐẸP & MƯỢT
     async toggleFavorite(id, ev) {
       ev.stopPropagation();
-
-      const token = getToken("khach-hang");
-      if (!token) {
-        this.showToast("Vui lòng đăng nhập để lưu tin", "warning");
+      if (!getToken("khach-hang")) {
+        this.showToast("Vui lòng đăng nhập để lưu tin");
         setTimeout(() => this.$router.push("/khach-hang/dang-nhap"), 800);
         return;
       }
 
-      // ✅ Tìm property để lấy tên và trạng thái cũ
       const property = this.properties.find((p) => p.id === id);
       const wasFavorite = property?.isFavorite || false;
       const action = wasFavorite ? "remove" : "add";
-      const propertyName = property?.name || "Bất động sản";
 
-      // ✅ Optimistic UI: Cập nhật ngay để cảm giác nhanh
+      // Optimistic update
       if (property) property.isFavorite = !wasFavorite;
 
       try {
-        // ✅ GỌI API HIỆN TẠI
         await api.post("/khach-hang/bds/yeu-thich", { bds_id: id });
-
-        const res = await api.get("/khach-hang/bds/yeu-thich/data");
-
-        // Lấy danh sách id đã thích
-        const favoriteIds = res.data.data.map(
-          (item) => item.bat_dong_san_id || item.bds_id || item.batDongSan?.id
-        );
-
-        // Update lại toàn bộ properties
-        this.properties = this.properties.map((p) => ({
-          ...p,
-          isFavorite: favoriteIds.includes(p.id),
-        }));
-
-        // ✅ Hiển thị toast CHUYÊN BIỆT cho THÊM/XÓA
-        this.showFavoriteToast(action, propertyName);
-
-        // Sync header
+        await this.syncFavoriteList();
+        this.showFavoriteToast(action, property?.name || "Bất động sản");
         window.dispatchEvent(new Event("favorite-updated"));
       } catch (err) {
-        console.error("API lỗi:", err.response?.data || err);
-
-        // ✅ Rollback UI nếu API fail
+        // Rollback
         if (property) property.isFavorite = wasFavorite;
-
         this.showToast("Có lỗi xảy ra, vui lòng thử lại", "error");
       }
     },
@@ -862,96 +551,40 @@ export default {
       if (gia >= 1_000_000_000) return Math.floor(gia / 1_000_000_000) + " Tỷ";
       if (gia >= 1_000_000) return Math.floor(gia / 1_000_000) + " Triệu";
       return "Liên hệ";
-    },
-
-    animateStats() {
-      this.stats.forEach((stat) => {
-        let current = 0;
-        const step = stat.value / 60;
-        const interval = setInterval(() => {
-          current += step;
-          if (current >= stat.value) {
-            stat.current = stat.value;
-            clearInterval(interval);
-          } else {
-            stat.current = Math.floor(current);
-          }
-        }, 30);
-      });
-    },
+    }
   },
 };
 </script>
 
 <style scoped>
-.line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  line-clamp: 1;
-  overflow: hidden;
-  word-break: break-all;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-.bg-blue-500\/10,
-.bg-cyan-500\/10 {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* 🍞 Enhanced Toast Animation - Mượt với cubic-bezier */
-.toast-slide-enter-active {
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.toast-slide-leave-active {
-  transition: all 0.2s ease-in;
-}
-.toast-slide-enter-from {
+/* 1. Scroll Reveal Animations */
+.reveal-item {
   opacity: 0;
-  transform: translateX(120%) scale(0.9);
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.toast-slide-leave-to {
+.reveal-item.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 2. Hero subtle zoom */
+.animate-hero-scale {
+  animation: heroScale 25s ease-in-out infinite alternate;
+}
+@keyframes heroScale {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
+}
+
+/* 3. Toast Fade Up */
+.fade-toast-enter-active,
+.fade-toast-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-toast-enter-from,
+.fade-toast-leave-to {
   opacity: 0;
-  transform: translateX(120%) scale(0.95);
-}
-
-/* 💖 Heart pulse animation cho icon khi add favorite */
-@keyframes heartPulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.25);
-  }
-}
-.animate-heart-pulse {
-  animation: heartPulse 0.6s ease-in-out;
-}
-
-/* 🌟 Glow effect cho toast favorite-add */
-.bg-gradient-to-r.from-pink-500 {
-  box-shadow: 0 8px 32px rgba(236, 72, 153, 0.4);
-}
-
-/* Reduce motion cho người dùng nhạy cảm */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-  .animate-heart-pulse {
-    animation: none !important;
-  }
+  transform: translate(-50%, 20px);
 }
 </style>

@@ -605,9 +605,9 @@ export default {
       } catch (err) {
         console.error("Lỗi load saved notifications:", err);
         this.notifications = [];
+        // ✅ Không tự redirect ở đây — để axios interceptor xử lý 401 tập trung
         if (err.response?.status === 401) {
           this.clearData();
-          this.$router.push("/khach-hang/dang-nhap");
         }
       } finally {
         this.loadingNotifs = false;
@@ -729,9 +729,9 @@ export default {
         console.error("Lỗi load conversations:", err);
         this.conversations = [];
         this.unreadCount = 0;
+        // ✅ Không tự redirect ở đây — để axios interceptor xử lý 401 tập trung
         if (err.response?.status === 401) {
           this.clearData();
-          this.$router.push("/khach-hang/dang-nhap");
         }
       } finally {
         this.loadingChat = false;

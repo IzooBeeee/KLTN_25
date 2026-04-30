@@ -127,7 +127,7 @@
               </div>
             </div>
 
-            <div class="form-row">
+            <div v-if="isResidential" class="form-row fade-in">
               <!-- Bedrooms -->
               <div class="form-group">
                 <label class="form-label">Số phòng ngủ</label>
@@ -597,6 +597,13 @@ const quanHuyenList = ref([]);
 const phuongList = ref([]);
 
 // ===== COMPUTED =====
+const isResidential = computed(() => {
+  const loai = loaiBDSList.value.find(l => l.id === form.loai_id);
+  if (!loai) return true;
+  const ten = loai.ten.toLowerCase();
+  return ['căn hộ', 'nhà phố', 'nhà riêng', 'biệt thự'].some(t => ten.includes(t));
+});
+
 const isFormValid = computed(() => {
   if (currentStep.value === 1) {
     return form.tieu_de && form.loai_id && form.gia && form.dien_tich;
@@ -1495,6 +1502,12 @@ const submitForm = async () => {
 
       if (["gia", "dien_tich", "so_phong_ngu", "so_phong_tam", "loai_id", "tinh_id", "quan_id", "phuong_id", "trang_thai_id"].includes(key)) {
         if (value === null || value === "" || value === undefined) return;
+        
+        // Bỏ qua phòng ngủ/phòng tắm nếu là dạng BĐS không phải nhà ở
+        if ((key === "so_phong_ngu" || key === "so_phong_tam") && !isResidential.value) {
+          return;
+        }
+
         value = parseFloat(value);
       }
 

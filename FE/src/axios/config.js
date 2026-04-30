@@ -30,24 +30,44 @@ api.interceptors.request.use(
 );
 
 // ✅ Response interceptor: xử lý 401
+// Dùng flag để tránh redirect nhiều lần liên tiếp
+let _isRedirecting = false;
+
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 401) {
-      console.error('🔴 [Axios] 401 Unauthorized → Clearing auth for current role...');
+    if (error.response?.status === 401 && !_isRedirecting) {
+      // ✅ Đọc role từ URL của API request (không phải window.location)
+      // Ví dụ: /api/khach-hang/... → role "khach-hang"
+      //         /api/admin/...      → role "admin"
+      //         /api/moi-gioi/...   → role "moi-gioi"
+      const requestUrl = error.config?.url || '';
+      let roleFromRequest = 'khach-hang';
+      if (requestUrl.includes('/admin/')) roleFromRequest = 'admin';
+      else if (requestUrl.includes('/moi-gioi/')) roleFromRequest = 'moi-gioi';
 
-      const role = getRoleFromPath(window.location.pathname);
-      clearAuth(role);
+      const tokenBefore = getToken(roleFromRequest);
 
-      // Redirect về trang đăng nhập đúng role (chỉ redirect nếu chưa ở trang login)
-      const path = window.location.pathname;
-      const isOnLoginPage = path.includes('/dang-nhap');
+      // Chỉ redirect nếu role đó đang có token (token hết hạn/không hợp lệ)
+      if (tokenBefore) {
+        console.error('🔴 [Axios] 401 Unauthorized → Clearing auth for role:', roleFromRequest);
+        clearAuth(roleFromRequest);
 
-      if (!isOnLoginPage) {
-        let loginPath = '/khach-hang/dang-nhap';
-        if (path.startsWith('/admin')) loginPath = '/admin/dang-nhap';
-        else if (path.startsWith('/moi-gioi')) loginPath = '/moi-gioi/dang-nhap';
-        window.location.href = loginPath;
+        const currentPath = window.location.pathname;
+        const isOnLoginPage = currentPath.includes('/dang-nhap');
+
+        // Không redirect nếu đang ở trang login (tránh vòng lặp)
+        if (!isOnLoginPage) {
+          _isRedirecting = true;
+          let loginPath = '/khach-hang/dang-nhap';
+          if (roleFromRequest === 'admin') loginPath = '/admin/dang-nhap';
+          else if (roleFromRequest === 'moi-gioi') loginPath = '/moi-gioi/dang-nhap';
+
+          import('@/router').then(({ default: router }) => {
+            router.push(loginPath);
+            setTimeout(() => { _isRedirecting = false; }, 2000);
+          });
+        }
       }
     }
     return Promise.reject(error);

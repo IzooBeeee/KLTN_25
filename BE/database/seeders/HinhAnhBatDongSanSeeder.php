@@ -86,6 +86,46 @@ class HinhAnhBatDongSanSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            // NEW IMAGES FOR 7 NEW PROPERTIES
+            // BDS 8
+            ['bds_id' => 8, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/209142_69eae8cd14e8c.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 8, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/209142_69eae8cda281a.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 8, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/209142_69eae8cde93c8.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 8, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/209142_69eae8ce53fb4.jpg', 'created_at' => now(), 'updated_at' => now()],
+            // BDS 9
+            ['bds_id' => 9, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207467_69dd00e53f3cd.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 9, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207467_69dd00e5b6338.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 9, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207467_69dd00e5ec533.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 9, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207467_69dd00e631409.jpg', 'created_at' => now(), 'updated_at' => now()],
+            // BDS 10
+            ['bds_id' => 10, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207373_69dc52148dc14.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 10, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207373_69dc52151bad9.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 10, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207373_69dc5215983a1.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 10, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207373_69dc5215de877.jpg', 'created_at' => now(), 'updated_at' => now()],
+            // BDS 11
+            ['bds_id' => 11, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207046_69d861e8be198.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 11, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207046_69d861e91930d.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 11, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207046_69d861e9355c3.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 11, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207046_69d861e95067e.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 11, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207046_69d861e96fd95.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 11, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207046_69d861e98a8df.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 11, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207046_69d861e9a6069.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 11, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207046_69d861e9c0a1f.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 11, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/207046_69d861e9d9111.jpg', 'created_at' => now(), 'updated_at' => now()],
+            // BDS 12
+            ['bds_id' => 12, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/206909_69d717e53e5a7.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 12, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/206909_69d717e59bfa8.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 12, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/206909_69d717e5ba630.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 12, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/206909_69d717e5d688e.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 12, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/206909_69d717e5eb438.jpg', 'created_at' => now(), 'updated_at' => now()],
+            // BDS 13
+            ['bds_id' => 13, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/143522_67c27ffaf410b.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 13, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/143522_67c27ffb8d5d0.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 13, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/143522_67c27ffbaf030.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 13, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/143522_67c27ffbd1c58.jpg', 'created_at' => now(), 'updated_at' => now()],
+            // BDS 14
+            ['bds_id' => 14, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/142947_67bee13f43eca.jpg', 'created_at' => now(), 'updated_at' => now()],
+            ['bds_id' => 14, 'url' => 'https://media.batdongsan.vn/crop/1275x717/posts/142947_67bee13faa127.jpg', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

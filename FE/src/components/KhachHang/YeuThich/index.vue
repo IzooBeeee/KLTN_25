@@ -153,6 +153,7 @@ const removeYeuThich = async (item) => {
   try {
     await api.post("/khach-hang/bds/yeu-thich", { bds_id: item.bat_dong_san_id });
     list.value = list.value.filter((i) => i.id !== item.id);
+    window.dispatchEvent(new Event("favorite-updated"));
   } catch (e) {
     console.error("Lỗi bỏ yêu thích:", e);
   }
@@ -166,5 +167,18 @@ const getInitials = (name) => {
   return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
 };
 
-onMounted(() => fetchYeuThich());
+const handleFavoriteUpdated = () => {
+  fetchYeuThich();
+};
+
+import { onUnmounted } from "vue";
+
+onMounted(() => {
+  fetchYeuThich();
+  window.addEventListener("favorite-updated", handleFavoriteUpdated);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("favorite-updated", handleFavoriteUpdated);
+});
 </script>
