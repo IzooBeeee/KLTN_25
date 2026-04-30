@@ -203,8 +203,8 @@
                 <!-- Menu Items -->
                 <div class="dropdown-items-new">
                   <!-- Hồ sơ cá nhân -->
-                  <router-link to="/khach-hang/ho-so-ca-nhan" class="dropdown-item-new" @click="showMenu = false">
-                    <span class="item-icon-new">�</span>
+                  <router-link to="/khach-hang/profile" class="dropdown-item-new" @click="showMenu = false">
+                    <span class="item-icon-new">👤</span>
                     <span class="item-label-new">Hồ sơ cá nhân</span>
                     <span class="item-arrow-new">→</span>
                   </router-link>
@@ -225,7 +225,7 @@
 
                   <!-- Nâng cấp -->
                   <router-link to="/khach-hang/nang-cap-moi-gioi" class="dropdown-item-new" @click="showMenu = false">
-                    <span class="item-icon-new">�</span>
+                    <span class="item-icon-new">🚀</span>
                     <span class="item-label-new">Trở thành Môi Giới</span>
                     <span class="item-arrow-new">→</span>
                   </router-link>
@@ -236,7 +236,7 @@
 
                 <!-- Footer: Settings + Logout -->
                 <div class="dropdown-footer-new">
-                  <router-link to="/cai-dat" class="dropdown-item-new settings-item" @click="showMenu = false">
+                  <router-link to="/khach-hang/profile" class="dropdown-item-new settings-item" @click="showMenu = false">
                     <span class="item-icon-new">⚙️</span>
                     <span class="item-label-new">Cài đặt tài khoản</span>
                   </router-link>
@@ -543,8 +543,8 @@ export default {
 
     handleChatWithBroker() {
       this.showMenu = false;
-      toaster.info("Đang kết nối với môi giới...", { duration: 2000 });
-      // Option: this.$router.push('/khach-hang/chat-voi-moi-gioi');
+      this.showChatPanel = true;
+      this.loadConversations();
     },
 
     // ===== NOTIFICATION METHODS =====

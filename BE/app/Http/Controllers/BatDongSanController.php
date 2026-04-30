@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\BatDongSan;
 use App\Models\MoiGioi;
 use App\Models\LoaiBatDongSan;
-use App\Models\TrangThaiBatDongSan;
 use App\Models\TinhThanh;
 use App\Models\QuanHuyen;
 use App\Models\DiaChi;
@@ -267,7 +266,6 @@ class BatDongSanController extends Controller
 
         $query = BatDongSan::with([
             'loai',
-            'trangThai',
             'diaChi.quan',
             'diaChi.tinh',
             'hinhAnh'

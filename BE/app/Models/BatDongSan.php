@@ -16,7 +16,6 @@ class BatDongSan extends Model
         'gia',
         'dien_tich',
         'loai_id',
-        'trang_thai_id',
         'moi_gioi_id',
         'dia_chi_id',
         'so_phong_ngu',
@@ -40,10 +39,7 @@ class BatDongSan extends Model
     {
         return $this->belongsTo(LoaiBatDongSan::class, 'loai_id');
     }
-    public function trangThai(): BelongsTo
-    {
-        return $this->belongsTo(TrangThaiBatDongSan::class, 'trang_thai_id');
-    }
+
     public function moiGioi(): BelongsTo
     {
         return $this->belongsTo(MoiGioi::class, 'moi_gioi_id');

@@ -62,7 +62,6 @@ class ClientHomeController extends Controller
     {
         $bds = BatDongSan::with([
             'loai',
-            'trangThai',
             'moiGioi',
             'diaChi.tinh',
             'diaChi.quan',
