@@ -5,6 +5,11 @@
       <h6 class="fw-bold mb-3"><i class="bi bi-funnel me-2"></i>Bộ lọc bản đồ</h6>
 
       <div class="mb-3">
+        <label class="form-label small fw-semibold">Từ khóa</label>
+        <input v-model="filter.keyword" type="text" class="form-control form-control-sm" placeholder="Tìm tên BĐS..." @keyup.enter="applyFilter" />
+      </div>
+
+      <div class="mb-3">
         <label class="form-label small fw-semibold">Khoảng giá</label>
         <div class="d-flex gap-2">
           <input v-model="filter.minPrice" type="number" class="form-control form-control-sm" placeholder="Từ (VNĐ)" />
@@ -32,11 +37,11 @@
 
       <div class="mb-2">
         <label class="form-label small fw-semibold">Vĩ độ (Lat)</label>
-        <input v-model="nearby.lat" type="number" step="0.0001" class="form-control form-control-sm" placeholder="10.7769" />
+        <input v-model="nearby.lat" type="number" step="0.0001" class="form-control form-control-sm" placeholder="16.0544" />
       </div>
       <div class="mb-2">
         <label class="form-label small fw-semibold">Kinh độ (Lng)</label>
-        <input v-model="nearby.lng" type="number" step="0.0001" class="form-control form-control-sm" placeholder="106.7009" />
+        <input v-model="nearby.lng" type="number" step="0.0001" class="form-control form-control-sm" placeholder="108.2022" />
       </div>
       <div class="mb-3">
         <label class="form-label small fw-semibold">Bán kính (km)</label>
@@ -88,8 +93,8 @@ const mapLoading = ref(false);
 const loaiBDS = ref([]);
 const nearbyList = ref([]);
 
-const filter = ref({ minPrice: "", maxPrice: "", loai_id: "" });
-const nearby = ref({ lat: "", lng: "", radius: 5 });
+const filter = ref({ minPrice: "", maxPrice: "", loai_id: "", keyword: "" });
+const nearby = ref({ lat: "16.0544", lng: "108.2022", radius: 5 });
 
 let map = null;
 let markersLayer = null;
@@ -97,7 +102,7 @@ let markersLayer = null;
 const isLoggedIn = !!localStorage.getItem("khach_hang_auth_token");
 
 const initMap = () => {
-  map = L.map("ban-do-leaflet").setView([10.7769, 106.7009], 12);
+  map = L.map("ban-do-leaflet").setView([16.0544, 108.2022], 13);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap contributors",
     maxZoom: 19,
@@ -112,13 +117,20 @@ const loadMapProperties = async () => {
   mapLoading.value = true;
   try {
     const b = map.getBounds();
-    const bounds = { north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest() };
-    const params = { bounds: JSON.stringify(bounds) };
+    const params = {
+      bounds: {
+        north: b.getNorth(),
+        south: b.getSouth(),
+        east: b.getEast(),
+        west: b.getWest()
+      }
+    };
     if (filter.value.minPrice) params.min_price = filter.value.minPrice;
     if (filter.value.maxPrice) params.max_price = filter.value.maxPrice;
     if (filter.value.loai_id) params.loai_id = filter.value.loai_id;
+    if (filter.value.keyword) params.keyword = filter.value.keyword;
 
-    const endpoint = isLoggedIn ? "/khach-hang/map/bat-dong-san" : "/khach-hang/map/bat-dong-san";
+    const endpoint = "/client/map/bat-dong-san";
     const res = await api.get(endpoint, { params });
     if (res.data?.data) {
       renderMarkers(res.data.data);
@@ -144,10 +156,13 @@ const renderMarkers = (items) => {
           style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px" />
         <div style="font-weight:700;font-size:14px;margin-bottom:4px">${item.tieu_de}</div>
         <div style="color:#16a34a;font-weight:700;font-size:15px">${formatCurrency(item.gia)}</div>
-        <div style="color:#6b7280;font-size:12px;margin:4px 0">${item.dien_tich} m² · ${item.dia_chi?.dia_chi_chi_tiet || ''}</div>
-        <div style="color:#6b7280;font-size:12px;margin-bottom:8px">Môi giới: ${item.moi_gioi?.ten || '—'}</div>
+        <div style="color:#6b7280;font-size:12px;margin:4px 0">
+          ${item.dien_tich} m² · ${item.dia_chi?.quan_ten ? item.dia_chi.quan_ten + ', ' : ''}${item.dia_chi?.tinh_ten || ''}
+        </div>
+        <div style="color:#94a3b8;font-size:11px;margin-bottom:8px">${item.dia_chi?.dia_chi_chi_tiet || ''}</div>
+        <div style="color:#475569;font-size:12px;margin-bottom:12px">Môi giới: <b>${item.moi_gioi?.ten || '—'}</b></div>
         <a href="/khach-hang/chi-tiet-bat-dong-san/${item.id}"
-          style="display:block;text-align:center;background:#2563eb;color:#fff;padding:6px 12px;border-radius:20px;font-size:13px;font-weight:600;text-decoration:none">
+          style="display:block;text-align:center;background:linear-gradient(to right, #2563eb, #1d4ed8);color:#fff;padding:8px 12px;border-radius:12px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 6px -1px rgba(37,99,235,0.2)">
           Xem chi tiết
         </a>
       </div>`;
@@ -158,7 +173,7 @@ const renderMarkers = (items) => {
 
 const applyFilter = () => loadMapProperties();
 const resetFilter = () => {
-  filter.value = { minPrice: "", maxPrice: "", loai_id: "" };
+  filter.value = { minPrice: "", maxPrice: "", loai_id: "", keyword: "" };
   loadMapProperties();
 };
 
@@ -166,7 +181,7 @@ const searchNearby = async () => {
   if (!nearby.value.lat || !nearby.value.lng) return;
   mapLoading.value = true;
   try {
-    const res = await api.get("/khach-hang/map/nearby", {
+    const res = await api.get("/client/map/nearby", {
       params: { lat: nearby.value.lat, lng: nearby.value.lng, radius: nearby.value.radius },
     });
     if (res.data?.data) {

@@ -95,6 +95,10 @@ Route::get('/tinh-thanh', [TinhThanhController::class, 'getTinhThanh']); //đã 
 Route::get('/quan-huyen', [QuanHuyenController::class, 'getQuanHuyen']); //đã test postman ?tinh_id=1
 Route::get('/loai-bds', [LoaiBatDongSanController::class, 'getAll']);
 
+// ✅ MAP (Public access)
+Route::get('/client/map/bat-dong-san', [MapController::class, 'getBatDongSanMap']);
+Route::get('/client/map/nearby', [MapController::class, 'getNearbyProperties']);
+
 // Public gói tin list (for KhachHang upgrade page)
 Route::get('/goi-tin/data', [GoiTinController::class, 'getPublicPackages']);
 
@@ -225,6 +229,7 @@ Route::prefix('moi-gioi')->middleware('MoiGioiMiddleware')->group(function () {
         Route::post('/create', [BatDongSanController::class, 'store']);
         Route::post('/{id}/publish', [BatDongSanController::class, 'publish']);
         Route::post('/update', [BatDongSanController::class, 'update']);
+        Route::post('/change-status', [BatDongSanController::class, 'changeStatusMoiGioi']);
         Route::delete('/delete', [BatDongSanController::class, 'destroy']);
         Route::post('/{id}/anh-dai-dien', [BatDongSanController::class, 'setImage']);
     });
@@ -290,10 +295,6 @@ Route::prefix('khach-hang')->middleware('KhachHangMiddleware')->group(function (
     Route::get('/dia-chi', [DiaChiController::class, 'getDiaChi']); // đã test postman ?keyword=123
     Route::get('/dia-chi/{id}', [DiaChiController::class, 'show']);
     Route::get('/bds-khu-vuc', [DiaChiController::class, 'getBdsByKhuVuc']); // đã test postman ?tinh_id=1&quan_id=1
-
-    //MAP (HIỂN THỊ BĐS THEO KHU VỰC)
-    Route::get('/map/bat-dong-san', [MapController::class, 'getBatDongSanMap']); // đã test postman ?bounds={"north":10,"south":9,"east":106,"west":105}&min_price=1000000000&max_price=5000000000&loai_id=1
-    Route::get('/map/nearby', [MapController::class, 'getNearbyProperties']); // đã test postman ?lat=10.762622&lng=106.660172&radius=5
 
     //YÊU THÍCH (THẢ TIM)
     Route::post('/bds/yeu-thich', [YeuThichController::class, 'like']); // đã test postman

@@ -35,9 +35,12 @@ class ClientHomeController extends Controller
             'moiGioi',
             'hinhAnh',
             'anhDaiDien',
-            'diaChi'
+            'diaChi.tinh',
+            'diaChi.quan',
         ])
             ->where('is_duyet', true)
+            // ✅ Đẩy tin "Đã bán" (trang_thai_id = 3) xuống dưới cùng
+            ->orderByRaw("CASE WHEN trang_thai_id = 3 THEN 1 ELSE 0 END")
             ->latest()
             ->paginate(6);
 
@@ -102,7 +105,8 @@ class ClientHomeController extends Controller
             'moiGioi',
             'hinhAnh',
             'anhDaiDien',
-            'diaChi'
+            'diaChi.tinh',
+            'diaChi.quan',
         ])->paginate(6);
 
         if (!Auth::guard('sanctum')->check()) {
@@ -209,6 +213,9 @@ class ClientHomeController extends Controller
                     break;
             }
     
+            // ✅ Luôn đẩy tin "Đã bán" (trang_thai_id = 3) xuống dưới cùng bất kể sort nào khác
+            $query->orderByRaw("CASE WHEN trang_thai_id = 3 THEN 1 ELSE 0 END");
+
             $data = $query->paginate($request->input('limit', 12));
     
             // FIX: trả sẵn ảnh đại diện chuẩn để FE hiển thị ổn định

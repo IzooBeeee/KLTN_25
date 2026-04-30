@@ -165,6 +165,9 @@ const xuLyDangNhap = async () => {
       // ✅ Lưu vào key riêng của admin (không ảnh hưởng moi-gioi/khach-hang)
       setAuth("admin", res.data.token, user);
 
+      // ✅ Thông báo cho Header biết auth đã thay đổi
+      window.dispatchEvent(new Event("admin-auth-changed"));
+
       updateEchoToken(res.data.token);
 
       if (user?.id) {

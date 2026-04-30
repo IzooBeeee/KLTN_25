@@ -101,7 +101,7 @@
 
             <p class="flex items-start gap-1 text-xs text-gray-400 mb-4 leading-relaxed">
               <svg class="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-              <span class="line-clamp-1">{{ [item.bat_dong_san?.dia_chi?.dia_chi_chi_tiet, item.bat_dong_san?.dia_chi?.quan?.ten_quan, item.bat_dong_san?.dia_chi?.tinh?.ten_tinh].filter(Boolean).join(', ') || '—' }}</span>
+              <span class="line-clamp-1">{{ [item.bat_dong_san?.dia_chi?.dia_chi_chi_tiet, item.bat_dong_san?.dia_chi?.quan?.ten, item.bat_dong_san?.dia_chi?.tinh?.ten].filter(Boolean).join(', ') || '—' }}</span>
             </p>
 
             <!-- Agent -->

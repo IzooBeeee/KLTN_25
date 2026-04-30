@@ -40,11 +40,15 @@ class CreateBatDongSanRequest extends FormRequest
         'dien_tich' => 'required|numeric|min:0',
         'loai_id' => 'required|integer|exists:loai_bat_dong_sans,id',
         'trang_thai_id' => 'required|integer|exists:trang_thai_bat_dong_sans,id',
-        'dia_chi_id' => 'required|integer|exists:dia_chis,id',
+        
+        'tinh_id' => 'required|integer|exists:tinh_thanhs,id',
+        'quan_id' => 'required|integer|exists:quan_huyens,id',
+        'phuong_id' => 'nullable|integer|exists:phuong_xas,id',
+        'dia_chi_chi_tiet' => 'nullable|string|max:255',
+        'latitude' => 'nullable|numeric',
+        'longitude' => 'nullable|numeric',
 
         'mo_ta' => 'nullable|string',
-        'tinh_id' => 'nullable|integer|exists:tinh_thanhs,id',
-        'quan_id' => 'nullable|integer|exists:quan_huyens,id',
         'so_phong_ngu' => 'nullable|integer|min:0',
         'so_phong_tam' => 'nullable|integer|min:0',
         'hinh_anh' => 'nullable|array|max:10',

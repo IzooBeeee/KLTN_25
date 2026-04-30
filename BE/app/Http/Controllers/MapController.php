@@ -19,16 +19,16 @@ class MapController extends Controller
         ])
             ->where('is_duyet', true)
             ->whereHas('diaChi', function ($q) {
-                $q->whereNotNull('lat')
-                    ->whereNotNull('lng');
+                $q->whereNotNull('latitude')
+                    ->whereNotNull('longitude');
             });
 
         // Filter theo bounds (viewport)
         if ($request->has('bounds')) {
             $bounds = $request->bounds;
             $query->whereHas('diaChi', function ($q) use ($bounds) {
-                $q->whereBetween('lat', [$bounds['south'], $bounds['north']])
-                    ->whereBetween('lng', [$bounds['west'], $bounds['east']]);
+                $q->whereBetween('latitude', [$bounds['south'], $bounds['north']])
+                    ->whereBetween('longitude', [$bounds['west'], $bounds['east']]);
             });
         }
 
@@ -45,29 +45,33 @@ class MapController extends Controller
             $query->where('loai_id', $request->loai_id);
         }
 
+        // Filter theo từ khóa
+        if ($request->has('keyword')) {
+            $query->where('tieu_de', 'like', '%' . $request->keyword . '%');
+        }
+
         $batDongSans = $query->get()->map(function ($bds) {
             return [
                 'id' => $bds->id,
                 'tieu_de' => $bds->tieu_de,
-                'gia' => $bds->gia,
+                'gia' => (float)$bds->gia,
                 'gia_formatted' => $this->formatPrice($bds->gia),
                 'dien_tich' => $bds->dien_tich,
-                'dia_chi' => $bds->diaChi->dia_chi_chi_tiet ?? '',
-                'tinh' => $bds->diaChi->tinh->ten_tinh ?? '',
-                'quan' => $bds->diaChi->quan->ten_quan ?? '',
+                'anh_dai_dien_url' => $bds->anh_dai_dien_url,
+                
+                // 🔥 Phẳng hóa cho FE dễ dùng
+                'dia_chi' => [
+                    'lat' => (float)$bds->diaChi->latitude,
+                    'lng' => (float)$bds->diaChi->longitude,
+                    'dia_chi_chi_tiet' => $bds->diaChi->dia_chi_chi_tiet ?? '',
+                    'tinh_ten' => $bds->diaChi->tinh->ten ?? '',
+                    'quan_ten' => $bds->diaChi->quan->ten ?? '',
+                ],
 
-                // Tọa độ
-                'lat' => $bds->diaChi->lat,
-                'lng' => $bds->diaChi->lng,
+                'loai' => [
+                    'ten_loai' => $bds->loai->ten_loai ?? 'BĐS',
+                ],
 
-                // Badge
-                'is_vip' => $bds->is_vip ?? false,
-                'is_kim_cuong' => $bds->is_kim_cuong ?? false,
-
-                // Hình ảnh
-                'hinh_anh' => $bds->hinhAnh->first()?->url ?? null,
-
-                // Môi giới
                 'moi_gioi' => [
                     'ten' => $bds->moiGioi->ten ?? '',
                     'sdt' => $bds->moiGioi->so_dien_thoai ?? '',
@@ -105,23 +109,48 @@ class MapController extends Controller
         $radius = $request->radius ?? 5;
 
         // Lấy tất cả BĐS có diaChi, filter 
-        $properties = BatDongSan::with(['diaChi', 'loai'])
+        $properties = BatDongSan::with(['diaChi.tinh', 'diaChi.quan', 'loai', 'moiGioi', 'hinhAnh', 'anhDaiDien'])
             ->where('is_duyet', true)
-            ->whereHas('diaChi', function ($q) use ($lat, $lng, $radius) {
-                $q->whereNotNull('lat')
-                    ->whereNotNull('lng');
+            ->whereHas('diaChi', function ($q) {
+                $q->whereNotNull('latitude')
+                    ->whereNotNull('longitude');
             })
             ->get()
-            ->filter(function ($bds) use ($lat, $lng, $radius) {
-                // Tính khoảng cách bằng PHP
-                $distance = $this->calculateDistance(
-                    $lat,
-                    $lng,
-                    $bds->diaChi->lat,
-                    $bds->diaChi->lng
-                );
-                return $distance < $radius;
+            ->map(function ($bds) use ($lat, $lng) {
+                $dist = $this->calculateDistance($lat, $lng, $bds->diaChi->latitude, $bds->diaChi->longitude);
+                
+                // Trả về cấu trúc đồng nhất
+                return [
+                    'id' => $bds->id,
+                    'tieu_de' => $bds->tieu_de,
+                    'gia' => (float)$bds->gia,
+                    'gia_formatted' => $this->formatPrice($bds->gia),
+                    'dien_tich' => $bds->dien_tich,
+                    'anh_dai_dien_url' => $bds->anh_dai_dien_url,
+                    'khoang_cach_km' => $dist,
+                    
+                    'dia_chi' => [
+                        'lat' => (float)$bds->diaChi->latitude,
+                        'lng' => (float)$bds->diaChi->longitude,
+                        'dia_chi_chi_tiet' => $bds->diaChi->dia_chi_chi_tiet ?? '',
+                        'tinh_ten' => $bds->diaChi->tinh->ten ?? '',
+                        'quan_ten' => $bds->diaChi->quan->ten ?? '',
+                    ],
+
+                    'loai' => [
+                        'ten_loai' => $bds->loai->ten_loai ?? 'BĐS',
+                    ],
+
+                    'moi_gioi' => [
+                        'ten' => $bds->moiGioi->ten ?? '',
+                        'sdt' => $bds->moiGioi->so_dien_thoai ?? '',
+                    ]
+                ];
             })
+            ->filter(function ($item) use ($radius) {
+                return $item['khoang_cach_km'] < $radius;
+            })
+            ->sortBy('khoang_cach_km')
             ->values();
 
         return response()->json([

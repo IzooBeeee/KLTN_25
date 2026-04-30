@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="container-fluid py-4 dashboard-bg min-vh-100" style="
       background-color: #f4f6f9;
       font-family: &quot;Inter&quot;, sans-serif;
@@ -195,6 +195,12 @@
             <button v-if="item.status === 'Nháp'" @click="handlePublish(item)"
               class="btn btn-success rounded-3 btn-sm fw-semibold shadow-sm px-3 py-2" title="Đăng bài">
               Đăng
+            </button>
+            <button v-if="item.status === 'Đã đăng'" @click="handleMarkSold(item)"
+              class="btn btn-warning rounded-3 btn-sm fw-semibold shadow-sm px-3 py-2 d-flex align-items-center gap-1"
+              title="Đánh dấu đã bán">
+              <i class="bi bi-check2-circle"></i>
+              Đã bán
             </button>
             <button @click="handleEdit(item)"
               class="btn btn-light border text-primary rounded-3 btn-sm d-flex align-items-center justify-content-center"
@@ -432,7 +438,8 @@ const loadBatDongSan = async (page = 1) => {
         if (item.status === "draft") {
           displayStatus = "Nháp";
         } else {
-          if (item.is_duyet == 0) displayStatus = "Chờ duyệt";
+          if (item.trang_thai_id == 3) displayStatus = "Đã bán";
+          else if (item.is_duyet == 0) displayStatus = "Chờ duyệt";
           else if (item.is_duyet == 1) displayStatus = "Đã đăng";
           else if (item.is_duyet == 2) displayStatus = "Bị từ chối";
         }
@@ -484,23 +491,24 @@ const formatDiaChi = (item) => {
 
 // Helper: Lấy ảnh đại diện
 const getImageUrl = (item) => {
+  if (!item) return "/no-image.png";
+  
+  // Lấy URL thô từ object hoặc string
+  let url = "";
+  if (typeof item === 'string') {
+    url = item;
+  } else {
+    url = item.anh_dai_dien_url || (item.hinh_anh?.[0]?.url) || (item.anh_dai_dien?.url) || "";
+  }
+  
+  if (!url) return "/no-image.png";
+  if (url.startsWith("http")) return url;
+  
   const base = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:8000';
-  const baseUrl = `${base}/storage/`;
-  if (item.anh_dai_dien_url) {
-    if (item.anh_dai_dien_url.startsWith("http")) return item.anh_dai_dien_url;
-    return baseUrl + item.anh_dai_dien_url;
-  }
-  if (item.hinh_anh?.length > 0) {
-    const anhDaiDien = item.hinh_anh.find(
-      (img) => img.is_anh_dai_dien === true,
-    );
-    if (anhDaiDien) return baseUrl + anhDaiDien.url;
-    return baseUrl + item.hinh_anh[0].url;
-  }
-  if (item.anh_dai_dien && item.anh_dai_dien.url) {
-    return baseUrl + item.anh_dai_dien.url;
-  }
-  return "/no-image.png";
+  const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
+  const finalUrl = cleanUrl.startsWith('storage/') ? cleanUrl : `storage/${cleanUrl}`;
+  
+  return `${base}/${finalUrl}`;
 };
 
 // FILTER & SEARCH
@@ -651,6 +659,42 @@ const handlePublish = async (item) => {
       loadBatDongSan(pagination.value.current_page);
     } else {
       Swal.fire("Lỗi", res.data.message || "Đăng bài thất bại", "error");
+    }
+  } catch (error) {
+    Swal.fire("Lỗi", error.response?.data?.message || "Đã xảy ra lỗi", "error");
+  }
+};
+
+const handleMarkSold = async (item) => {
+  const { isConfirmed } = await Swal.fire({
+    title: "Xác nhận đã bán?",
+    text: "Bạn có chắc chắn muốn đánh dấu bất động sản này là ĐÃ BÁN? Tin đăng sẽ ngừng hiển thị công khai.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Xác nhận",
+    cancelButtonColor: "#f59e0b",
+    cancelButtonText: "Hủy",
+  });
+  if (!isConfirmed) return;
+
+  try {
+    const res = await api.post("/moi-gioi/bds/change-status", {
+      id: item.id,
+      trang_thai_id: 3 // ID của 'Đã bán'
+    });
+    
+    if (res.data.status) {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: "Cập nhật thành công!",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      loadBatDongSan(pagination.value.current_page);
+    } else {
+      Swal.fire("Lỗi", res.data.message || "Cập nhật thất bại", "error");
     }
   } catch (error) {
     Swal.fire("Lỗi", error.response?.data?.message || "Đã xảy ra lỗi", "error");

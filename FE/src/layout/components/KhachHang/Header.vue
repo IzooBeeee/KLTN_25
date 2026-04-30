@@ -42,14 +42,17 @@
           <!-- ✅ Nút Tin đã lưu -->
           <div class="saved-trigger-wrapper" v-if="isLoggedIn">
             <button @click.stop="toggleNotifPanel" class="btn-saved" aria-label="Tin đã lưu">
-              <span class="icon">❤️</span>
+              <span class="material-symbols-outlined icon">favorite</span>
             </button>
 
             <!-- 🔔 NOTIFICATION PANEL -->
             <transition name="notif-slide">
               <div v-if="showNotifPanel" class="notif-panel" @click.stop>
                 <div class="notif-header">
-                  <h3 class="notif-title">Tin đã lưu</h3>
+                  <h3 class="notif-title flex items-center gap-2">
+                    <span class="material-symbols-outlined text-rose-500">favorite</span>
+                    Tin đã lưu
+                  </h3>
                   <span class="notif-count">{{ notifications.length }} tin</span>
                 </div>
 
@@ -68,7 +71,7 @@
                         @mousemove="handleMouseMove($event, item)" @mouseup="handleMouseUp(item)"
                         @mouseleave="handleMouseUp(item)" :class="{ dragging: draggedItem === item }">
                         <div class="notif-image-wrapper">
-                          <img :src="getImageUrl(item.avatar)" :alt="item.text" @error="handleImageError"
+                          <img :src="item.avatar" :alt="item.text" @error="handleImageError"
                             class="notif-image" />
                         </div>
                         <div class="notif-content">
@@ -84,7 +87,7 @@
                     <div class="notif-empty-icon">📭</div>
                     <p class="notif-empty-title">Chưa có tin nào được lưu</p>
                     <p class="notif-empty-hint">
-                      Bấm ❤️ để lưu tin bạn quan tâm
+                      Bấm <span class="material-symbols-outlined text-xs align-middle">favorite</span> để lưu tin bạn quan tâm
                     </p>
                   </div>
 
@@ -208,7 +211,7 @@
 
                   <!-- Yêu thích -->
                   <router-link to="/khach-hang/yeu-thich" class="dropdown-item-new" @click="showMenu = false">
-                    <span class="item-icon-new">❤️</span>
+                    <span class="item-icon-new material-symbols-outlined text-rose-500">favorite</span>
                     <span class="item-label-new">BĐS yêu thích</span>
                     <span class="item-arrow-new">→</span>
                   </router-link>
@@ -562,21 +565,27 @@ export default {
           };
 
           this.notifications = res.data.data.map((item) => {
-            const bds =
-              item.batDongSan || item.bat_dong_san || item.property || {};
-            let avatar = this.defaultImage;
-
-            if (Array.isArray(bds.hinhAnh) && bds.hinhAnh.length > 0) {
-              const img = bds.hinhAnh.find((i) => i && isValidUrl(i.url));
-              if (img) avatar = this.getImageUrl(img.url.trim());
+            const bds = item.batDongSan || item.bat_dong_san || item.property || {};
+            
+            // Tìm ảnh đại diện từ nhiều nguồn khả thi
+            let avatarUrl = "";
+            
+            // 1. Ưu tiên anh_dai_dien_url trực tiếp
+            if (isValidUrl(bds.anh_dai_dien_url)) {
+              avatarUrl = bds.anh_dai_dien_url;
             }
-
-            if (
-              avatar === this.defaultImage &&
-              bds.anh_dai_dien &&
-              isValidUrl(bds.anh_dai_dien.url)
-            ) {
-              avatar = this.getImageUrl(bds.anh_dai_dien.url.trim());
+            // 2. Thử hinh_anh hoặc hinhAnh array
+            else {
+              const images = bds.hinh_anh || bds.hinhAnh || [];
+              if (Array.isArray(images) && images.length > 0) {
+                const img = images.find(i => i && isValidUrl(i.url));
+                if (img) avatarUrl = img.url;
+              }
+            }
+            
+            // 3. Thử anh_dai_dien object
+            if (!avatarUrl && bds.anh_dai_dien && isValidUrl(bds.anh_dai_dien.url)) {
+              avatarUrl = bds.anh_dai_dien.url;
             }
 
             return {
@@ -584,7 +593,7 @@ export default {
               text: bds.tieu_de || "Bất động sản",
               time: this.formatTime(item.created_at || item.createdAt),
               propertyId: bds.id || item.bat_dong_san_id,
-              avatar: avatar,
+              avatar: this.getImageUrl(avatarUrl), // Chuyển thành URL tuyệt đối ngay tại đây
               price: bds.gia,
               swipeOffset: 0,
               isDeleting: false,
@@ -619,10 +628,14 @@ export default {
 
     getImageUrl(url) {
       if (!url) return this.defaultImage;
-      if (typeof url === "string" && url.startsWith("http")) return url;
-      const cleanUrl = url.replace(/^\/+/, "");
+      if (typeof url !== "string") return this.defaultImage;
+      if (url.startsWith("http")) return url;
+      
       const base = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:8000';
-      return `${base}/storage/${cleanUrl}`;
+      const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
+      const finalUrl = cleanUrl.startsWith('storage/') ? cleanUrl : `storage/${cleanUrl}`;
+      
+      return `${base}/${finalUrl}`;
     },
 
     handleImageError(e) {

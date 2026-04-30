@@ -17,37 +17,45 @@
     </div>
 
     <div class="posting-grid">
-      <!-- Left Sidebar - Navigation -->
+      <!-- Sidebar Trái: Thống kê & Gói tin -->
       <aside class="sidebar-left">
         <div class="sidebar-section">
-          <h3 class="sidebar-title">Quản lý tin đăng</h3>
-          <nav class="sidebar-nav">
-            <a href="#" class="nav-item active">
-              <i class="fas fa-plus-circle"></i>
-              <span>Đăng tin mới</span>
-            </a>
-            <a href="#" class="nav-item">
-              <i class="fas fa-list"></i>
-              <span>Tin đang hoạt động</span>
-            </a>
-            <a href="#" class="nav-item">
-              <i class="fas fa-clock"></i>
-              <span>Chờ duyệt</span>
-            </a>
-            <a href="#" class="nav-item">
-              <i class="fas fa-archive"></i>
-              <span>Tin đã hết hạn</span>
-            </a>
-          </nav>
+          <h3 class="sidebar-title">Gói tin của bạn</h3>
+          <div class="credit-card">
+            <div class="credit-label">Số tin còn lại</div>
+            <div class="credit-value">{{ soTinConLai }}</div>
+            <div class="progress-mini">
+              <div class="progress-bar-mini" :style="{ width: (soTinConLai / 10 * 100) + '%' }"></div>
+            </div>
+            <p class="credit-hint">Nâng cấp để nhận thêm nhiều ưu đãi và lượt đăng tin VIP.</p>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">Hướng dẫn đăng tin</h3>
+          <div class="guide-list">
+            <div class="guide-item active">
+              <i class="fas fa-check-circle"></i>
+              <span>Cung cấp đủ thông tin</span>
+            </div>
+            <div class="guide-item" :class="{ active: form.images.length > 0 }">
+              <i class="fas fa-image"></i>
+              <span>Hình ảnh sắc nét</span>
+            </div>
+            <div class="guide-item" :class="{ active: form.latitude }">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Vị trí chính xác</span>
+            </div>
+          </div>
         </div>
 
         <div class="sidebar-section upgrade-box">
           <div class="upgrade-icon">
             <i class="fas fa-crown"></i>
           </div>
-          <h4>Nâng cấp tài khoản</h4>
-          <p>Để sử dụng nhiều tính năng cao cấp hơn</p>
-          <button class="btn-upgrade">Nâng cấp ngay</button>
+          <h4>Mua thêm gói tin</h4>
+          <p>Tăng khả năng tiếp cận khách hàng tiềm năng lên gấp 5 lần.</p>
+          <button class="btn-upgrade" @click="$router.push('/moi-gioi/goi-tin')">Nâng cấp ngay</button>
         </div>
       </aside>
 
@@ -235,9 +243,9 @@
             </div>
 
             <!-- Preview Gallery -->
-            <div v-if="form.images.length > 0" class="image-preview-grid">
-              <div v-for="(img, idx) in form.images" :key="idx" class="preview-item">
-                <img :src="getImagePreviewUrl(img)" :alt="'Preview ' + (idx + 1)" />
+            <div v-if="imagePreviewUrls.length > 0" class="image-preview-grid">
+              <div v-for="(url, idx) in imagePreviewUrls" :key="idx" class="preview-item">
+                <img :src="url" :alt="'Preview ' + (idx + 1)" />
                 <button class="remove-img" @click="removeImage(idx)">
                   <i class="fas fa-times"></i>
                 </button>
@@ -350,16 +358,77 @@
           </div>
         </div>
 
-        <!-- Step 4: Package -->
+        <!-- Step 4: Package & Confirmation -->
         <div v-else-if="currentStep === 4" class="form-step fade-in">
           <div class="section-header">
-            <h2 class="section-title">Chọn gói tin đăng</h2>
-            <p class="section-desc">Chọn gói phù hợp với nhu cầu của bạn</p>
+            <h2 class="section-title">Xác nhận & Gói tin đăng</h2>
+            <p class="section-desc">Kiểm tra lại quyền lợi đăng tin của bạn trước khi hoàn tất</p>
           </div>
-          <div class="empty-state">
-            <i class="fas fa-box-open"></i>
-            <h3>Gói tin đăng</h3>
-            <p>Chức năng đang được phát triển</p>
+
+          <div class="package-confirmation-card">
+            <div class="package-info-main">
+              <div class="package-header">
+                <div class="package-icon">
+                  <i class="fas fa-gem"></i>
+                </div>
+                <div class="package-titles">
+                  <h3>Gói tin hiện tại</h3>
+                  <p class="package-name">VIP Broker Package</p>
+                </div>
+                <div class="status-badge" :class="hetTin ? 'expired' : 'active'">
+                  {{ hetTin ? 'Hết lượt' : 'Đang hoạt động' }}
+                </div>
+              </div>
+
+              <div class="package-stats-grid">
+                <div class="p-stat">
+                  <span class="p-label">Số tin còn lại</span>
+                  <span class="p-value" :class="{ 'text-danger': hetTin }">{{ soTinConLai }} tin</span>
+                </div>
+                <div class="p-stat">
+                  <span class="p-label">Ngày hết hạn</span>
+                  <span class="p-value">{{ formatDate(form.ngay_het_han_goi) || '30/12/2026' }}</span>
+                </div>
+                <div class="p-stat">
+                  <span class="p-label">Chi phí đăng tin</span>
+                  <span class="p-value text-success">Miễn phí (Trừ 1 tin)</span>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="hetTin" class="alert-box danger">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p>Bạn đã hết số lượng tin đăng. Vui lòng mua thêm gói để tiếp tục.</p>
+              <button class="btn btn-primary btn-sm" @click="$router.push('/moi-gioi/goi-tin')">Mua gói ngay</button>
+            </div>
+            <div v-else class="alert-box success">
+              <i class="fas fa-info-circle"></i>
+              <p>Tin đăng của bạn sẽ được chuyển đến Admin để duyệt sau khi bấm "Đăng tin ngay".</p>
+            </div>
+          </div>
+
+          <!-- Review Summary -->
+          <div class="review-summary mt-8 d-flex gap-4">
+            <div class="summary-image" style="width: 150px; height: 100px; border-radius: 12px; overflow: hidden; flex-shrink: 0;">
+                <img :src="imagePreviewUrls[0] || 'https://via.placeholder.com/400x300?text=No+Image'" class="w-100 h-100 object-cover" />
+            </div>
+            <div class="flex-grow-1">
+                <h4 class="summary-title">Tóm tắt tin đăng</h4>
+                <div class="summary-list">
+                  <div class="summary-item">
+                    <span>Tiêu đề:</span>
+                    <strong>{{ form.tieu_de }}</strong>
+                  </div>
+                  <div class="summary-item">
+                    <span>Giá:</span>
+                    <strong>{{ formatPrice(form.gia) }}</strong>
+                  </div>
+                  <div class="summary-item">
+                    <span>Vị trí:</span>
+                    <strong>{{ form.dia_chi_chi_tiet }}</strong>
+                  </div>
+                </div>
+            </div>
           </div>
         </div>
 
@@ -375,9 +444,9 @@
             <i class="fas fa-arrow-right"></i>
           </button>
 
-          <button v-else class="btn btn-success btn-lg" @click="submitForm">
-            <i class="fas fa-check-circle"></i>
-            Đăng tin ngay
+          <button v-else class="btn btn-success btn-lg" @click="submitForm" :disabled="hetTin">
+            <i class="fas fa-paper-plane"></i>
+            {{ hetTin ? 'Hết lượt đăng' : 'Đăng tin ngay' }}
           </button>
 
           <button class="btn btn-outline" @click="saveDraft(true)">
@@ -592,13 +661,37 @@ const removeImage = (index) => {
   saveImagePreviewsToLocal();
 };
 
+const formatPrice = (gia) => {
+  if (!gia && gia !== 0) return 'Liên hệ';
+  if (gia >= 1000000000) return (gia / 1000000000).toFixed(2) + ' tỷ';
+  if (gia >= 1000000) return (gia / 1000000).toFixed(0) + ' triệu';
+  return new Intl.NumberFormat('vi-VN').format(gia) + ' VNĐ';
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
+
+const getImageUrl = (url) => {
+  if (!url) return "https://via.placeholder.com/400x300?text=No+Image";
+  if (url.startsWith("http") || url.startsWith("data:")) return url;
+  
+  const base = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:8000';
+  const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
+  const finalUrl = cleanUrl.startsWith('storage/') ? cleanUrl : `storage/${cleanUrl}`;
+  
+  return `${base}/${finalUrl}`;
+};
+
 // Trả về URL preview: ưu tiên File object, fallback về base64
 const getImagePreviewUrl = (file) => {
+  if (!file) return "";
   if (file instanceof File || file instanceof Blob) {
     return URL.createObjectURL(file);
   }
-  // Trường hợp là base64 string (restored từ localStorage)
-  return file;
+  return getImageUrl(file);
 };
 
 const saveImagePreviewsToLocal = () => {
@@ -1317,7 +1410,7 @@ const saveDraft = async (isManual = false) => {
         cancelButtonText: "Ở lại",
       }).then((result) => {
         if (result.isConfirmed) {
-          this.$router.push("/moi-gioi/quan-ly-tin");
+          window.location.href = "/moi-gioi/quan-ly-bat-dong-san";
         }
       });
     } else {
@@ -1352,8 +1445,7 @@ const saveDraft = async (isManual = false) => {
 };
 
 const submitForm = async () => {
-  // ✅ KIỂM TRA SỐ TIN TRƯỚC
-  if (soTinConLai.value <= 0) {
+  if (hetTin.value) {
     Swal.fire({
       icon: "error",
       title: "Hết số tin đăng!",
@@ -1374,7 +1466,7 @@ const submitForm = async () => {
 
   const { value: confirm } = await Swal.fire({
     title: "Xác nhận đăng tin?",
-    text: "Kiểm tra kỹ thông tin trước khi đăng",
+    text: "Tin đăng sẽ trừ 1 lượt đăng và cần Admin duyệt để hiển thị.",
     icon: "question",
     showCancelButton: true,
     confirmButtonText: "Đồng ý đăng",
@@ -1386,42 +1478,7 @@ const submitForm = async () => {
   if (!confirm) return;
 
   try {
-    // ✅ Bước 1: Tạo địa chỉ nếu có tọa độ
-    if (form.latitude && form.longitude && !form.dia_chi_id) {
-      try {
-        const diaChiRes = await api.post(
-          "/moi-gioi/dia-chi",
-          {
-            latitude: parseFloat(form.latitude).toFixed(6),
-            longitude: parseFloat(form.longitude).toFixed(6),
-            dia_chi_chi_tiet: form.dia_chi_chi_tiet || "",
-            tinh_id: form.tinh_id || null,
-            quan_id: form.quan_id || null,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-              "Content-Type": "application/json",
-            },
-          },
-        );
-
-        if (diaChiRes.data?.status && diaChiRes.data?.data?.id) {
-          form.dia_chi_id = diaChiRes.data.data.id;
-          console.log("✅ Created dia_chi_id:", form.dia_chi_id);
-        }
-      } catch (err) {
-        console.warn(
-          "⚠️ Could not create dia_chi, continuing without it:",
-          err,
-        );
-      }
-    }
-
-    // ✅ Bước 2: Chuẩn bị FormData
     const formData = new FormData();
-
-    // ✅ Thêm status = published
     formData.append("status", "published");
 
     if (draftId.value) {
@@ -1432,24 +1489,11 @@ const submitForm = async () => {
       if (key === "images") return;
       let value = form[key];
 
-      if (key === "dia_chi_id" && (!value || value === "")) return;
-
       if (key === "is_noi_bat" || key === "is_duyet") {
         value = value ? 1 : 0;
       }
 
-      if (
-        [
-          "gia",
-          "dien_tich",
-          "so_phong_ngu",
-          "so_phong_tam",
-          "loai_id",
-          "tinh_id",
-          "quan_id",
-          "trang_thai_id",
-        ].includes(key)
-      ) {
+      if (["gia", "dien_tich", "so_phong_ngu", "so_phong_tam", "loai_id", "tinh_id", "quan_id", "phuong_id", "trang_thai_id"].includes(key)) {
         if (value === null || value === "" || value === undefined) return;
         value = parseFloat(value);
       }
@@ -1467,33 +1511,25 @@ const submitForm = async () => {
       formData.append(`hinh_anh[${index}]`, image);
     });
 
-    // ✅ Bước 3: Submit (Nếu có draftId thì Update -> Publish, nếu không thì Create)
     if (draftId.value) {
-      await api.post("/moi-gioi/bds/update", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.post("/moi-gioi/bds/update", formData, { headers: { "Content-Type": "multipart/form-data" } });
       await api.post(`/moi-gioi/bds/${draftId.value}/publish`);
     } else {
-      await api.post("/moi-gioi/bds/create", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.post("/moi-gioi/bds/create", formData, { headers: { "Content-Type": "multipart/form-data" } });
     }
 
-    // ✅ Bước 4: TRỪ SỐ TIN (update local)
     soTinConLai.value--;
 
     await Swal.fire({
       icon: "success",
-      title: "Thành công!",
-      text: `Tin đăng đã được tạo! Bạn còn ${soTinConLai.value} tin.`,
-      timer: 2500,
-      showConfirmButton: false,
+      title: "Đã gửi tin đăng!",
+      text: "Tin của bạn đang chờ Admin duyệt. Bạn còn " + soTinConLai.value + " lượt đăng.",
+      timer: 3000,
+      showConfirmButton: true,
     });
 
-    // ✅ Xóa localStorage sau khi đăng thành công
     clearDraftLocal();
-
-    window.location.href = "/moi-gioi/bds";
+    window.location.href = "/moi-gioi/quan-ly-bat-dong-san";
   } catch (error) {
     console.error("❌ Submit error:", error.response?.data);
     Swal.fire({
@@ -2296,6 +2332,261 @@ select.form-select {
   border-radius: 8px;
   font-size: 0.875rem;
   color: #6b7280;
+}
+
+/* ===== PACKAGE CONFIRMATION ===== */
+.package-confirmation-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.package-info-main {
+  padding: 2rem;
+}
+
+.package-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.package-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.package-titles h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.package-name {
+  color: #6366f1;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.status-badge {
+  margin-left: auto;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.status-badge.expired {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.package-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.p-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.p-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.p-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.alert-box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 2rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.alert-box.success {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.alert-box.danger {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.alert-box p {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.review-summary {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px dashed #cbd5e1;
+}
+
+.summary-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.summary-item span {
+  color: #64748b;
+}
+
+.summary-item strong {
+  color: #1e293b;
+}
+
+.mt-8 { margin-top: 2rem; }
+.text-danger { color: #ef4444; }
+.text-success { color: #10b981; }
+
+/* ===== SIDEBAR ENHANCEMENTS ===== */
+.credit-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.credit-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.credit-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #001f7c;
+  margin: 0.5rem 0;
+}
+
+.progress-mini {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+.progress-bar-mini {
+  height: 100%;
+  background: #001f7c;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+.credit-hint {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  transition: color 0.3s;
+}
+
+.guide-item i {
+  font-size: 1rem;
+}
+
+.guide-item.active {
+  color: #059669;
+}
+
+.guide-item.active i {
+  color: #10b981;
+}
+
+.upgrade-box {
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  color: white;
+}
+
+.upgrade-box h4 {
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.upgrade-box p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+}
+
+.btn-upgrade {
+  background: white;
+  color: #1e40af;
+  border: none;
+  padding: 0.6rem;
+  border-radius: 6px;
+  font-weight: 700;
+  width: 100%;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.btn-upgrade:hover {
+  transform: scale(1.02);
 }
 
 .auto-save-indicator.saving {

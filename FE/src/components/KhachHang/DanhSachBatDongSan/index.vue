@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="bg-[#f8fafc] min-h-screen font-['Inter']" style="contain: layout style;">
 
     <!-- Content -->
@@ -602,12 +602,30 @@ export default {
           const raw = res.data.data?.data || res.data.data || [];
           this.properties = raw.map(it => {
             let img = this.defaultImage;
-            if (it.anh_dai_dien?.url) img = this.getImageUrl(it.anh_dai_dien.url);
-            else if (it.hinh_anh?.[0]?.url) img = this.getImageUrl(it.hinh_anh[0].url);
-            else if (it.anh_dai_dien_url) img = this.getImageUrl(it.anh_dai_dien_url);
+            
+            // 🔥 Priority mapping
+            if (it.anh_dai_dien_url) {
+              img = this.getImageUrl(it.anh_dai_dien_url);
+            } else if (it.hinh_anh && it.hinh_anh.length > 0) {
+              const firstImg = it.hinh_anh.find(i => i.url);
+              if (firstImg) img = this.getImageUrl(firstImg.url);
+            } else if (it.anh_dai_dien?.url) {
+              img = this.getImageUrl(it.anh_dai_dien.url);
+            }
+
+            // 🔥 Location mapping
+            let loc = it.location || 'Đang cập nhật';
+            if (it.dia_chi) {
+              const quan = it.dia_chi.quan?.ten || it.dia_chi.ten_quan;
+              const tinh = it.dia_chi.tinh?.ten || it.dia_chi.ten_tinh;
+              if (quan && tinh) loc = `${quan}, ${tinh}`;
+              else if (tinh) loc = tinh;
+            }
+
             return {
               ...it,
               image: img,
+              location: loc,
               isFavorite: this.favoriteIds.includes(it.id)
             };
           });

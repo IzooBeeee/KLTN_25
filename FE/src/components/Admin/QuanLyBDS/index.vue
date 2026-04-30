@@ -805,16 +805,29 @@ export default {
     },
 
     getImageUrl(url) {
-      if (!url) return "https://via.placeholder.com/100x100?text=No+Image";
+      if (!url) return "https://via.placeholder.com/400x300?text=No+Image";
+      if (typeof url !== 'string') return "https://via.placeholder.com/400x300?text=Invalid+URL";
       if (url.startsWith("http")) return url;
+      
       const base = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:8000';
-      return `${base}/storage/${url}`;
+      // Đảm bảo không bị trùng /storage/
+      const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
+      const finalUrl = cleanUrl.startsWith('storage/') ? cleanUrl : `storage/${cleanUrl}`;
+      
+      return `${base}/${finalUrl}`;
     },
 
     getPrimaryImageUrl(bds) {
-      if (!bds) return "https://via.placeholder.com/100x100?text=No+Image";
-      const firstImage = bds.hinhAnh?.[0]?.url || bds.hinh_anh?.[0]?.url;
-      return bds.anh_dai_dien_url || this.getImageUrl(firstImage);
+      if (!bds) return "https://via.placeholder.com/400x300?text=No+Image";
+      
+      // Ưu tiên anh_dai_dien_url từ backend (đã có accessor asset())
+      if (bds.anh_dai_dien_url) {
+        return this.getImageUrl(bds.anh_dai_dien_url);
+      }
+      
+      const images = bds.hinh_anh || bds.hinhAnh || [];
+      const firstImage = images[0]?.url;
+      return this.getImageUrl(firstImage);
     },
 
     getGalleryImageUrl(img) {
@@ -859,7 +872,7 @@ export default {
     },
 
     getTrangThaiName(value) {
-      const map = { 1: "Chờ duyệt", 2: "Đã duyệt", 3: "Từ chối", 4: "Đã bán" };
+      const map = { 1: "Chờ duyệt", 2: "Đã đăng", 3: "Đã bán", 4: "Cho thuê", 5: "Hết hạn", 6: "Bị từ chối" };
       return map[value] || "—";
     },
 
@@ -877,10 +890,10 @@ export default {
       const map = {
         1: 'bg-warning text-dark',
         2: 'bg-success text-white',
-        3: 'bg-danger text-white',
-        4: 'bg-secondary text-white',
-        5: 'bg-info text-dark',
-        6: 'bg-dark text-white'
+        3: 'bg-info text-white', // Đã bán
+        4: 'bg-primary text-white', // Cho thuê
+        5: 'bg-dark text-white', // Hết hạn
+        6: 'bg-danger text-white' // Bị từ chối
       };
       return map[statusId] || 'bg-light text-dark border';
     },
@@ -888,11 +901,11 @@ export default {
     getStatusText(statusId) {
       const map = {
         1: 'Chờ duyệt',
-        2: 'Đã duyệt',
-        3: 'Từ chối',
-        4: 'Đã bán',
-        5: 'Cho thuê',
-        6: 'Hết hạn'
+        2: 'Đã đăng',
+        3: 'Đã bán',
+        4: 'Cho thuê',
+        5: 'Hết hạn',
+        6: 'Bị từ chối'
       };
       return map[statusId] || 'Không xác định';
     },
