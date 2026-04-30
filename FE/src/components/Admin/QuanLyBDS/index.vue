@@ -181,7 +181,7 @@
                 <div>
                   <div class="d-flex justify-content-between align-items-start mb-2">
                     <h5 class="fw-bold text-dark mb-0 property-title pe-3">{{ bds.tieu_de }}</h5>
-                    <div class="d-flex gap-2 shrink-0">
+                    <div class="d-flex gap-2 align-items-center shrink-0">
                       <button @click="viewProperty(bds.id)" class="btn-action bg-light text-primary hover-primary" title="Xem chi tiết">
                         <i class="bi bi-eye-fill"></i>
                       </button>
@@ -354,10 +354,14 @@
              </div>
           </div>
 
-          <div class="modal-footer border-0 py-3 px-4 bg-light">
+          <div class="modal-footer border-0 py-3 px-4 bg-light d-flex justify-content-end gap-3">
             <template v-if="selectedProperty?.trang_thai_id == 1">
-              <button @click="openRejectModal(selectedProperty)" class="btn btn-outline-danger rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Từ chối</button>
-              <button @click="approveProperty(selectedProperty.id)" class="btn btn-success rounded-pill px-5 fw-bold shadow-sm d-flex align-items-center gap-2" data-bs-dismiss="modal"><i class="bi bi-check-lg"></i> Phê duyệt tin</button>
+              <button @click="openRejectModal(selectedProperty)" class="btn btn-outline-danger rounded-pill px-4 fw-bold transition-all hover-elevate">
+                <i class="bi bi-x-circle me-2"></i>Từ chối
+              </button>
+              <button @click="approveProperty(selectedProperty.id)" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2 transition-all hover-elevate" data-bs-dismiss="modal">
+                <i class="bi bi-check-lg"></i>Phê duyệt tin
+              </button>
             </template>
             <button v-else type="button" class="btn btn-secondary rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Đóng</button>
           </div>
@@ -995,10 +999,12 @@ export default {
 .tab-btn-inactive:hover { background: rgba(255,255,255,0.5); }
 
 .btn-action {
-  width: 36px; height: 36px; border-radius: 10px; border: none; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s;
+  width: 38px; height: 38px; border-radius: 12px; border: none; display: inline-flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-.hover-primary:hover { background: #4f46e5 !important; color: white !important; transform: translateY(-2px); }
-.hover-danger:hover { background: #ef4444 !important; color: white !important; transform: translateY(-2px); }
+.hover-elevate:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.hover-primary:hover { background: #4f46e5 !important; color: white !important; transform: translateY(-3px) scale(1.05); }
+.hover-danger:hover { background: #ef4444 !important; color: white !important; transform: translateY(-3px) scale(1.05); }
 
 /* Grid / List Layout */
 .property-card {

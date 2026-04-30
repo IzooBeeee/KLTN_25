@@ -85,6 +85,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { getCurrentInstance } from "vue";
 import { subscribeAdmin, leaveAllChannels } from '@/js/services/echo';
+import { clearAuth } from "@/js/auth";
 
 const router = useRouter();
 const { appContext } = getCurrentInstance();
@@ -153,8 +154,7 @@ const markAllRead = () => {
 // Logout
 const logout = () => {
   showProfileDropdown.value = false;
-  localStorage.removeItem("admin_auth_token");
-  localStorage.removeItem("admin_user_info");
+  clearAuth("admin");
 
   toast.success("Đăng xuất thành công 👋");
 
@@ -164,42 +164,45 @@ const logout = () => {
   }, 1000);
 };
 
-  // Load admin info from token or admin_user_info
-onMounted(() => {
+// ========== AUTH HANDLERS ==========
+const checkLogin = () => {
   const token = localStorage.getItem("admin_auth_token");
-  // ✅ Ưu tiên lấy tên từ admin_user_info
   const savedUserInfo = localStorage.getItem("admin_user_info");
   if (savedUserInfo) {
     try {
       const ui = JSON.parse(savedUserInfo);
       if (ui.ten || ui.name) adminName.value = ui.ten || ui.name;
+      adminId.value = ui.id;
     } catch (_) {}
-  } else if (token && typeof token === 'string' && token.includes('.')) {
-    // Fallback: giải mã JWT
-    try {
-      const parts = token.split('.');
-      if (parts.length >= 2 && parts[1]) {
-        const payload = JSON.parse(atob(parts[1]));
-        if (payload.name) adminName.value = payload.name;
-      }
-    } catch (e) {
-      console.error("Error decoding token:", e);
-      localStorage.removeItem("admin_auth_token");
-      localStorage.removeItem("admin_user_info");
-    }
+  } else {
+    adminName.value = "Admin";
+    adminId.value = null;
   }
+};
 
-  // Add click outside listener
+const onStorageChange = (event) => {
+  if (event.key === "admin_auth_token" || event.key === "admin_user_info") {
+    checkLogin();
+  }
+};
+
+const onAuthChanged = () => {
+  checkLogin();
+};
+
+  // Load admin info from token or admin_user_info
+onMounted(() => {
+  checkLogin();
+
+  // Add listeners
   document.addEventListener("click", handleClickOutside);
+  window.addEventListener("storage", onStorageChange);
+  window.addEventListener("admin-auth-changed", onAuthChanged);
 
-  // ✅ Subscribe Echo admin channel - dùng admin_user_info
-  const userInfoStr = localStorage.getItem("admin_user_info");
-  const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
-  const id = userInfo?.id;
-  if (id) {
-    adminId.value = id;
-    subscribeAdmin(id, (data) => {
-      console.log('SUBSCRIBED ADMIN RECEIVED NOTIFICATION:', id, data);
+  // ✅ Subscribe Echo admin channel
+  if (adminId.value) {
+    subscribeAdmin(adminId.value, (data) => {
+      console.log('SUBSCRIBED ADMIN RECEIVED NOTIFICATION:', adminId.value, data);
       adminNotifs.value.unshift({
         tieu_de: data.tieu_de || 'Thông báo mới',
         noi_dung: data.noi_dung || '',
@@ -209,22 +212,12 @@ onMounted(() => {
       unreadCount.value += 1;
     });
   }
-
-  // ✅ Lắng nghe admin-auth-changed
-  window.addEventListener("admin-auth-changed", () => {
-    const newUserStr = localStorage.getItem("admin_user_info");
-    if (newUserStr) {
-      try {
-        const ui = JSON.parse(newUserStr);
-        if (ui.ten || ui.name) adminName.value = ui.ten || ui.name;
-      } catch (_) {}
-    }
-  });
 });
 
 onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
-  window.removeEventListener("admin-auth-changed", () => {});
+  window.removeEventListener("storage", onStorageChange);
+  window.removeEventListener("admin-auth-changed", onAuthChanged);
   leaveAllChannels();
 });
 

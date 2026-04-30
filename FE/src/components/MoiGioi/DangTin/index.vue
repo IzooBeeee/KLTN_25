@@ -1486,7 +1486,6 @@ const submitForm = async () => {
 
   try {
     const formData = new FormData();
-    formData.append("status", "published");
 
     if (draftId.value) {
       formData.append("id", draftId.value);
@@ -1528,10 +1527,13 @@ const submitForm = async () => {
       await api.post("/moi-gioi/bds/update", formData, { headers: { "Content-Type": "multipart/form-data" } });
       await api.post(`/moi-gioi/bds/${draftId.value}/publish`);
     } else {
+      formData.append("status", "published");
       await api.post("/moi-gioi/bds/create", formData, { headers: { "Content-Type": "multipart/form-data" } });
     }
 
     soTinConLai.value--;
+    // ✅ Trigger Header refresh số tin ngay lập tức
+    window.dispatchEvent(new Event("moi-gioi-posts-updated"));
 
     await Swal.fire({
       icon: "success",
@@ -2164,6 +2166,70 @@ select.form-select {
   color: #001f7c;
 }
 
+.btn {
+  padding: 0.875rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+.btn-lg {
+  padding: 1rem 2.5rem;
+  font-size: 1.05rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #001f7c 0%, #1e40af 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 31, 124, 0.3);
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.btn-success:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+.btn-outline {
+  background: white;
+  color: #001f7c;
+  border: 2px solid #001f7c;
+}
+
+.btn-outline:hover {
+  background: #f0f7ff;
+  transform: translateY(-2px);
+}
+
 .upload-content h4 {
   font-size: 1.25rem;
   font-weight: 700;
@@ -2276,63 +2342,9 @@ select.form-select {
   justify-content: flex-end;
 }
 
-.btn {
-  padding: 0.875rem 2rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-  font-size: 0.95rem;
-}
-
-.btn-lg {
-  padding: 1rem 2.5rem;
-  font-size: 1rem;
-}
-
-.btn-primary {
-  background: #001f7c;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #1e40af;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 31, 124, 0.3);
-}
-
-.btn-secondary {
-  background: #6b7280;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: #4b5563;
-}
-
-.btn-success {
-  background: #10b981;
-  color: white;
-}
-
-.btn-success:hover {
-  background: #059669;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.btn-outline {
-  background: white;
-  color: #001f7c;
-  border: 2px solid #001f7c;
-}
-
 .btn-outline:hover {
-  background: #f9fafb;
+  background: #f0f7ff;
+  transform: translateY(-2px);
 }
 
 .auto-save-indicator {

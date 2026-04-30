@@ -382,7 +382,8 @@ export default {
 
     // Event Listeners
     document.addEventListener("click", this.handleClickOutside);
-    window.addEventListener("storage", this.checkLogin);
+    // ✅ Chỉ react với storage event của key khách hàng (tránh cross-tab)
+    window.addEventListener("storage", this._onStorageChange);
     window.addEventListener("favorite-updated", this.loadSavedNotifications);
     document.addEventListener("selectstart", this.preventSelect);
 
@@ -396,7 +397,7 @@ export default {
   beforeUnmount() {
     // Cleanup listeners
     document.removeEventListener("click", this.handleClickOutside);
-    window.removeEventListener("storage", this.checkLogin);
+    window.removeEventListener("storage", this._onStorageChange);
     window.removeEventListener("favorite-updated", this.loadSavedNotifications);
     document.removeEventListener("selectstart", this.preventSelect);
     window.removeEventListener("khach-hang-auth-changed", this.onAuthChanged);
@@ -410,6 +411,12 @@ export default {
 
   methods: {
     // ===== AUTH METHODS =====
+    // ✅ Chỉ react với storage event của key khách hàng (tránh cross-tab interference)
+    _onStorageChange(event) {
+      if (event.key === 'khach_hang_auth_token' || event.key === 'khach_hang_user_info') {
+        this.checkLogin();
+      }
+    },
     checkLogin() {
       // ✅ Đọc từ key riêng của khách hàng
       const token = localStorage.getItem("khach_hang_auth_token");

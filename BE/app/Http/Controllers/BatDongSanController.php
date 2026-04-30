@@ -231,17 +231,6 @@ class BatDongSanController extends Controller
     // Chi tiết BDS (Dành cho tất cả mọi người)
     public function xemChiTietBDS($id)
     {
-        // $id_chuc_nang = 59; // ID chức năng xem danh sách BDS cho admin
-        // $user = Auth::guard('sanctum')->user();
-        // $check = PhanQuyen::where('id_chuc_vu', $user->id_chuc_vu)
-        //     ->where('id_chuc_nang', $id_chuc_nang)
-        //     ->first();
-        // if (!$user->is_super &&  !$check) {
-        //     return response()->json([
-        //         'status' => false,
-        //         'message' => "Bạn không có quyền thực hiện chức năng này"
-        //     ]);
-        // }
         $data = BatDongSan::with([
             'anhDaiDien',
             'hinhAnh',
@@ -250,12 +239,7 @@ class BatDongSanController extends Controller
             'diaChi',
             'diaChi.tinh',
             'diaChi.quan'
-        ])
-            ->where(function ($query) {
-                $query->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            })
-            ->find($id);
+        ])->find($id);
         if (!$data) {
             return response()->json([
                 'status' => false,

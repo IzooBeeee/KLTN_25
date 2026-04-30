@@ -362,10 +362,12 @@ export default {
     this.startPolling();
     this.subscribeEcho();   // ✅ Real-time notifications
     document.addEventListener("click", this.handleClickOutside);
-    window.addEventListener("storage", this.checkLogin);
-    window.addEventListener("focus", this.checkLogin);
+    // ✅ storage event: chỉ trigger khi localStorage thay đổi từ TAB KHÁC
+    // (KHÔNG dùng focus vì nó chạy khi switch tab làm checkLogin sai)
+    window.addEventListener("storage", this._onStorageChange);
     // ✅ Lắng nghe auth thay đổi trong cùng tab
     window.addEventListener("moi-gioi-auth-changed", this.checkLogin);
+    window.addEventListener("moi-gioi-posts-updated", this.fetchRemainingPosts);
     this.$router.afterEach(() => {
       this.showMenu = false;
       this.showNotifications = false;
@@ -374,9 +376,9 @@ export default {
   },
   beforeUnmount() {
     document.removeEventListener("click", this.handleClickOutside);
-    window.removeEventListener("storage", this.checkLogin);
-    window.removeEventListener("focus", this.checkLogin);
+    window.removeEventListener("storage", this._onStorageChange);
     window.removeEventListener("moi-gioi-auth-changed", this.checkLogin);
+    window.removeEventListener("moi-gioi-posts-updated", this.fetchRemainingPosts);
     if (this.menuTimer) clearTimeout(this.menuTimer);
     if (this.pollingInterval) clearInterval(this.pollingInterval);
     // ✅ Leave Echo channel khi unmount
@@ -448,6 +450,12 @@ export default {
       }
     },
     // ========== AUTH ==========
+    // ✅ Chỉ react với storage event của key môi giới (tránh cross-tab)
+    _onStorageChange(event) {
+      if (event.key === 'moi_gioi_auth_token' || event.key === 'moi_gioi_user_info') {
+        this.checkLogin();
+      }
+    },
     checkLogin() {
       const token = localStorage.getItem("moi_gioi_auth_token");
       // ✅ Dùng key riêng moi_gioi_user_info
@@ -457,6 +465,10 @@ export default {
           this.token = token;
           this.user = userStr ? JSON.parse(userStr) : (this.user || { ten: "Môi giới" });
           this.userType = "moi-gioi";
+          
+          // ✅ Refresh dữ liệu mỗi khi check login (chuyển trang, storage change)
+          this.fetchRemainingPosts();
+          this.fetchNotifications();
         } catch (e) {
           console.error("Parse user error:", e);
           this.clearData();

@@ -16,9 +16,9 @@ class MoiGioiSeeder extends Seeder
         DB::table('moi_giois')->insertOrIgnore([
             [
                 'ten' => 'Nguyễn Văn An',
-                'email' => 'nva@bds.com',
+                'email' => 'vannhan130504@gmail.com',
                 'so_dien_thoai' => '0901234567',
-                'password' => bcrypt('123456789'),
+                'password' => bcrypt('123456'),
                 'avatar' => null,
                 'mo_ta' => 'Môi giới bất động sản chuyên nghiệp, kinh nghiệm 5 năm',
                 'zalo_link' => 'https://zalo.me/0901234567',

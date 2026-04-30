@@ -13,9 +13,9 @@ class GiaoDichSeeder extends Seeder
      */
     public function run(): void
     {
-        $paidAt1 = Carbon::now()->subDays(30);
-        $paidAt2 = Carbon::now()->subDays(20);
-        $paidAt4 = Carbon::now()->subDays(15);
+        $paidAt1 = Carbon::now(); // ✅ Gói môi giới 1 bắt đầu hôm nay (chưa hết hạn)
+        $paidAt2 = Carbon::now()->subDays(5);
+        $paidAt4 = Carbon::now()->subDays(3);
 
         DB::table('giao_dichs')->insertOrIgnore([
             [
