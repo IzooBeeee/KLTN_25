@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="customer-management p-4">
     <div class="row mb-4">
       <div class="col-12">
@@ -488,7 +488,7 @@ export default {
       if (this.$toast) {
         this.$toast[type]?.(message);
       } else {
-        alert(message);
+        toaster[type]?.(message);
       }
     },
     handleError(err, fallbackMsg) {
@@ -567,7 +567,7 @@ export default {
     exportData(format) {
       const token = this.getToken();
       if (!token) {
-        alert("Vui lòng đăng nhập lại");
+        this.showToast("Vui lòng đăng nhập lại", "error");
         return;
       }
 

@@ -155,12 +155,7 @@ const allData = ref([]);
 const filterStatus = ref("");
 const pagination = ref({ current_page: 1, last_page: 1, total: 0, from: 1, to: 1 });
 
-const stats = computed(() => ({
-  total: allData.value.length,
-  success: allData.value.filter((d) => d.trang_thai === "success").length,
-  pending: allData.value.filter((d) => d.trang_thai === "pending").length,
-  failed: allData.value.filter((d) => ["failed", "fail"].includes(d.trang_thai)).length,
-}));
+const stats = ref({ total: 0, success: 0, pending: 0, failed: 0 });
 
 const filteredData = computed(() => {
   if (!filterStatus.value) return allData.value;
@@ -171,9 +166,12 @@ const fetchData = async (page = 1) => {
   loading.value = true;
   try {
     const res = await api.get("/admin/giao-dich/data", { params: { page } });
-    if (res.data?.data) {
+    if (res.data?.status) {
       const d = res.data.data;
       allData.value = d.data || d;
+      if (res.data.stats) {
+        stats.value = res.data.stats;
+      }
       if (d.current_page) {
         pagination.value = {
           current_page: d.current_page,

@@ -309,7 +309,7 @@ export default {
 
     async saveData() {
       if (!this.formData.ten_loai.trim()) {
-        alert("Vui lòng nhập tên loại BĐS!");
+        this.$toast.error("Vui lòng nhập tên loại BĐS!");
         return;
       }
 
@@ -326,9 +326,10 @@ export default {
           await api.put(`/admin/loai-bds/update/${this.formData.id}`, payload);
         }
         this.loadData(this.pagination.current_page);
+        this.$toast.success(this.showAdd ? "Thêm mới thành công!" : "Cập nhật thành công!");
         this.closeModals();
       } catch (err) {
-        alert(err.response?.data?.message || "Có lỗi xảy ra khi lưu dữ liệu.");
+        this.$toast.error(err.response?.data?.message || "Có lỗi xảy ra khi lưu dữ liệu.");
       }
     },
 
@@ -336,10 +337,11 @@ export default {
       if (!this.deleteData?.id) return;
       try {
         await api.delete(`/admin/loai-bds/delete/${this.deleteData.id}`);
+        this.$toast.success("Xóa danh mục thành công!");
         this.loadData(this.pagination.current_page);
         this.closeModals();
       } catch (err) {
-        alert(err.response?.data?.message || "Không thể xóa danh mục này.");
+        this.$toast.error(err.response?.data?.message || "Không thể xóa danh mục này.");
       }
     },
 
@@ -352,9 +354,10 @@ export default {
           is_active: isChecked ? 1 : 0 
         });
         if (!res.data?.status) throw new Error("Cập nhật thất bại");
+        this.$toast.success("Cập nhật trạng thái thành công!");
       } catch (err) {
         item.is_active = originalStatus; 
-        alert("Cập nhật trạng thái thất bại");
+        this.$toast.error("Cập nhật trạng thái thất bại");
       }
     },
   },

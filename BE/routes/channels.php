@@ -21,6 +21,15 @@ Broadcast::channel('admin.{id}', function ($user, $id) {
 
 // ── MoiGioi channel: private-user.{id} ────────────────────────────────
 Broadcast::channel('user.{id}', function ($user, $id) {
+    \Illuminate\Support\Facades\Log::info('Broadcasting Auth Attempt', [
+        'user_id' => $user->id,
+        'user_class' => get_class($user),
+        'requested_id' => $id
+    ]);
+    
     // MoiGioi authenticate qua Sanctum → $user là MoiGioi model
-    return $user instanceof \App\Models\MoiGioi && (int) $user->id === (int) $id;
+    $match = $user instanceof \App\Models\MoiGioi && (int) $user->id === (int) $id;
+    
+    \Illuminate\Support\Facades\Log::info('Broadcasting Auth Result', ['match' => $match]);
+    return $match;
 });

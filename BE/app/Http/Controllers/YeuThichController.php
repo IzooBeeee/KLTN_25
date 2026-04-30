@@ -47,6 +47,7 @@ class YeuThichController extends Controller
                 ]);
             }
 
+            \Log::info('YeuThichController: User liking BDS', ['user_id' => $user->id, 'bds_id' => $bdsId]);
             DB::transaction(function () use ($user, $bds, $bdsId) {
                 // FIX: lưu lịch sử yêu thích theo user đang đăng nhập và BĐS được like
                 YeuThich::create([
@@ -57,6 +58,7 @@ class YeuThichController extends Controller
                 ]);
 
                 // FIX: dispatch event để listener tạo Thông báo cho môi giới
+                \Log::info('YeuThichController: Dispatching BatDongSanDuocYeuThich event');
                 event(new BatDongSanDuocYeuThich($user, $bds));
             });
 

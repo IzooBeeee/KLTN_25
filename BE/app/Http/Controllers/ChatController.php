@@ -27,15 +27,26 @@ class ChatController extends Controller
             ]);
         }
 
-        if (!($user instanceof KhachHang)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Chi khach hang moi co the bat dau cuoc chat',
-            ], 403);
+        $khachHangId = null;
+        $moiGioiId = null;
+
+        if ($user instanceof KhachHang) {
+            $khachHangId = $user->id;
+            $moiGioiId = $request->moi_gioi_id;
+        } elseif ($user instanceof MoiGioi) {
+            $moiGioiId = $user->id;
+            $khachHangId = $request->khach_hang_id;
         }
 
-        $conversation = Conversation::where('khach_hang_id', $user->id)
-            ->where('moi_gioi_id', $request->moi_gioi_id)
+        if (!$khachHangId || !$moiGioiId) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Thong tin cuoc chat khong hop le',
+            ], 400);
+        }
+
+        $conversation = Conversation::where('khach_hang_id', $khachHangId)
+            ->where('moi_gioi_id', $moiGioiId)
             ->when($request->bat_dong_san_id, function ($query) use ($request) {
                 $query->where('bat_dong_san_id', $request->bat_dong_san_id);
             })
@@ -43,8 +54,8 @@ class ChatController extends Controller
 
         if (!$conversation) {
             $conversation = Conversation::create([
-                'khach_hang_id' => $user->id,
-                'moi_gioi_id' => $request->moi_gioi_id,
+                'khach_hang_id' => $khachHangId,
+                'moi_gioi_id' => $moiGioiId,
                 'bat_dong_san_id' => $request->bat_dong_san_id,
             ]);
         }

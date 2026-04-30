@@ -42,9 +42,17 @@ class GiaoDichController extends Controller
 
         $data = $query->orderBy('created_at', 'desc')->paginate($request->input('per_page', 10));
 
+        $stats = [
+            'total'   => GiaoDich::count(),
+            'success' => GiaoDich::where('trang_thai', 'success')->count(),
+            'pending' => GiaoDich::where('trang_thai', 'pending')->count(),
+            'failed'  => GiaoDich::whereIn('trang_thai', ['failed', 'fail'])->count(),
+        ];
+
         return response()->json([
             'status' => true,
-            'data' => $data
+            'data' => $data,
+            'stats' => $stats
         ]);
     }
 

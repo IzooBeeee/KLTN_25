@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="min-h-screen bg-[#f0f4f8] font-['Inter'] p-6">
 
     <!-- Header -->
@@ -8,8 +8,10 @@
         <p class="text-sm text-gray-400">Quản lý danh sách các gói dịch vụ và bảng giá cho môi giới.</p>
       </div>
       <button @click="showCreateModal = true"
-        class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-200 hover:-translate-y-0.5 transition-all">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-sm font-bold rounded-2xl shadow-xl shadow-blue-200 hover:shadow-2xl hover:shadow-blue-300 hover:-translate-y-1 transition-all active:scale-95 group">
+        <svg class="w-5 h-5 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+        </svg>
         Tạo gói mới
       </button>
     </div>
@@ -102,12 +104,12 @@
               <td class="px-5 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
                   <button @click="Object.assign(goi_tin_update, value); showUpdateModal = true"
-                    class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-100 transition" title="Cập nhật">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-100 transition-all active:scale-90" title="Cập nhật">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                   </button>
                   <button @click="id_can_xoa = value.id; showDeleteModal = true"
-                    class="w-8 h-8 bg-red-50 text-red-500 rounded-lg flex items-center justify-center hover:bg-red-100 transition" title="Xóa">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    class="w-9 h-9 bg-red-50 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-100 transition-all active:scale-90" title="Xóa">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                   </button>
                 </div>
               </td>
@@ -172,7 +174,7 @@
           </div>
           <div class="flex gap-3 p-6 pt-0">
             <button @click="showCreateModal = false" class="flex-1 py-3 border-2 border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition text-sm">Hủy bỏ</button>
-            <button @click="themMoiGoiTin(); showCreateModal = false" class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-xl shadow-sm hover:-translate-y-0.5 transition-all text-sm">Lưu gói tin</button>
+            <button @click="themMoiGoiTin(); showCreateModal = false" class="flex-[2] py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-100 hover:-translate-y-1 hover:shadow-xl transition-all active:scale-95 text-sm">Lưu gói tin</button>
           </div>
         </div>
       </div>
@@ -264,6 +266,7 @@ export default {
       showDeleteModal: false,
       currentPage: 1,
       itemsPerPage: 5,
+      isLoading: false,
     };
   },
   computed: {
@@ -336,7 +339,10 @@ export default {
           this.danhSachGoiTin = data.data || data;
         })
         .catch(() => {
-          this.toaster.error("Lỗi load dữ liệu");
+          toaster.error("Lỗi load dữ liệu");
+        })
+        .finally(() => {
+          this.isLoading = false;
         });
     },
 
@@ -493,10 +499,10 @@ export default {
         if (res.data?.status) {
           // ✅ Cập nhật UI ngay
           item.trang_thai = newStatus;
-          alert("Cập nhật thành công!");
+          this.$toast.success("Cập nhật trạng thái thành công!");
         }
       } catch (err) {
-        alert(err.response?.data?.message || "Lỗi!");
+        this.$toast.error(err.response?.data?.message || "Lỗi cập nhật trạng thái!");
       }
     },
 
@@ -511,10 +517,10 @@ export default {
 
         if (res.data?.status) {
           item.trang_thai = newStatus ? "active" : "inactive";
-          alert("Cập nhật thành công!");
+          this.$toast.success("Cập nhật trạng thái thành công!");
         }
       } catch (err) {
-        alert(err.response?.data?.message || "Lỗi!");
+        this.$toast.error(err.response?.data?.message || "Lỗi cập nhật trạng thái!");
       }
     },
   },

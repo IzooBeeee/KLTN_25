@@ -41,9 +41,11 @@ textarea {
   font: inherit;
 }
 
-button {
-  border: 0;
-  background: transparent;
+@layer base {
+  button {
+    border: 0;
+    background: transparent;
+  }
 }
 
 .material-symbols-outlined {

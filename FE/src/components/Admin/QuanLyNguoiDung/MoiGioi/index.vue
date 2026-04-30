@@ -843,21 +843,22 @@ export default {
         await api.post("/admin/moi-gioi/create", this.moi_gioi);
         this.loadMoiGioi();
         this.closeModals();
+        toaster.success("Thêm môi giới thành công!");
       } catch (err) {
         console.error("Lỗi thêm:", err);
-        alert("Lỗi thêm môi giới!");
+        toaster.error(err.response?.data?.message || "Lỗi thêm môi giới!");
       }
     },
 
     async capNhatMoiGioi() {
       try {
         await api.post("/admin/moi-gioi/update", { ...this.edit_moi_gioi });
-        alert("Cập nhật thành công");
+        toaster.success("Cập nhật thành công");
         this.loadMoiGioi();
         this.closeModals();
       } catch (err) {
         console.error("Lỗi update:", err);
-        alert("Cập nhật thất bại!");
+        toaster.error(err.response?.data?.message || "Cập nhật thất bại!");
       }
     },
 
@@ -866,11 +867,12 @@ export default {
       if (!this.delete_moi_gioi?.id) return;
       try {
         await api.delete("/admin/moi-gioi/delete", { data: { id: this.delete_moi_gioi.id } });
+        toaster.success("Xóa môi giới thành công");
         this.loadMoiGioi();
         this.closeModals();
       } catch (err) {
         console.error("Lỗi xóa:", err);
-        alert("Xóa thất bại!");
+        toaster.error(err.response?.data?.message || "Xóa thất bại!");
       }
     },
 
@@ -900,7 +902,7 @@ export default {
     exportData(format) {
       const token = this.getToken();
       if (!token) {
-        alert("Vui lòng đăng nhập lại");
+        toaster.error("Vui lòng đăng nhập lại");
         return;
       }
 
@@ -917,7 +919,7 @@ export default {
 
       window.open(exportUrl, "_blank");
       this.showExportMenu = false;
-      this.showToast(`Đang tải file ${format.toUpperCase()}...`, "success");
+      toaster.success(`Đang tải file ${format.toUpperCase()}...`);
     },
   },
   watch: {

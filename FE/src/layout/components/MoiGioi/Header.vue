@@ -255,7 +255,10 @@
           <div class="modal-footer">
             <button class="btn btn-secondary" @click="closeModal">Đóng</button>
             <button v-if="selectedCustomer?.email" class="btn btn-primary" @click="contactCustomer">
-              Liên hệ
+              Liên hệ Email
+            </button>
+            <button v-if="selectedCustomer" class="btn btn-emerald" @click="startChatWithCustomer">
+              <i class="bi bi-chat-dots me-1"></i> Nhắn tin
             </button>
           </div>
         </div>
@@ -282,7 +285,7 @@
 
 <script>
 import api from '@/axios/config';
-import { subscribeUser, leaveAllChannels } from '@/js/services/echo';
+import { subscribeUser, leaveAllChannels, updateEchoToken } from '@/js/services/echo';
 export default {
   name: "MoiGioiHeader",
   data() {
@@ -307,6 +310,7 @@ export default {
       hasNewNotifications: false, // ✅ Theo dõi thông báo mới
       statsListings: 0,
       statsCustomers: 0,
+      selectedBdsId: null,
     };
   },
   computed: {
@@ -403,9 +407,15 @@ export default {
           noi_dung: data.noi_dung || '',
           thoi_gian: new Date().toISOString(),
           da_doc: false,
+          khach_hang: data.khach_hang || null,
+          khach_hang_id: data.khach_hang_id || null,
+          bat_dong_san_id: data.bds_id || null,
         });
         this.unreadCount += 1;
         this.hasNewNotifications = true;
+
+        // ✅ Hiển thị Toast thông báo real-time
+        this.triggerToast(data.tieu_de || "Bạn có thông báo mới!");
 
         // Nếu đang mở dropdown thì refresh list để sync dữ liệu chính xác từ DB nếu cần
         if (this.showNotifications) {
@@ -421,6 +431,7 @@ export default {
     // ========== MODAL ==========
     openCustomerModal(item) {
       this.selectedCustomer = item.khach_hang;
+      this.selectedBdsId = item.bat_dong_san_id || item.bds_id; // Lưu lại ID BĐS nếu có
       this.showCustomerModal = true;
       this.showNotifications = false;
       this.showMenu = false;
@@ -435,6 +446,33 @@ export default {
       if (this.selectedCustomer?.email)
         window.location.href = `mailto:${this.selectedCustomer.email}`;
       this.closeModal();
+    },
+    async startChatWithCustomer() {
+      if (!this.selectedCustomer) return;
+      
+      this.triggerToast("Đang khởi tạo cuộc trò chuyện...");
+      
+      try {
+        const payload = {
+          khach_hang_id: this.selectedCustomer.id,
+          // Nếu có thông tin BĐS từ notification thì đính kèm vào room chat luôn
+          bat_dong_san_id: this.selectedBdsId || null
+        };
+        
+        const res = await api.post('/moi-gioi/chat/start', payload);
+        
+        if (res.data?.status) {
+          this.closeModal();
+          // Chuyển hướng sang trang quản lý khách hàng (trang chat) và truyền ID cuộc hội thoại
+          this.$router.push({
+            path: '/moi-gioi/quan-ly-khach-hang',
+            query: { active_chat_id: res.data.data.id }
+          });
+        }
+      } catch (error) {
+        console.error("Lỗi khởi tạo chat:", error);
+        this.triggerToast("Không thể bắt đầu chat. Vui lòng thử lại.");
+      }
     },
     // ========== TOAST & COPY ==========
     triggerToast(message) {
@@ -462,7 +500,6 @@ export default {
     },
     checkLogin() {
       const token = localStorage.getItem("moi_gioi_auth_token");
-      // ✅ Dùng key riêng moi_gioi_user_info
       const userStr = localStorage.getItem("moi_gioi_user_info");
       if (token) {
         try {
@@ -470,6 +507,9 @@ export default {
           this.user = userStr ? JSON.parse(userStr) : (this.user || { ten: "Môi giới" });
           this.userType = "moi-gioi";
           
+          // ✅ Cập nhật token cho Echo
+          updateEchoToken(token);
+
           // ✅ Refresh dữ liệu mỗi khi check login (chuyển trang, storage change)
           this.fetchRemainingPosts();
           this.fetchNotifications();

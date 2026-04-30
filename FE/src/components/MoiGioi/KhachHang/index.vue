@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="page-content">
     <div class="broker-chat-container">
       
@@ -171,9 +171,11 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
+import { useRoute } from 'vue-router';
 import api from '@/axios/config';
 
 // ===== STATE =====
+const route = useRoute();
 const searchQuery = ref('');
 const filterType = ref('all');
 const activeChatId = ref(null);
@@ -434,7 +436,22 @@ function listenRealtime(conversationId) {
 // ===== LIFECYCLE =====
 onMounted(async () => {
   await loadConversations();
-  // Echo sẽ được init khi selectChat() được gọi
+  
+  // 🔥 Kiểm tra nếu có active_chat_id từ URL (do nhấn từ thông báo)
+  const queryChatId = route.query.active_chat_id;
+  if (queryChatId) {
+    const convId = Number(queryChatId);
+    // Kiểm tra xem conversation này có trong list không
+    const exists = conversations.value.find(c => c.id === convId);
+    if (exists) {
+      selectChat(convId);
+    } else {
+      // Nếu là chat mới toanh chưa load kịp sidebar, ta vẫn load nội dung
+      activeConversationId.value = convId;
+      await loadMessages();
+      listenRealtime(convId);
+    }
+  }
 });
 
 onUnmounted(() => {

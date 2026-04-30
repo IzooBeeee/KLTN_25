@@ -108,8 +108,11 @@
 import { ref, computed, onMounted } from "vue";
 import api from "@/axios/config";
 
+import { subscribeUser } from "@/js/services/echo";
+
 const loading = ref(false);
 const list = ref([]);
+const user = JSON.parse(localStorage.getItem("moi_gioi_user_info") || "{}");
 
 const unreadCount = computed(() => list.value.filter((n) => !n.is_read).length);
 
@@ -125,6 +128,22 @@ const fetchData = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const subscribeNotifications = () => {
+  if (!user.id) return;
+  subscribeUser(user.id, (data) => {
+    // Thêm vào đầu danh sách
+    list.value.unshift({
+      id: data.id || Date.now(),
+      tieu_de: data.tieu_de,
+      noi_dung: data.noi_dung,
+      loai: data.loai === 'khach_moi' ? 'yeu_thich' : data.loai,
+      is_read: false,
+      created_at: new Date().toISOString(),
+      bat_dong_san: data.khach_hang ? { tieu_de: data.noi_dung.split(': ')[1] || 'BĐS của bạn' } : null
+    });
+  });
 };
 
 const markRead = async (item) => {
@@ -170,5 +189,8 @@ const formatTime = (val) => {
   return d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
 };
 
-onMounted(() => fetchData());
+onMounted(() => {
+  fetchData();
+  subscribeNotifications();
+});
 </script>

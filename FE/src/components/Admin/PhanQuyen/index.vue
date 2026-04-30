@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="permission-manager p-4">
     <div class="row mb-4">
       <div class="col-12">
@@ -725,7 +725,7 @@ export default {
         .get("/admin/chuc-nang/data")
         .then((res) => {
           if (res.data.status == false) {
-            toaster.error(res.data.message);
+            this.$toast.error(res.data.message);
           }
           this.listChucNang = res.data.data;
         });
@@ -737,7 +737,7 @@ export default {
         .get("/admin/phan-quyen/data/" + this.id_chuc_vu)
         .then((res) => {
           if (res.data.status == false) {
-            toaster.error(res.data.message);
+            this.$toast.error(res.data.message);
           }
           this.list_chi_tiet = res.data.data; // Gán data vào list_chi_tiet
         })
@@ -752,7 +752,7 @@ export default {
         .get("/admin/phan-quyen/data/" + this.id_chuc_vu)
         .then((res) => {
           if (res.data.status == false) {
-            toaster.error(res.data.message);
+            this.$toast.error(res.data.message);
           }
           this.listPhanQuyen = res.data.data;
         });
@@ -771,7 +771,7 @@ export default {
     // Cấp quyền cho chức năng
     capQuyen(chuc_nang) {
       if (!this.quyen_dang_chon.id) {
-        toaster.warning("Vui lòng chọn chức vụ cần phân quyền!");
+        this.$toast.warning("Vui lòng chọn chức vụ cần phân quyền!");
         return;
       }
 
@@ -781,7 +781,7 @@ export default {
       );
 
       if (daTonTai) {
-        toaster.error(
+        this.$toast.error(
           `<span class="text-nowrap">Chức năng <b>${chuc_nang.ten_chuc_nang}</b> đã tồn tại!</span>`
         );
         return;
@@ -796,7 +796,7 @@ export default {
         .post("/admin/phan-quyen/chuc-vu/create", payload)
         .then((res) => {
           if (res.data.status || res.data.success) {
-            toaster.success(
+            this.$toast.success(
               `<span class="text-nowrap">Đã cấp quyền "<b>${chuc_nang.ten_chuc_nang}</b>" cho <b>${this.quyen_dang_chon.ten_chuc_vu}</b></span> `
             );
             this.loadData(); // Reload lại danh sách

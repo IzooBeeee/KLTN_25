@@ -708,12 +708,18 @@ export default {
     },
 
     async approveProperty(id) {
-      if (!confirm("Bạn có chắc chắn muốn duyệt tin đăng này?")) return;
       try {
         const response = await api.post(`/admin/bds/duyet`, { id: id, is_duyet: 1 });
         if (response.data.status) {
-          toaster.success("Đã duyệt tin đăng thành công!");
+          toaster.success("Đã duyệt tin đăng thành công! 🎉");
           this.loadProperties();
+          
+          // Đóng modal chi tiết nếu đang mở
+          const modalEl = document.getElementById("propertyModal");
+          if (modalEl) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+          }
         }
       } catch (error) {
         console.error("Lỗi duyệt tin:", error.response?.data);
@@ -737,20 +743,12 @@ export default {
     },
 
     async rejectProperty() {
-      console.log("🔄 rejectProperty called");
-      console.log("🔄 rejectTarget:", this.rejectTarget);
-
       if (!this.rejectTarget) {
         toaster.error("Không tìm thấy tin đăng!");
         return;
       }
 
-      const bdsId =
-        typeof this.rejectTarget === "object"
-          ? this.rejectTarget.id || this.rejectTarget.bds_id
-          : this.rejectTarget;
-
-      console.log("🔄 bdsId:", bdsId);
+      const bdsId = this.rejectTarget.id || this.rejectTarget.bds_id;
 
       if (!bdsId) {
         toaster.error("Không tìm thấy ID bất động sản!");
@@ -758,14 +756,17 @@ export default {
       }
 
       try {
-        const response = await api.post(`/admin/bds/duyet`, { id: bdsId, is_duyet: 2, ly_do: this.rejectReason });
-
-        console.log("📥 Response:", response.data);
+        const response = await api.post(`/admin/bds/duyet`, { 
+          id: bdsId, 
+          is_duyet: 2, 
+          ly_do: this.rejectReason 
+        });
 
         if (response.data.status) {
-          toaster.success("Đã từ chối tin đăng");
+          toaster.success("Đã từ chối tin đăng thành công");
           this.loadProperties();
           this.rejectTarget = null;
+          this.rejectReason = "";
 
           // ✅ Đóng modal reject
           const modalEl = document.getElementById("rejectModal");
@@ -773,13 +774,19 @@ export default {
             const modal = bootstrap.Modal.getInstance(modalEl);
             if (modal) modal.hide();
           }
+          
+          // Đóng modal chi tiết nếu đang mở
+          const detailModalEl = document.getElementById("propertyModal");
+          if (detailModalEl) {
+            const detailModal = bootstrap.Modal.getInstance(detailModalEl);
+            if (detailModal) detailModal.hide();
+          }
         } else {
           toaster.error(response.data.message || "Từ chối thất bại");
         }
       } catch (error) {
-        console.error("❌ Lỗi từ chối:", error.response?.data);
-        const message = error.response?.data?.message || "Lỗi khi từ chối";
-        toaster.error(message);
+        console.error("❌ Lỗi từ chối:", error);
+        toaster.error(error.response?.data?.message || "Lỗi khi từ chối tin đăng");
       }
     },
 

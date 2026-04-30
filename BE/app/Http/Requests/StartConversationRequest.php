@@ -14,7 +14,8 @@ class StartConversationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'moi_gioi_id' => 'required|integer|exists:moi_giois,id',
+            'moi_gioi_id' => 'nullable|integer|exists:moi_giois,id',
+            'khach_hang_id' => 'nullable|integer|exists:khach_hangs,id',
             'bat_dong_san_id' => 'nullable|integer|exists:bat_dong_sans,id',
         ];
     }

@@ -18,7 +18,7 @@ class CustomerInterestedNotification extends Notification implements ShouldBroad
 {
     public function __construct(
         public BatDongSan $batDongSan,
-        public string $tenKhach,
+        public \App\Models\KhachHang $khachHang,
         public string $loai = 'yeu_thich'
     ) {}
 
@@ -41,12 +41,14 @@ class CustomerInterestedNotification extends Notification implements ShouldBroad
     {
         $action = $this->loai === 'lien_he' ? 'liên hệ' : 'quan tâm';
         return [
-            'type'     => 'customer_interested',
-            'loai'     => 'khach_moi',
-            'tieu_de'  => "Khách hàng {$action} bài đăng 👤",
-            'noi_dung' => "Khách \"{$this->tenKhach}\" đã {$action} bài: {$this->batDongSan->tieu_de}",
-            'bds_id'   => $this->batDongSan->id,
-            'link'     => "/moi-gioi/khach-hang",
+            'type'          => 'customer_interested',
+            'loai'          => 'khach_moi',
+            'tieu_de'       => "Khách hàng {$action} bài đăng 👤",
+            'noi_dung'      => "Khách \"{$this->khachHang->ten}\" đã {$action} bài: {$this->batDongSan->tieu_de}",
+            'bds_id'        => $this->batDongSan->id,
+            'khach_hang_id' => $this->khachHang->id,
+            'khach_hang'    => $this->khachHang->toArray(),
+            'link'          => "/moi-gioi/khach-hang",
         ];
     }
 }

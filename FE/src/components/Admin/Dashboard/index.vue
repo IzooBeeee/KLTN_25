@@ -323,8 +323,10 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 import api from "@/axios/config";
 
+const router = useRouter();
 const currentTime = ref("");
 const currentDate = ref("");
 const lastUpdateTime = ref("Vừa xong");
@@ -563,8 +565,12 @@ const getInitials = (name) => {
 };
 
 const getStatusIcon = (status) => (status === "success" ? "fa-check-circle" : "fa-clock");
-const viewAllFavorites = () => {};
-const viewAllTransactions = () => {};
+const viewAllFavorites = () => {
+  // router.push("/admin/bat-dong-san"); // or appropriate route
+};
+const viewAllTransactions = () => {
+  router.push("/admin/giao-dich");
+};
 
 const updateTime = () => {
   const now = new Date();
@@ -575,6 +581,7 @@ const updateTime = () => {
 const toggleAutoRefresh = () => {
   autoRefresh.value = !autoRefresh.value;
   if (autoRefresh.value) {
+    refreshAllData(); // Initial refresh when enabled
     autoRefreshInterval = setInterval(refreshAllData, 30000);
   } else {
     if (autoRefreshInterval) clearInterval(autoRefreshInterval);
