@@ -16,6 +16,7 @@ class BatDongSan extends Model
         'gia',
         'dien_tich',
         'loai_id',
+        'trang_thai_id',
         'moi_gioi_id',
         'dia_chi_id',
         'so_phong_ngu',

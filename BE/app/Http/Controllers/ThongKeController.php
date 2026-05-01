@@ -230,4 +230,29 @@ class ThongKeController extends Controller
             default => 'Unknown',
         };
     }
+
+    // Biểu đồ tròn (Pie chart) tỷ lệ bất động sản theo trạng thái
+    public function getPropertyStatusChart(Request $request)
+    {
+        $user = $this->resolveUser($request);
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => "Có lỗi xảy ra"], 401);
+        }
+
+        $choDuyet = BatDongSan::where('is_duyet', 0)->count();
+        $daDuyet = BatDongSan::where('is_duyet', 1)->count();
+        $tuChoi = BatDongSan::where('is_duyet', 2)->count();
+        $daBan = BatDongSan::where('trang_thai_id', 4)->count();
+
+        // Adjust for overlap if properties can be is_duyet=1 AND trang_thai_id=4
+        $daDuyetActive = BatDongSan::where('is_duyet', 1)->where('trang_thai_id', '!=', 4)->count();
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'labels' => ['Chờ duyệt', 'Đang hoạt động', 'Bị từ chối', 'Đã bán/Thuê'],
+                'series' => [$choDuyet, $daDuyetActive, $tuChoi, $daBan]
+            ]
+        ]);
+    }
 }

@@ -83,6 +83,11 @@ class YeuThichController extends Controller
         }
 
         $yeuThichs = YeuThich::where('khach_hang_id', $user->id)
+            ->whereHas('batDongSan', function($q) {
+                $q->where('is_duyet', true)
+                  ->where('status', 'published')
+                  ->whereHas('loai', fn($l) => $l->where('is_active', 1));
+            })
             ->with([
                 'batDongSan',
                 'batDongSan.moiGioi',

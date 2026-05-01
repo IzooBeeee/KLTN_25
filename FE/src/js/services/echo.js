@@ -51,6 +51,27 @@ export const subscribeUser = (userId, onNotify) => {
         });
     }
 
+    // Lắng nghe thêm event tin nhắn mới trên cùng channel
+    _userChannel.listen('.message.sent', (data) => {
+        console.log('[Echo] New message received:', data);
+        if (onNotify) {
+            try {
+                // Đóng gói data lại giống format notification để xử lý chung
+                onNotify({
+                    id: 'msg_' + data.id,
+                    loai: 'tin_nhan',
+                    tieu_de: 'Tin nhắn mới từ ' + data.sender_name,
+                    noi_dung: data.type === 'image' ? '[Hình ảnh]' : data.content,
+                    khach_hang_id: data.sender_id,
+                    conversation_id: data.conversation_id,
+                    sender_type: data.sender_type
+                });
+            } catch (error) {
+                console.error('[Echo] Message handler failed:', error);
+            }
+        }
+    });
+
     console.log(`[Echo] Subscribed to private-user.${userId}`);
     return _userChannel;
 };
@@ -82,6 +103,46 @@ export const subscribeAdmin = (adminId, onNotify) => {
     return _adminChannel;
 };
 
+// KhachHang Channel
+let _customerChannel = null;
+let _subscribedCustomerId = null;
+
+export const subscribeCustomer = (customerId, onNotify) => {
+    if (!window.Echo || !customerId) return null;
+
+    if (_subscribedCustomerId === customerId && _customerChannel) return _customerChannel;
+
+    if (_subscribedCustomerId) {
+        safeLeave(`khach-hang.${_subscribedCustomerId}`);
+    }
+
+    _subscribedCustomerId = customerId;
+    _customerChannel = window.Echo.private(`khach-hang.${customerId}`);
+
+    // Lắng nghe event tin nhắn mới trên cùng channel
+    _customerChannel.listen('.message.sent', (data) => {
+        console.log('[Echo] Customer message received:', data);
+        if (onNotify) {
+            try {
+                onNotify({
+                    id: 'msg_' + data.id,
+                    loai: 'tin_nhan',
+                    tieu_de: 'Tin nhắn mới từ ' + data.sender_name,
+                    noi_dung: data.type === 'image' ? '[Hình ảnh]' : data.content,
+                    moi_gioi_id: data.sender_id,
+                    conversation_id: data.conversation_id,
+                    sender_type: data.sender_type
+                });
+            } catch (error) {
+                console.error('[Echo] Customer message handler failed:', error);
+            }
+        }
+    });
+
+    console.log(`[Echo] Subscribed to private-khach-hang.${customerId}`);
+    return _customerChannel;
+};
+
 export const leaveAllChannels = () => {
     if (window.Echo) {
         if (_subscribedUserId) {
@@ -90,10 +151,15 @@ export const leaveAllChannels = () => {
         if (_subscribedAdminId) {
             safeLeave(`admin.${_subscribedAdminId}`);
         }
+        if (_subscribedCustomerId) {
+            safeLeave(`khach-hang.${_subscribedCustomerId}`);
+        }
     }
 
     _userChannel = null;
     _adminChannel = null;
+    _customerChannel = null;
     _subscribedUserId = null;
     _subscribedAdminId = null;
+    _subscribedCustomerId = null;
 };

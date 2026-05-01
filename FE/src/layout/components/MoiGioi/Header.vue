@@ -368,7 +368,10 @@ export default {
     this.fetchRemainingPosts();
     this.fetchDropdownStats();
     this.startPolling();
-    this.subscribeEcho();   // ✅ Real-time notifications
+    // ✅ subscribeEcho gọi sau checkLogin (user đã có sẵn) trong một tick sau
+    this.$nextTick(() => {
+      this.subscribeEcho();
+    });
     document.addEventListener("click", this.handleClickOutside);
     // ✅ storage event: chỉ trigger khi localStorage thay đổi từ TAB KHÁC
     // (KHÔNG dùng focus vì nó chạy khi switch tab làm checkLogin sai)
@@ -396,9 +399,15 @@ export default {
     // ========== ✅ ECHO REALTIME (dùng service) ==========
     subscribeEcho() {
       const userId = this.user?.id;
+      console.log('[Header] subscribeEcho called, userId:', userId, '| Echo ready:', !!window.Echo);
       if (!userId) return;
 
       subscribeUser(userId, (data) => {
+        // ✅ Nếu là tin nhắn của chính mình gửi (từ tab khác) thì bỏ qua
+        if (data.loai === 'tin_nhan' && data.sender_type === 'moi_gioi') {
+          return;
+        }
+
         // data là payload từ Laravel Broadcast
         this.notifications.unshift({
           id: data.id ?? Date.now(),
@@ -414,22 +423,51 @@ export default {
         this.unreadCount += 1;
         this.hasNewNotifications = true;
 
-        // ✅ Dùng VueToaster (Global) để hiển thị thông báo
+        // ✅ Hiển thị toast với nội dung phù hợp theo loại thông báo
+        const toastMsg = this._buildToastMessage(data);
         if (this.$toast) {
-          this.$toast.info(data.tieu_de || "Bạn có thông báo mới!", {
-            position: "top-right",
-            duration: 5000,
-          });
+          if (data.loai === 'tin_nhan') {
+            this.$toast.info(toastMsg, { 
+              position: 'top-right', 
+              duration: 6000,
+              onClick: () => {
+                // Điều hướng sang trang chat
+                this.$router.push({
+                  path: '/moi-gioi/quan-ly-khach-hang',
+                  query: { active_chat_id: data.conversation_id }
+                });
+              }
+            });
+          } else if (data.loai === 'tu_choi') {
+            this.$toast.error(toastMsg, { position: 'top-right', duration: 6000 });
+          } else if (data.loai === 'approved') {
+            this.$toast.success(toastMsg, { position: 'top-right', duration: 6000 });
+          } else {
+            // yeu_thich / khach_moi / pending
+            this.$toast.info(toastMsg, { position: 'top-right', duration: 6000 });
+          }
         }
         
         // Cập nhật lại stats ở dropdown nếu đang mở
         this.fetchDropdownStats();
-
-        // Nếu đang mở dropdown thì refresh list để sync dữ liệu chính xác từ DB nếu cần
         if (this.showNotifications) {
           this.fetchNotifications();
         }
       });
+    },
+
+    // ✅ Build nội dung toast rõ ràng theo loại thông báo
+    _buildToastMessage(data) {
+      if (data.loai === 'yeu_thich' || data.loai === 'khach_moi') {
+        return data.noi_dung || `❤️ ${data.tieu_de}`;
+      }
+      if (data.loai === 'approved') {
+        return data.noi_dung || `✅ ${data.tieu_de}`;
+      }
+      if (data.loai === 'tu_choi') {
+        return data.noi_dung || `❌ ${data.tieu_de}`;
+      }
+      return data.tieu_de || 'Bạn có thông báo mới!';
     },
 
     leaveEcho() {
@@ -517,6 +555,9 @@ export default {
           
           // ✅ Cập nhật token cho Echo
           updateEchoToken(token);
+
+          // ✅ Re-subscribe Echo nếu chưa subscribe (ví dụ: login từ tab khác)
+          this.subscribeEcho();
 
           // ✅ Refresh dữ liệu mỗi khi check login (chuyển trang, storage change)
           this.fetchRemainingPosts();

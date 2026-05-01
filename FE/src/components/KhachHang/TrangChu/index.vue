@@ -473,7 +473,7 @@ export default {
           gia: item.gia_display || item.gia,
           image: imageUrl,
           isFavorite: item.is_favorite || false,
-          isExclusive: Math.random() > 0.8 // Random logic for mockup exclusive badge
+          isExclusive: item.is_noi_bat || false // Random logic for mockup exclusive badge
         };
       });
     },

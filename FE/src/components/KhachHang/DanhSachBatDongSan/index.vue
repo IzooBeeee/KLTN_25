@@ -205,7 +205,7 @@
                 </div>
 
                 <!-- Badge Nổi bật -->
-                <div v-if="bds.is_featured"
+                <div v-if="bds.is_noi_bat"
                   class="absolute top-4 right-16 px-3 py-1 bg-yellow-400 text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
                   Nổi bật
                 </div>
@@ -231,7 +231,7 @@
                 </h3>
                 <p class="text-gray-500 text-sm flex items-center gap-1 mb-4">
                   <span class="material-symbols-outlined text-[16px]">location_on</span>
-                  {{ bds.dia_chi?.ten_quan || bds.location || '—' }}
+                  {{ bds.location || '—' }}
                 </p>
 
                 <!-- Stats -->
@@ -683,7 +683,12 @@ export default {
       if (k === 'dien_tich') { const lb = { '0-50': 'Dưới 50m²', '50-100': '50 - 100m²', '100-200': '100 - 200m²', '200-999999': 'Trên 200m²' }; return lb[v] || v; }
       return v;
     },
-    formatPriceFull(g) { if (g == null) return 'Liên hệ'; return new Intl.NumberFormat('vi-VN').format(g) + ' VNĐ'; }
+    formatPriceFull(g) { 
+      if (!g) return 'Liên hệ'; 
+      if (g >= 1_000_000_000) return Math.floor(g / 1_000_000_000) + ' Tỷ'; 
+      if (g >= 1_000_000) return Math.floor(g / 1_000_000) + ' Triệu'; 
+      return new Intl.NumberFormat('vi-VN').format(g) + ' đ'; 
+    }
   },
   watch: {
     'filters.tinh': async function (v) { this.filters.quan = ''; await this.loadQuan(v); this.triggerAutoSearch(); },

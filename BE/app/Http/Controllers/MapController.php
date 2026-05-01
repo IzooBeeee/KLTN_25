@@ -18,6 +18,8 @@ class MapController extends Controller
             'hinhAnh'
         ])
             ->where('is_duyet', true)
+            ->where('status', 'published')
+            ->whereHas('loai', fn($q) => $q->where('is_active', 1))
             ->whereHas('diaChi', function ($q) {
                 $q->whereNotNull('latitude')
                     ->whereNotNull('longitude');
@@ -111,6 +113,8 @@ class MapController extends Controller
         // Lấy tất cả BĐS có diaChi, filter 
         $properties = BatDongSan::with(['diaChi.tinh', 'diaChi.quan', 'loai', 'moiGioi', 'hinhAnh', 'anhDaiDien'])
             ->where('is_duyet', true)
+            ->where('status', 'published')
+            ->whereHas('loai', fn($q) => $q->where('is_active', 1))
             ->whereHas('diaChi', function ($q) {
                 $q->whereNotNull('latitude')
                     ->whereNotNull('longitude');

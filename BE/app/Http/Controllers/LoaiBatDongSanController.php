@@ -154,13 +154,14 @@ class LoaiBatDongSanController extends Controller
     public function getDataMoiGioi(Request $request)
     {
         $user = Auth::guard('sanctum')->user();
+
         if (!$user) {
             return response()->json([
                 'status' => false,
                 'message' => "Bạn cần đăng nhập để thực hiện chức năng này"
             ], 401);
         }
-        $data = LoaiBatDongSan::all();
+        $data = LoaiBatDongSan::where('is_active', 1)->get();
 
         return response()->json([
             'status' => true,

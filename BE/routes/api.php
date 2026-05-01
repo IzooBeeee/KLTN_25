@@ -181,6 +181,7 @@ Route::prefix('admin')->middleware('AdminMiddleware')->group(function () {
         Route::get('/stats', [ThongKeController::class, 'getDashboardStats']); // đã test postman
         // Dashboard Chart (biểu đồ) TẦNG 2
         Route::post('/revenue-chart', [ThongKeController::class, 'getRevenueChart']); // đã test postman
+        Route::get('/property-status-chart', [ThongKeController::class, 'getPropertyStatusChart']);
         // Khách hàng yêu thích BĐS gần đây
         Route::get('/recent-favorites', [ThongKeController::class, 'getRecentFavorites']); // đã test postman    
         // Giao dịch gần đây (5 giao dịch mới nhất) Tầng 3

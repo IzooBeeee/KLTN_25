@@ -33,3 +33,8 @@ Broadcast::channel('user.{id}', function ($user, $id) {
     \Illuminate\Support\Facades\Log::info('Broadcasting Auth Result', ['match' => $match]);
     return $match;
 });
+
+// ── KhachHang channel: private-khach-hang.{id} ──────────────────────────
+Broadcast::channel('khach-hang.{id}', function ($user, $id) {
+    return $user instanceof \App\Models\KhachHang && (int) $user->id === (int) $id;
+});

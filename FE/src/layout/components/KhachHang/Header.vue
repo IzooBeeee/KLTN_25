@@ -30,6 +30,10 @@
           <router-link to="/khach-hang/ban-do" class="nav-link">
             <span class="nav-label">Bản đồ</span>
           </router-link>
+
+          <router-link to="/khach-hang/dinh-gia-ai" class="nav-link">
+            <span class="nav-label"><i class="bi bi-robot text-warning me-1"></i> Định giá AI</span>
+          </router-link>
         </nav>
 
         <!-- Actions -->
@@ -427,6 +431,12 @@ export default {
           this.token = token;
           this.user = JSON.parse(userStr);
           this.userType = "khach-hang";
+          
+          import("@/js/services/echo").then(({ updateEchoToken, subscribeCustomer }) => {
+            updateEchoToken(this.token);
+            this.subscribeEchoCustomer(subscribeCustomer);
+          });
+          
           return true;
         } catch (e) {
           console.error("Parse user error:", e);
@@ -437,11 +447,49 @@ export default {
         this.token = token;
         this.userType = "khach-hang";
         this.user = this.user || { ten: "Khách hàng" };
+        
+        import("@/js/services/echo").then(({ updateEchoToken, subscribeCustomer }) => {
+          updateEchoToken(this.token);
+          this.subscribeEchoCustomer(subscribeCustomer);
+        });
+        
         return true;
       } else {
         this.clearData();
       }
       return false;
+    },
+    
+    subscribeEchoCustomer(subscribeCustomer) {
+      const userId = this.user?.id;
+      if (!userId) return;
+
+      subscribeCustomer(userId, (data) => {
+        // Nếu là tin nhắn của chính mình gửi (từ tab khác) thì bỏ qua
+        if (data.loai === 'tin_nhan' && data.sender_type === 'khach_hang') {
+          return;
+        }
+
+        if (this.$toast && data.loai === 'tin_nhan') {
+          this.$toast.info(data.tieu_de || "Tin nhắn mới", { 
+            position: 'top-right', 
+            duration: 6000,
+            onClick: () => {
+              // Dispatch event to open chat panel
+              this.showMenu = false;
+              this.showChatPanel = true;
+              this.loadConversations().then(() => {
+                const conv = this.conversations.find(c => Number(c.id) === Number(data.conversation_id));
+                if (conv) {
+                  this.openChat(conv);
+                }
+              });
+            }
+          });
+          // Update unread chat badge
+          this.unreadCount += 1;
+        }
+      });
     },
 
     // ✅ Handler khi có auth thay đổi trong cùng tab

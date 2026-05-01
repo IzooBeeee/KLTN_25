@@ -32,22 +32,39 @@ class BatDongSanController extends Controller
     //Lấy danh sách BDS cho admin
     public function getData(Request $request)
     {
-        $data = BatDongSan::with([
-            'loai',
-            'moiGioi',
-            'diaChi.tinh',
-            'diaChi.quan',
-            'hinhAnh'
-        ])
-            // ✅ SẮP XẾP: Tin chưa duyệt (is_duyet = 0/false) lên trước
-            ->orderByRaw("CASE WHEN is_duyet = 0 OR is_duyet = false THEN 0 ELSE 1 END")
-            // ✅ Sau đó sắp xếp theo ngày tạo mới nhất
+        $query = BatDongSan::with([
+            'loai', 'moiGioi', 'diaChi.tinh', 'diaChi.quan', 'hinhAnh'
+        ]);
+
+        if ($request->filled('trang_thai')) {
+            $query->where('trang_thai_id', $request->trang_thai);
+        }
+        if ($request->filled('loai_id')) {
+            $query->where('loai_id', $request->loai_id);
+        }
+        if ($request->filled('min_price')) {
+            $query->where('gia', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('gia', '<=', $request->max_price);
+        }
+
+        $data = $query
+            ->orderByRaw("CASE WHEN trang_thai_id = 1 THEN 0 ELSE 1 END")
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        $stats = [
+            'total'    => BatDongSan::count(),
+            'pending'  => BatDongSan::where('trang_thai_id', 1)->count(),
+            'approved' => BatDongSan::where('trang_thai_id', 2)->count(),
+            'featured' => BatDongSan::where('is_noi_bat', true)->count(),
+        ];
+
         return response()->json([
             'status' => true,
-            'data' => $data
+            'data'   => $data,
+            'stats'  => $stats,
         ]);
     }
 
@@ -117,7 +134,7 @@ class BatDongSanController extends Controller
                 // ✅ Dispatch event duyệt → listener gửi notification cho môi giới
                 event(new BatDongSanDuocDuyet($bds));
             } else {
-                $bds->trang_thai_id = 3; // Từ chối
+                $bds->trang_thai_id = 6; // Bị từ chối
                 $bds->save();
                 // ✅ Dispatch event từ chối → listener gửi notification cho môi giới
                 $lyDo = $request->input('ly_do');
@@ -271,6 +288,7 @@ class BatDongSanController extends Controller
             'hinhAnh'
         ])
             ->where('moi_gioi_id', $user->id)
+            ->whereHas('loai', fn($q) => $q->where('is_active', 1))
             ->orderBy('created_at', 'desc');
 
         // 🔥 filter draft / published
@@ -342,7 +360,7 @@ class BatDongSanController extends Controller
                 'gia'           => $request->gia,
                 'dien_tich'     => $request->dien_tich,
                 'loai_id'       => $request->loai_id,
-                'trang_thai_id' => $request->trang_thai_id,
+                'trang_thai_id' => $request->trang_thai_id ?? 1,
                 'mo_ta'         => $request->mo_ta,
                 'dia_chi_id'    => $diaChi->id,
                 'so_phong_ngu'  => $request->so_phong_ngu,
@@ -515,18 +533,44 @@ class BatDongSanController extends Controller
             // Chỉ reset is_duyet khi update bài đã published (không reset khi đang là nháp)
             if ($data->status !== 'draft') {
                 $data->is_duyet = false;
+                $data->trang_thai_id = 1; // Chờ admin duyệt lại
             }
             $data->save();
 
-            // Xử lý hình ảnh mới nếu có
+            // Update DiaChi nếu có thông tin địa chỉ mới
+            if ($data->dia_chi_id) {
+                $diaChi = \App\Models\DiaChi::find($data->dia_chi_id);
+                if ($diaChi) {
+                    $diaChi->update([
+                        'tinh_id'          => $request->tinh_id ?? $diaChi->tinh_id,
+                        'quan_id'          => $request->quan_id ?? $diaChi->quan_id,
+                        'phuong_xa_id'     => $request->phuong_id ?? $diaChi->phuong_xa_id,
+                        'dia_chi_chi_tiet' => $request->dia_chi_chi_tiet ?? $diaChi->dia_chi_chi_tiet,
+                        'latitude'         => $request->latitude ?? $diaChi->latitude,
+                        'longitude'        => $request->longitude ?? $diaChi->longitude,
+                    ]);
+                }
+            }
+
+            // Xóa ảnh cũ được chỉ định xóa
+            if ($request->has('deleted_images')) {
+                $deletedIds = $request->input('deleted_images');
+                if (is_array($deletedIds) && count($deletedIds) > 0) {
+                    \App\Models\HinhAnhBatDongSan::whereIn('id', $deletedIds)
+                        ->where('bds_id', $data->id)
+                        ->delete();
+                }
+            }
+
+            // Upload ảnh mới nếu có
             if ($request->hasFile('hinh_anh')) {
+                $currentMaxThuTu = $data->hinhAnh()->max('thu_tu') ?? -1;
                 foreach ($request->file('hinh_anh') as $index => $file) {
                     $path = $file->store('bds/' . $data->id, 'public');
-
                     HinhAnhBatDongSan::create([
                         'bds_id'          => $data->id,
                         'url'             => $path,
-                        'thu_tu'          => $index,
+                        'thu_tu'          => $currentMaxThuTu + $index + 1,
                         'is_anh_dai_dien' => $index == 0 && !$data->hinhAnh()->where('is_anh_dai_dien', true)->exists(),
                     ]);
                 }

@@ -40,6 +40,7 @@ class ClientHomeController extends Controller
         ])
             ->where('is_duyet', true)
             ->where('status', 'published')
+            ->whereHas('loai', fn($q) => $q->where('is_active', 1))
             // ✅ Đẩy tin "Đã bán" (trang_thai_id = 3) xuống dưới cùng
             ->orderByRaw("CASE WHEN trang_thai_id = 3 THEN 1 ELSE 0 END")
             ->latest()
@@ -68,7 +69,11 @@ class ClientHomeController extends Controller
             'diaChi',
             'hinhAnh',
             'anhDaiDien'
-        ])->find($id);
+        ])
+        ->where('is_duyet', true)
+        ->where('status', 'published')
+        ->whereHas('loai', fn($q) => $q->where('is_active', 1))
+        ->find($id);
 
         if (!$bds) {
             return response()->json([
@@ -99,7 +104,9 @@ class ClientHomeController extends Controller
         $query->when($request->gia_max, fn($q) => $q->where('gia', '<=', $request->gia_max));
         $query->when($request->tieu_de, fn($q) => $q->where('tieu_de', 'like', '%' . $request->tieu_de . '%'));
 
-        $query->where('is_duyet', true)->where('status', 'published');
+        $query->where('is_duyet', true)
+            ->where('status', 'published')
+            ->whereHas('loai', fn($q) => $q->where('is_active', 1));
 
         $data = $query->with([
             'loai',
@@ -123,7 +130,7 @@ class ClientHomeController extends Controller
     // Loại bất động sản
     public function getLoaiBDS(Request $request)
     {
-        $data = LoaiBatDongSan::all();
+        $data = LoaiBatDongSan::where('is_active', 1)->get();
 
         return response()->json([
             'status' => true,
@@ -146,6 +153,7 @@ class ClientHomeController extends Controller
             ->where('moi_gioi_id', $id)
             ->where('is_duyet', true)
             ->where('status', 'published')
+            ->whereHas('loai', fn($q) => $q->where('is_active', 1))
             ->orderByRaw("CASE WHEN trang_thai_id = 3 THEN 1 ELSE 0 END")
             ->latest()
             ->paginate(6);
@@ -174,7 +182,10 @@ class ClientHomeController extends Controller
                 'anhDaiDien',
                 'diaChi.tinh',
                 'diaChi.quan',
-            ])->where('is_duyet', true);
+            ])
+            ->where('is_duyet', true)
+            ->where('status', 'published')
+            ->whereHas('loai', fn($q) => $q->where('is_active', 1));
     
             // FIX: lọc theo tỉnh/thành
             if ($request->filled('tinh_id')) {

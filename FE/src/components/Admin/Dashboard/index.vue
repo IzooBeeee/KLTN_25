@@ -129,62 +129,94 @@
     <!-- TẦNG 1: 4 THẺ THỐNG KÊ -->
     <div class="layer-1 stats-grid">
       <div class="stat-card stat-card-1">
-        <div class="stat-icon-wrapper">
+        <div class="stat-icon-wrapper" v-if="!loading">
           <div class="stat-icon" style="
               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             ">
             <i class="fa-solid fa-users"></i>
           </div>
         </div>
-        <div class="stat-content">
+        <div class="stat-content" v-if="!loading">
           <div class="stat-label">Khách Hàng</div>
           <div class="stat-value">{{ formatNumber(stats.khach_hang) }}</div>
           <div class="stat-desc">Tổng số khách hàng</div>
         </div>
+        <div class="skeleton-wrapper" v-else>
+          <div class="skeleton-avatar"></div>
+          <div class="skeleton-text-group">
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-value"></div>
+            <div class="skeleton-text skeleton-desc"></div>
+          </div>
+        </div>
       </div>
 
       <div class="stat-card stat-card-2">
-        <div class="stat-icon-wrapper">
+        <div class="stat-icon-wrapper" v-if="!loading">
           <div class="stat-icon" style="
               background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             ">
             <i class="fa-solid fa-user-tie"></i>
           </div>
         </div>
-        <div class="stat-content">
+        <div class="stat-content" v-if="!loading">
           <div class="stat-label">Môi Giới</div>
           <div class="stat-value">{{ formatNumber(stats.moi_gioi) }}</div>
           <div class="stat-desc">Tổng số môi giới</div>
         </div>
+        <div class="skeleton-wrapper" v-else>
+          <div class="skeleton-avatar"></div>
+          <div class="skeleton-text-group">
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-value"></div>
+            <div class="skeleton-text skeleton-desc"></div>
+          </div>
+        </div>
       </div>
 
       <div class="stat-card stat-card-3">
-        <div class="stat-icon-wrapper">
+        <div class="stat-icon-wrapper" v-if="!loading">
           <div class="stat-icon" style="
               background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             ">
             <i class="fa-solid fa-building"></i>
           </div>
         </div>
-        <div class="stat-content">
+        <div class="stat-content" v-if="!loading">
           <div class="stat-label">Bất Động Sản</div>
           <div class="stat-value">{{ formatNumber(stats.bat_dong_san) }}</div>
           <div class="stat-desc">BĐS đã duyệt</div>
         </div>
+        <div class="skeleton-wrapper" v-else>
+          <div class="skeleton-avatar"></div>
+          <div class="skeleton-text-group">
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-value"></div>
+            <div class="skeleton-text skeleton-desc"></div>
+          </div>
+        </div>
       </div>
 
       <div class="stat-card stat-card-4">
-        <div class="stat-icon-wrapper">
+        <div class="stat-icon-wrapper" v-if="!loading">
           <div class="stat-icon" style="
               background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
             ">
             <i class="fa-solid fa-chart-line"></i>
           </div>
         </div>
-        <div class="stat-content">
+        <div class="stat-content" v-if="!loading">
           <div class="stat-label">Giao Dịch</div>
           <div class="stat-value">{{ formatNumber(stats.giao_dich) }}</div>
           <div class="stat-desc">Giao dịch thành công</div>
+        </div>
+        <div class="skeleton-wrapper" v-else>
+          <div class="skeleton-avatar"></div>
+          <div class="skeleton-text-group">
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-value"></div>
+            <div class="skeleton-text skeleton-desc"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -206,9 +238,9 @@
         <div class="chart-body">
           <apexchart v-if="chartLoaded" :type="isAreaChart ? 'area' : 'bar'" height="350" :options="revenueChartOptions"
             :series="revenueChartSeries"></apexchart>
-          <div v-else class="chart-loading">
-            <i class="fa-solid fa-circle-notch fa-spin"></i>
-            Đang tải biểu đồ...
+          <div v-else class="chart-loading skeleton-chart">
+            <div class="skeleton-text" style="width: 30%; height: 20px; margin-bottom: 20px;"></div>
+            <div class="skeleton-rect" style="width: 100%; height: 250px;"></div>
           </div>
         </div>
       </div>
@@ -224,9 +256,8 @@
         <div class="chart-body">
           <apexchart v-if="propertyChartLoaded" type="donut" height="350" :options="propertyChartOptions"
             :series="propertyChartSeries"></apexchart>
-          <div v-else class="chart-loading">
-            <i class="fa-solid fa-circle-notch fa-spin"></i>
-            Đang tải biểu đồ...
+          <div v-else class="chart-loading skeleton-chart" style="display:flex; justify-content:center; align-items:center;">
+            <div class="skeleton-circle" style="width: 250px; height: 250px; border-radius: 50%;"></div>
           </div>
         </div>
       </div>
@@ -497,12 +528,14 @@ const fetchChartData = async () => {
 
 const fetchPropertyChartData = async () => {
   try {
-    // Giả lập data - bạn có thể thay bằng API thật
-    propertyChartSeries.value = [12, 8, 15, 5, 3];
-    propertyChartOptions.value = {
-      ...propertyChartOptions.value,
-      labels: ["Căn hộ", "Nhà phố", "Biệt thự", "Đất nền", "Khác"],
-    };
+    const res = await api.get("/admin/dashboard/property-status-chart");
+    if (res.data.status && res.data.data) {
+      propertyChartSeries.value = res.data.data.series;
+      propertyChartOptions.value = {
+        ...propertyChartOptions.value,
+        labels: res.data.data.labels,
+      };
+    }
     propertyChartLoaded.value = true;
   } catch (error) {
     console.error("Error fetching property chart:", error);
@@ -1573,5 +1606,62 @@ onUnmounted(() => {
   .stat-value {
     font-size: 1.75rem;
   }
+}
+.skeleton-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+.skeleton-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+.skeleton-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+.skeleton-text {
+  background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+.skeleton-title {
+  width: 50%;
+  height: 14px;
+}
+.skeleton-value {
+  width: 70%;
+  height: 28px;
+}
+.skeleton-desc {
+  width: 40%;
+  height: 12px;
+}
+.skeleton-rect {
+  background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8px;
+}
+.skeleton-circle {
+  background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+.skeleton-chart {
+  padding: 1rem;
+  height: 350px;
+}
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 </style>
