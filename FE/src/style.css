@@ -52,3 +52,240 @@ textarea {
   font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
   line-height: 1;
 }
+
+/* ===================================================
+   DARK MODE GLOBAL OVERRIDES
+   Toggle bằng cách thêm class "dark" vào <html>
+=================================================== */
+
+/* ── Transition smooth khi toggle ── */
+html.dark,
+html.dark body,
+html.dark * {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ── Body ── */
+html.dark body {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+}
+
+/* ── Header / Navbar ── */
+html.dark .header {
+  background: rgba(15, 23, 42, 0.97) !important;
+  border-bottom-color: #1e293b !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4) !important;
+}
+html.dark .nav-link,
+html.dark .nav-label {
+  color: #94a3b8 !important;
+}
+html.dark .nav-link:hover .nav-label,
+html.dark .nav-link.router-link-active .nav-label {
+  color: #60a5fa !important;
+}
+html.dark .brand { color: #f1f5f9 !important; }
+html.dark .sub { color: #64748b !important; }
+html.dark .btn-post {
+  background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+}
+html.dark .btn-saved,
+html.dark .btn-chat {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+/* ── Cards / Panels / Sections ── */
+html.dark .card,
+html.dark .panel,
+html.dark .property-card,
+html.dark .prop-card,
+html.dark .bds-card,
+html.dark .feature-card,
+html.dark .stat-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+html.dark .card-body,
+html.dark .card-header,
+html.dark .card-footer {
+  background: transparent !important;
+  border-color: #334155 !important;
+}
+
+/* ── Whites & light grays ── */
+html.dark .bg-white,
+html.dark [class*="bg-white"],
+html.dark .bg-light,
+html.dark .bg-gray-50,
+html.dark .bg-gray-100 {
+  background-color: #1e293b !important;
+}
+
+/* ── Sections & wrappers ── */
+html.dark section,
+html.dark .section,
+html.dark .page-wrapper,
+html.dark .page-content,
+html.dark .main-content {
+  background: transparent !important;
+}
+
+/* ── Text ── */
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+  color: #f1f5f9 !important;
+}
+html.dark p, html.dark span:not([class*="badge"]):not([class*="btn"]):not([class*="tag"]) {
+  color: inherit;
+}
+html.dark .text-muted, html.dark .text-secondary {
+  color: #64748b !important;
+}
+html.dark .text-dark { color: #e2e8f0 !important; }
+html.dark .text-body { color: #cbd5e1 !important; }
+
+/* ── Borders ── */
+html.dark .border,
+html.dark [class*="border-"] {
+  border-color: #334155 !important;
+}
+html.dark hr { border-color: #1e293b !important; }
+
+/* ── Forms ── */
+html.dark input:not([type="range"]),
+html.dark select,
+html.dark textarea {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #475569 !important;
+}
+html.dark .form-control,
+html.dark .form-select {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+html.dark .form-control:focus,
+html.dark .form-select:focus {
+  background-color: #1e293b !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+  color: #e2e8f0 !important;
+}
+html.dark label,
+html.dark .form-label { color: #94a3b8 !important; }
+
+/* ── Buttons ── */
+html.dark .btn-outline-secondary {
+  color: #94a3b8 !important;
+  border-color: #475569 !important;
+}
+html.dark .btn-outline-secondary:hover {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+html.dark .btn-light {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+/* ── Dropdowns / Popups ── */
+html.dark .dropdown-menu,
+html.dark .notif-panel,
+html.dark .chat-panel,
+html.dark .user-dropdown {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+}
+html.dark .dropdown-item { color: #cbd5e1 !important; }
+html.dark .dropdown-item:hover { background: #263349 !important; color: #f1f5f9 !important; }
+html.dark .dropdown-divider { border-color: #334155 !important; }
+
+/* ── Modals ── */
+html.dark .modal-content {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+html.dark .modal-header,
+html.dark .modal-footer {
+  border-color: #334155 !important;
+}
+html.dark .modal-title { color: #f1f5f9 !important; }
+html.dark .btn-close { filter: invert(1); }
+
+/* ── Tables ── */
+html.dark table { color: #e2e8f0 !important; }
+html.dark thead th {
+  background: #0f172a !important;
+  color: #94a3b8 !important;
+  border-color: #334155 !important;
+}
+html.dark tbody tr { border-color: #1e293b !important; }
+html.dark tbody tr:hover { background: #263349 !important; }
+html.dark td, html.dark th { border-color: #1e293b !important; }
+
+/* ── Scrollbar ── */
+html.dark ::-webkit-scrollbar { width: 6px; height: 6px; }
+html.dark ::-webkit-scrollbar-track { background: #0f172a; }
+html.dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* ── Property listing page specific ── */
+html.dark .prop-image-overlay { background: linear-gradient(to top, rgba(0,0,0,0.8), transparent) !important; }
+html.dark .search-bar,
+html.dark .filter-bar { background: #1e293b !important; border-color: #334155 !important; }
+
+/* ── Hero sections: Keep dark gradient, just adjust text ── */
+html.dark .hero-section,
+html.dark .page-hero { filter: none !important; }
+
+/* ── Footer ── */
+html.dark footer,
+html.dark .footer {
+  background: #020617 !important;
+  border-top-color: #1e293b !important;
+}
+
+/* ── Tính Vay page ── */
+html.dark .tv-page { background: #0f172a !important; }
+html.dark .tv-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+html.dark .tv-bank-chip { background: #0f172a !important; border-color: #334155 !important; }
+html.dark .tv-bank-chip:hover,
+html.dark .tv-bank-chip.active { background: #1e3a5f !important; border-color: #3b82f6 !important; }
+html.dark .tv-bank-name { color: #e2e8f0 !important; }
+html.dark .tv-input-wrap { border-color: #334155 !important; }
+html.dark .tv-input-wrap input { color: #e2e8f0 !important; }
+html.dark .tv-unit { background: #0f172a !important; border-color: #334155 !important; color: #64748b !important; }
+html.dark .tv-tab { background: #0f172a !important; border-color: #334155 !important; color: #64748b !important; }
+html.dark .tv-tab.active { background: #1e3a5f !important; color: #60a5fa !important; }
+html.dark .tv-kpi { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .tv-table thead th { background: #0f172a !important; }
+html.dark .tv-table tbody tr:hover { background: #263349 !important; }
+html.dark .tv-tip { background: #1e293b !important; border-color: #334155 !important; color: #94a3b8 !important; }
+
+/* ── BĐS Map page ── */
+html.dark .bd-page { background: #0f172a !important; }
+
+/* ── Định giá AI page specific ── */
+html.dark .dinh-gia-wrap { background: #0f172a !important; }
+
+/* ── SweetAlert2 dark ── */
+html.dark .swal2-popup {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+html.dark .swal2-title { color: #f1f5f9 !important; }
+html.dark .swal2-html-container { color: #cbd5e1 !important; }

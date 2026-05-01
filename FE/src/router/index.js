@@ -167,6 +167,12 @@ const routes = [
     name: "KhachHangDinhGiaAI",
     meta: { layout: "khach-hang" }
   },
+  {
+    path: "/khach-hang/tinh-vay",
+    component: () => import("../components/KhachHang/TinhVay/index.vue"),
+    name: "KhachHangTinhVay",
+    meta: { layout: "khach-hang" }
+  },
   // {
   //   path: "/khach-hang/ve-chung-toi",
   //   component: () => import("../components/KhachHang/VeChungToi/index.vue"),
