@@ -578,6 +578,12 @@ class BatDongSanController extends Controller
 
             DB::commit();
 
+            // Fire event if it requires re-approval
+            if ($data->status !== 'draft') {
+                \Illuminate\Support\Facades\Log::info('EVENT FIRED: BatDongSanMoiDang from update', ['bds_id' => $data->id]);
+                event(new BatDongSanMoiDang($data));
+            }
+
             return response()->json([
                 'status' => true,
                 'message' => 'Cập nhật data thành công và đang chờ duyệt lại',

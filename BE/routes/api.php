@@ -154,6 +154,9 @@ Route::prefix('admin')->middleware('AdminMiddleware')->group(function () {
         Route::post('/change-status', [BatDongSanController::class, 'changeStatus']); // đã test postman
         Route::post('/tim-kiem', [BatDongSanController::class, 'searchAdmin']); // đã test postman
     });
+    Route::get('/notifications', [AdminController::class, 'getNotifications']);
+    Route::post('/notifications/mark-read', [AdminController::class, 'markNotificationsRead']);
+
 
     //QUẢN LÝ LOẠI BĐS (xong)
     Route::prefix('loai-bds')->group(function () {

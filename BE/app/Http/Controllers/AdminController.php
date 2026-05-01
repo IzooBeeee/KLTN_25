@@ -255,4 +255,28 @@ class AdminController extends Controller
             'message' => 'Đổi mật khẩu thành công'
         ]);
     }
+    // ✅ Lấy danh sách thông báo
+    public function getNotifications()
+    {
+        /** @var Admin $user */
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
+
+        // Lấy 20 thông báo gần nhất
+        $notifications = $user->notifications()->latest()->take(20)->get();
+
+        return response()->json($notifications);
+    }
+
+    // ✅ Đánh dấu tất cả đã đọc
+    public function markNotificationsRead()
+    {
+        /** @var Admin $user */
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
+
+        $user->unreadNotifications->markAsRead();
+
+        return response()->json(['status' => true, 'message' => 'Đã đánh dấu tất cả là đã đọc']);
+    }
 }

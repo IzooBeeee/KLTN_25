@@ -160,7 +160,7 @@ const xuLyDangNhap = async () => {
     });
 
     if (res.data?.token) {
-      const user = res.data.user;
+      const user = res.data.data; // Backend returns user in 'data' key
 
       // ✅ Lưu vào key riêng của admin (không ảnh hưởng moi-gioi/khach-hang)
       setAuth("admin", res.data.token, user);

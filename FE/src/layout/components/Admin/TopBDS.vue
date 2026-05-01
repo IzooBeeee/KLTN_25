@@ -81,11 +81,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { getCurrentInstance } from "vue";
 import { subscribeAdmin, leaveAllChannels } from '@/js/services/echo';
 import { clearAuth } from "@/js/auth";
+import api from "@/axios/config";
 
 const router = useRouter();
 const { appContext } = getCurrentInstance();
@@ -98,11 +99,28 @@ const unreadCount   = ref(0);
 const adminNotifs   = ref([]);
 const showNotifPanel = ref(false);
 
+const fetchNotifications = async () => {
+  try {
+    const res = await api.get('/admin/notifications');
+    if (res.data) {
+      adminNotifs.value = res.data.map(n => ({
+        id: n.id,
+        tieu_de: n.data?.tieu_de || 'Thông báo',
+        noi_dung: n.data?.noi_dung || '',
+        thoi_gian: n.created_at,
+        read: !!n.read_at,
+        link: n.data?.link
+      }));
+      unreadCount.value = adminNotifs.value.filter(n => !n.read).length;
+    }
+  } catch (error) {
+    console.error('[AdminHeader] Failed to fetch notifications:', error);
+  }
+};
+
 const toggleNotifPanel = () => {
   showNotifPanel.value = !showNotifPanel.value;
 };
-
-
 
 // Toggle dropdown
 const toggleProfileDropdown = () => {
@@ -146,9 +164,15 @@ const formatTime = (isoString) => {
   return date.toLocaleDateString("vi-VN");
 };
 
-const markAllRead = () => {
-  adminNotifs.value.forEach(n => n.read = true);
-  unreadCount.value = 0;
+const markAllRead = async () => {
+  try {
+    await api.post('/admin/notifications/mark-read');
+    adminNotifs.value.forEach(n => n.read = true);
+    unreadCount.value = 0;
+    toast.success("Đã đánh dấu tất cả là đã đọc");
+  } catch (error) {
+    console.error("Mark read error:", error);
+  }
 };
 
 // Logout
@@ -165,18 +189,84 @@ const logout = () => {
 };
 
 // ========== AUTH HANDLERS ==========
-const checkLogin = () => {
+const checkLogin = async () => {
   const token = localStorage.getItem("admin_auth_token");
   const savedUserInfo = localStorage.getItem("admin_user_info");
-  if (savedUserInfo) {
+  
+  if (savedUserInfo && savedUserInfo !== "undefined" && savedUserInfo !== "null") {
     try {
       const ui = JSON.parse(savedUserInfo);
       if (ui.ten || ui.name) adminName.value = ui.ten || ui.name;
       adminId.value = ui.id;
-    } catch (_) {}
+    } catch (_) {
+      fetchAdminProfile();
+    }
+  } else if (token) {
+    // Nếu có token mà không có info -> Fetch từ server
+    fetchAdminProfile();
   } else {
     adminName.value = "Admin";
     adminId.value = null;
+  }
+};
+
+const fetchAdminProfile = async () => {
+  try {
+    const res = await api.get('/admin/profile');
+    if (res.data?.status || res.data?.data) {
+      const user = res.data.data;
+      adminName.value = user.ten || user.name;
+      adminId.value = user.id;
+      // Cập nhật lại localStorage để lần sau không cần fetch
+      localStorage.setItem("admin_user_info", JSON.stringify(user));
+    }
+  } catch (error) {
+    console.error('[AdminHeader] Failed to fetch profile:', error);
+  }
+};
+
+const initEcho = () => {
+  const token = localStorage.getItem("admin_auth_token");
+  console.log('[AdminHeader] Attempting initEcho...', { adminId: adminId.value, hasToken: !!token });
+  if (adminId.value && token) {
+    console.log('[AdminHeader] Initializing Echo for admin ID:', adminId.value);
+    
+    import('@/js/services/echo').then(({ updateEchoToken, subscribeAdmin }) => {
+      updateEchoToken(token);
+      
+      const channel = subscribeAdmin(adminId.value, (data) => {
+        console.log('[AdminHeader] Real-time notification received! Payload:', data);
+        
+        // Thêm vào danh sách
+        adminNotifs.value.unshift({
+          tieu_de: data.tieu_de || 'Thông báo mới',
+          noi_dung: data.noi_dung || '',
+          thoi_gian: new Date().toISOString(),
+          read: false,
+          link: data.link
+        });
+        unreadCount.value += 1;
+        
+        // Hiển thị toast
+        if (toast) {
+          toast.info(`${data.tieu_de || 'Thông báo mới'}: ${data.noi_dung || ''}`, {
+            position: "top-right",
+            duration: 8000,
+            onClick: () => {
+              if (data.link) router.push(data.link);
+            }
+          });
+        }
+      });
+
+      if (channel) {
+        console.log('[AdminHeader] Echo subscription successful ✅');
+      }
+    }).catch(err => {
+      console.error('[AdminHeader] Echo initialization failed:', err);
+    });
+  } else {
+    console.warn('[AdminHeader] Cannot init Echo: Missing adminId or token');
   }
 };
 
@@ -190,27 +280,25 @@ const onAuthChanged = () => {
   checkLogin();
 };
 
-  // Load admin info from token or admin_user_info
+watch(adminId, (newId) => {
+  if (newId) {
+    initEcho();
+    fetchNotifications();
+  }
+});
+
 onMounted(() => {
   checkLogin();
-
+  
   // Add listeners
   document.addEventListener("click", handleClickOutside);
   window.addEventListener("storage", onStorageChange);
   window.addEventListener("admin-auth-changed", onAuthChanged);
 
-  // ✅ Subscribe Echo admin channel
+  // Khởi tạo lần đầu
   if (adminId.value) {
-    subscribeAdmin(adminId.value, (data) => {
-      console.log('SUBSCRIBED ADMIN RECEIVED NOTIFICATION:', adminId.value, data);
-      adminNotifs.value.unshift({
-        tieu_de: data.tieu_de || 'Thông báo mới',
-        noi_dung: data.noi_dung || '',
-        thoi_gian: new Date().toISOString(),
-        read: false,
-      });
-      unreadCount.value += 1;
-    });
+    initEcho();
+    fetchNotifications();
   }
 });
 

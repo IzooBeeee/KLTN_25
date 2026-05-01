@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Broadcast;
 
 // ── Admin channel: private-admin.{id} ──────────────────────────────────
 Broadcast::channel('admin.{id}', function ($user, $id) {
+    \Illuminate\Support\Facades\Log::info('ADMIN Channel Auth Attempt', [
+        'user_id' => $user->id,
+        'user_class' => get_class($user),
+        'requested_id' => $id
+    ]);
     // Admin authenticate qua Sanctum → $user là Admin model
     return $user instanceof \App\Models\Admin && (int) $user->id === (int) $id;
 });
