@@ -20,7 +20,7 @@
         </div>
 
         <div v-else class="admin-notif-list">
-          <div v-for="(n, i) in adminNotifs" :key="i" class="admin-notif-item" :class="{ unread: !n.read }">
+          <div v-for="(n, i) in adminNotifs" :key="i" class="admin-notif-item" :class="{ unread: !n.read }" @click="goToNotifLink(n)">
             <div class="notif-icon">
               <span class="material-symbols-outlined">info</span>
             </div>
@@ -30,6 +30,21 @@
                 <span class="notif-time">{{ formatTime(n.thoi_gian) }}</span>
               </div>
               <div class="notif-body">{{ n.noi_dung }}</div>
+              
+              <!-- ⚡ Action Buttons for New Post Pending -->
+              <div v-if="n.type === 'new_post_pending' && !n.handled" class="notif-actions" @click.stop>
+                <button class="action-btn approve" @click="handleAction(n, 1)">
+                  <span class="material-symbols-outlined">check_circle</span>
+                  Duyệt
+                </button>
+                <button class="action-btn reject" @click="handleAction(n, 0)">
+                  <span class="material-symbols-outlined">cancel</span>
+                  Từ chối
+                </button>
+              </div>
+              <div v-else-if="n.handled" class="notif-status-tag" :class="n.handledStatus">
+                {{ n.handledStatus === 'approved' ? 'Đã duyệt' : 'Đã từ chối' }}
+              </div>
             </div>
             <div v-if="!n.read" class="unread-dot"></div>
           </div>
@@ -86,6 +101,7 @@ import { useRouter } from "vue-router";
 import { getCurrentInstance } from "vue";
 import { subscribeAdmin, leaveAllChannels } from '@/js/services/echo';
 import { clearAuth } from "@/js/auth";
+import Swal from "sweetalert2";
 import api from "@/axios/config";
 
 const router = useRouter();
@@ -105,11 +121,15 @@ const fetchNotifications = async () => {
     if (res.data) {
       adminNotifs.value = res.data.map(n => ({
         id: n.id,
+        type: n.data?.type,
+        bds_id: n.data?.bds_id,
         tieu_de: n.data?.tieu_de || 'Thông báo',
         noi_dung: n.data?.noi_dung || '',
         thoi_gian: n.created_at,
         read: !!n.read_at,
-        link: n.data?.link
+        link: n.data?.link,
+        handled: false,
+        handledStatus: null
       }));
       unreadCount.value = adminNotifs.value.filter(n => !n.read).length;
     }
@@ -172,6 +192,77 @@ const markAllRead = async () => {
     toast.success("Đã đánh dấu tất cả là đã đọc");
   } catch (error) {
     console.error("Mark read error:", error);
+  }
+};
+
+const goToNotifLink = (n) => {
+  console.log('[AdminHeader] Clicking notification:', n);
+  
+  // Mark as read if not already
+  if (!n.read) {
+    n.read = true;
+    unreadCount.value = Math.max(0, unreadCount.value - 1);
+    api.post(`/admin/notifications/mark-read`, { id: n.id }).catch(e => console.error(e));
+  }
+  
+  if (n.link) {
+    console.log('[AdminHeader] Navigating to:', n.link);
+    showNotifPanel.value = false;
+    
+    // Nếu link là chi tiết (có ID) mà chưa có route chi tiết, 
+    // ta hướng về trang danh sách để tránh bị redirect về home (404)
+    if (n.link.startsWith('/admin/bat-dong-san/') && n.link !== '/admin/bat-dong-san') {
+        router.push('/admin/bat-dong-san');
+    } else {
+        router.push(n.link);
+    }
+  } else {
+    console.warn('[AdminHeader] Notification has no link');
+  }
+};
+
+const handleAction = async (notif, isDuyet) => {
+  if (!notif.bds_id) return;
+
+  try {
+    let ly_do = "";
+    if (isDuyet === 0) {
+      const { value: text } = await Swal.fire({
+        title: 'Lý do từ chối',
+        input: 'textarea',
+        inputPlaceholder: 'Nhập lý do từ chối bài đăng...',
+        showCancelButton: true,
+        confirmButtonColor: '#ff4d4f',
+        confirmButtonText: 'Từ chối bài',
+        cancelButtonText: 'Hủy'
+      });
+      
+      if (text === undefined) return; // User cancelled
+      ly_do = text;
+    }
+
+    const res = await api.post('/admin/bds/duyet', {
+      id: notif.bds_id,
+      is_duyet: isDuyet,
+      ly_do: ly_do
+    });
+
+    if (res.data?.status) {
+      toast.success(isDuyet === 1 ? "Đã duyệt bài đăng thành công" : "Đã từ chối bài đăng");
+      notif.handled = true;
+      notif.handledStatus = isDuyet === 1 ? 'approved' : 'rejected';
+      
+      // Mark notification as read
+      if (!notif.read) {
+        notif.read = true;
+        unreadCount.value = Math.max(0, unreadCount.value - 1);
+      }
+    } else {
+      toast.error(res.data?.message || "Có lỗi xảy ra");
+    }
+  } catch (error) {
+    console.error("Action error:", error);
+    toast.error("Không thể thực hiện thao tác");
   }
 };
 
@@ -243,7 +334,11 @@ const initEcho = () => {
           noi_dung: data.noi_dung || '',
           thoi_gian: new Date().toISOString(),
           read: false,
-          link: data.link
+          link: data.link,
+          type: data.type,
+          bds_id: data.bds_id,
+          handled: false,
+          handledStatus: null
         });
         unreadCount.value += 1;
         
@@ -442,6 +537,59 @@ onUnmounted(() => {
   border-radius: 4px;
 }
 .view-all-btn:hover { background: #eef2ff; }
+
+/* ⚡ Action Buttons in Notif */
+.notif-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.action-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+.action-btn.approve {
+  background: #e6fffa;
+  color: #0d9488;
+}
+.action-btn.approve:hover {
+  background: #b2f5ea;
+}
+.action-btn.reject {
+  background: #fff5f5;
+  color: #e53e3e;
+}
+.action-btn.reject:hover {
+  background: #fed7d7;
+}
+
+.notif-status-tag {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.notif-status-tag.approved {
+  background: #0d9488;
+  color: white;
+}
+.notif-status-tag.rejected {
+  background: #e53e3e;
+  color: white;
+}
 
 .admin-topbar {
   position: fixed;

@@ -45,7 +45,7 @@ class NewPostPendingApprovalNotification extends Notification implements ShouldB
             'noi_dung'    => "Môi giới vừa đăng bài: {$this->batDongSan->tieu_de}",
             'bds_id'      => $this->batDongSan->id,
             'moi_gioi_id' => $this->batDongSan->moi_gioi_id,
-            'link'        => "/admin/bat-dong-san/{$this->batDongSan->id}",
+            'link'        => "/admin/bat-dong-san",
         ];
     }
 }
