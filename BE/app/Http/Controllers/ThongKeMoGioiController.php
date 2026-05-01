@@ -204,4 +204,131 @@ class ThongKeMoGioiController extends Controller
             return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * 📊 Dashboard tổng hợp cho môi giới
+     */
+    public function getDashboard()
+    {
+        try {
+            $user = auth('sanctum')->user();
+
+            // Số BĐS đang hoạt động
+            $activeBds = $user->batDongSans()
+                ->where('is_duyet', true)
+                ->where(function ($q) {
+                    $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                })->count();
+
+            // Số BĐS chờ duyệt
+            $pendingBds = $user->batDongSans()
+                ->where('is_duyet', false)
+                ->count();
+
+            // Số BĐS đã hết hạn
+            $expiredBds = $user->batDongSans()
+                ->whereNotNull('expires_at')
+                ->where('expires_at', '<=', now())
+                ->count();
+
+            // Tổng BĐS đã đăng
+            $totalBds = $user->batDongSans()->count();
+
+            // Tín chỉ còn lại
+            $credits = $user->so_tin_con_lai ?? 0;
+
+            // Gói hiện tại
+            $currentPlan = null;
+            if ($user->goiTin) {
+                $currentPlan = [
+                    'ten_goi' => $user->goiTin->ten_goi,
+                    'gia' => $user->goiTin->gia,
+                    'so_luong_tin' => $user->goiTin->so_luong_tin,
+                    'so_ngay' => $user->goiTin->so_ngay,
+                ];
+            }
+
+            // Ngày hết hạn gói
+            $planExpiry = $user->ngay_het_han_goi ? $user->ngay_het_han_goi->format('d/m/Y') : null;
+            $daysUntilExpiry = $user->ngay_het_han_goi ? now()->diffInDays($user->ngay_het_han_goi, false) : null;
+
+            // Tổng yêu thích (khách hàng đã tim BĐS của môi giới)
+            $totalFavorites = YeuThich::whereHas('batDongSan', function ($q) use ($user) {
+                $q->where('moi_gioi_id', $user->id);
+            })->distinct('khach_hang_id')->count('khach_hang_id');
+
+            // Tổng khách hàng đã liên hệ
+            $totalContacts = ThongBao::where('moi_gioi_id', $user->id)
+                ->whereNotNull('khach_hang_id')
+                ->distinct('khach_hang_id')
+                ->count('khach_hang_id');
+
+            // Tổng chi tiêu
+            $totalSpent = GiaoDich::where('moi_gioi_id', $user->id)
+                ->where('trang_thai', GiaoDich::STATUS_SUCCESS)
+                ->sum('so_tien');
+
+            // BĐS gần đây (5 tin mới nhất)
+            $recentBds = $user->batDongSans()
+                ->with(['loai', 'diaChi'])
+                ->latest()
+                ->take(5)
+                ->get()
+                ->map(fn ($b) => [
+                    'id' => $b->id,
+                    'tieu_de' => $b->tieu_de,
+                    'gia' => $b->gia,
+                    'anh_dai_dien_url' => $b->anh_dai_dien_url,
+                    'is_duyet' => $b->is_duyet,
+                    'expires_at' => $b->expires_at?->format('d/m/Y'),
+                    'loai' => $b->loai?->ten_loai,
+                    'dia_chi' => $b->diaChi?->dia_chi_day_du,
+                    'created_at' => $b->created_at->format('d/m/Y'),
+                ]);
+
+            // Chart: BĐS theo tháng (6 tháng gần nhất)
+            $chartLabels = [];
+            $chartData = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $month = now()->subMonths($i);
+                $chartLabels[] = $month->format('m/Y');
+                $count = $user->batDongSans()
+                    ->whereYear('created_at', $month->year)
+                    ->whereMonth('created_at', $month->month)
+                    ->count();
+                $chartData[] = $count;
+            }
+
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'stats' => [
+                        'active_bds' => $activeBds,
+                        'pending_bds' => $pendingBds,
+                        'expired_bds' => $expiredBds,
+                        'total_bds' => $totalBds,
+                        'credits_remaining' => $credits,
+                        'total_favorites' => $totalFavorites,
+                        'total_contacts' => $totalContacts,
+                        'total_spent' => $totalSpent,
+                    ],
+                    'plan' => [
+                        'current' => $currentPlan,
+                        'expiry_date' => $planExpiry,
+                        'days_until_expiry' => $daysUntilExpiry,
+                    ],
+                    'recent_bds' => $recentBds,
+                    'chart' => [
+                        'labels' => $chartLabels,
+                        'data' => $chartData,
+                    ],
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -144,7 +144,7 @@
           </router-link>
         </div>
 
-        <router-link to="/moi-gioi/khach-hang"
+        <router-link to="/moi-gioi/quan-ly-khach-hang"
           class="mt-4 flex items-center justify-center gap-2 py-2.5 border-2 border-blue-200 text-blue-600 text-xs font-bold rounded-xl hover:bg-blue-50 transition">
           Xem tất cả khách hàng
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
@@ -161,7 +161,7 @@
         <h3 class="font-bold text-gray-800 text-sm mb-0.5">Tin đăng sắp hết hạn</h3>
         <p class="text-sm text-gray-500">Một số tin đăng sẽ hết hiệu lực sớm. Hãy gia hạn để không bỏ lỡ khách hàng tiềm năng.</p>
       </div>
-      <router-link to="/moi-gioi/quan-ly-bds"
+      <router-link to="/moi-gioi/quan-ly-bat-dong-san"
         class="flex-shrink-0 px-5 py-2.5 bg-amber-500 text-white text-sm font-bold rounded-xl hover:bg-amber-600 transition shadow-sm shadow-amber-200">
         Quản lý tin
       </router-link>

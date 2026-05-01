@@ -282,6 +282,21 @@ html.dark .bd-page { background: #0f172a !important; }
 /* ── Định giá AI page specific ── */
 html.dark .dinh-gia-wrap { background: #0f172a !important; }
 
+/* ── Môi giới Dashboard ── */
+html.dark .mg-dashboard { background: #0f172a !important; }
+html.dark .mg-stat-card { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .mg-stat__value { color: #f1f5f9 !important; }
+html.dark .mg-stat__label { color: #94a3b8 !important; }
+html.dark .mg-card { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .mg-card__title { color: #f1f5f9 !important; }
+html.dark .mg-card__link { color: #60a5fa !important; }
+html.dark .mg-bds-item { background: #0f172a !important; border-color: #334155 !important; }
+html.dark .mg-bds__title { color: #f1f5f9 !important; }
+html.dark .mg-bds__type { color: #94a3b8 !important; }
+html.dark .mg-spending__amount { color: #f1f5f9 !important; }
+html.dark .mg-quick-btn.secondary { background: #334155 !important; color: #e2e8f0 !important; border-color: #475569 !important; }
+html.dark .mg-plan--empty p { color: #94a3b8 !important; }
+
 /* ── SweetAlert2 dark ── */
 html.dark .swal2-popup {
   background: #1e293b !important;

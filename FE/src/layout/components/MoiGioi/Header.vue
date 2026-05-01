@@ -142,12 +142,19 @@
 
                 <!-- Menu Items -->
                 <div class="dropdown-items-new">
+                  <!-- 📊 Dashboard -->
+                  <router-link to="/moi-gioi/dashboard" class="dropdown-item-new primary" role="menuitem"
+                    @click="showMenu = false">
+                    <span class="item-icon-new">📊</span>
+                    <span class="item-label-new">Dashboard</span>
+                    <span class="item-badge-new hot">MỚI</span>
+                  </router-link>
+
                   <!-- Đăng tin mới -->
-                  <router-link to="/moi-gioi/dang-tin" class="dropdown-item-new primary" role="menuitem"
+                  <router-link to="/moi-gioi/dang-tin" class="dropdown-item-new" role="menuitem"
                     @click="showMenu = false">
                     <span class="item-icon-new">✎</span>
                     <span class="item-label-new">Đăng tin mới</span>
-                    <span class="item-badge-new hot">HOT</span>
                   </router-link>
 
                   <!-- Quản lý tin đăng -->

@@ -218,6 +218,12 @@ const routes = [
     meta: { layout: "moi-gioi", roles: ["moi-gioi"] }  // ✅ Thêm roles
   },
   {
+    path: "/moi-gioi/dashboard",
+    component: () => import("../components/MoiGioi/Dashboard/index.vue"),
+    name: "MoiGioiDashboard",
+    meta: { layout: "moi-gioi", roles: ["moi-gioi"] }
+  },
+  {
     path: "/moi-gioi/dang-tin",
     component: () => import("../components/MoiGioi/DangTin/index.vue"),
     name: "MoiGioiDangTin",

@@ -273,6 +273,7 @@ Route::prefix('moi-gioi')->middleware('MoiGioiMiddleware')->group(function () {
     Route::get('/giao-dich/{orderCode}/status', [GiaoDichController::class, 'getTransactionStatus']);
 
     Route::prefix('thong-ke')->group(function () {
+        Route::get('/dashboard', [ThongKeMoGioiController::class, 'getDashboard']);
         Route::get('/tong-tin-da-dang', [ThongKeMoGioiController::class, 'tongTinDaDang']);
         Route::get('/tin-con-lai', [ThongKeMoGioiController::class, 'tinConLai']);
         Route::get('/tong-yeu-thich', [ThongKeMoGioiController::class, 'tongYeuThich']);
