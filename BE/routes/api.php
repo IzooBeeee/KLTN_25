@@ -189,6 +189,8 @@ Route::prefix('admin')->middleware('AdminMiddleware')->group(function () {
         Route::get('/recent-favorites', [ThongKeController::class, 'getRecentFavorites']); // đã test postman    
         // Giao dịch gần đây (5 giao dịch mới nhất) Tầng 3
         Route::get('/recent-package-purchases', [ThongKeController::class, 'getRecentPackagePurchases']); // đã test postman
+        // Tổng hợp toàn bộ dashboard
+        Route::get('/overview', [ThongKeController::class, 'getDashboardOverview']);
     });
 
     //GIAO 

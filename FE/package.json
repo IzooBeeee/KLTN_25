@@ -20,6 +20,7 @@
     "fs-extra": "^11.3.4",
     "laravel-echo": "^2.3.4",
     "leaflet": "^1.9.4",
+    "leaflet.heat": "^0.2.0",
     "pusher-js": "^8.5.0",
     "qrcode": "^1.5.4",
     "sweetalert2": "^11.26.24",

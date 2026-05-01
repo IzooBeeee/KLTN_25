@@ -220,6 +220,85 @@ class ThongKeController extends Controller
         ]);
     }
 
+    // Dashboard overview tổng hợp: stats mở rộng + top môi giới + BDS chờ duyệt
+    public function getDashboardOverview(Request $request)
+    {
+        $user = $this->resolveUser($request);
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $today      = now()->startOfDay();
+        $thisMonth  = now()->startOfMonth();
+        $lastMonth  = now()->subMonth()->startOfMonth();
+        $lastMonthEnd = now()->subMonth()->endOfMonth();
+
+        $doanhThuThang     = (float) GiaoDich::where('trang_thai', 'success')->where('created_at', '>=', $thisMonth)->sum('so_tien');
+        $doanhThuThangTruoc = (float) GiaoDich::where('trang_thai', 'success')->whereBetween('created_at', [$lastMonth, $lastMonthEnd])->sum('so_tien');
+        $doanhThuChange    = $doanhThuThangTruoc > 0 ? round(($doanhThuThang - $doanhThuThangTruoc) / $doanhThuThangTruoc * 100, 1) : 0;
+
+        $gdHomNay    = GiaoDich::where('trang_thai', 'success')->where('created_at', '>=', $today)->count();
+        $gdHomQua    = GiaoDich::where('trang_thai', 'success')->whereBetween('created_at', [now()->subDay()->startOfDay(), now()->subDay()->endOfDay()])->count();
+
+        $choDuyet    = BatDongSan::where('is_duyet', false)->count();
+        $kh          = KhachHang::count();
+        $mg          = MoiGioi::count();
+        $bds         = BatDongSan::where('is_duyet', true)->count();
+        $gd          = GiaoDich::where('trang_thai', 'success')->count();
+
+        $topMoiGioi = MoiGioi::withCount(['batDongSans' => function ($q) {
+            $q->where('is_duyet', true);
+        }])
+            ->orderBy('bat_dong_sans_count', 'desc')
+            ->limit(5)
+            ->get(['id', 'ten', 'email', 'avatar', 'goi_tin_id', 'so_tin_con_lai', 'ngay_het_han_goi'])
+            ->map(function ($m) {
+                return [
+                    'id'         => $m->id,
+                    'ten'        => $m->ten,
+                    'email'      => $m->email,
+                    'avatar'     => $m->avatar,
+                    'so_bds'     => $m->bat_dong_sans_count,
+                    'tin_con_lai' => $m->so_tin_con_lai ?? 0,
+                ];
+            });
+
+        $bdsChoDuyet = BatDongSan::with(['moiGioi:id,ten', 'loai:id,ten_loai', 'diaChi.tinh:id,ten'])
+            ->where('is_duyet', false)
+            ->where('status', 'published')
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(function ($b) {
+                return [
+                    'id'       => $b->id,
+                    'tieu_de'  => $b->tieu_de,
+                    'gia'      => $b->gia,
+                    'loai'     => $b->loai->ten_loai ?? '—',
+                    'tinh'     => $b->diaChi->tinh->ten ?? '—',
+                    'moi_gioi' => $b->moiGioi->ten ?? '—',
+                    'ngay'     => $b->created_at->format('d/m/Y'),
+                ];
+            });
+
+        return response()->json([
+            'status' => true,
+            'stats'  => [
+                'khach_hang'       => $kh,
+                'moi_gioi'         => $mg,
+                'bat_dong_san'     => $bds,
+                'giao_dich'        => $gd,
+                'cho_duyet'        => $choDuyet,
+                'doanh_thu_thang'  => $doanhThuThang,
+                'doanh_thu_change' => $doanhThuChange,
+                'giao_dich_hom_nay' => $gdHomNay,
+                'giao_dich_hom_qua' => $gdHomQua,
+            ],
+            'top_moi_gioi'  => $topMoiGioi,
+            'bds_cho_duyet' => $bdsChoDuyet,
+        ]);
+    }
+
     private function getPaymentStatusLabel($status)
     {
         return match ($status) {

@@ -363,6 +363,7 @@
 import api from '@/axios/config';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { saveToRecentlyViewed } from '@/js/recentlyViewed';
 
 export default {
   name: 'PropertyDetailLuxury',
@@ -472,9 +473,21 @@ export default {
         if (res.data.status) {
           this.property = res.data.data;
           this.loadSimilarProperties(id);
-          setTimeout(() => {
-            this.initMap();
-          }, 500);
+          setTimeout(() => { this.initMap(); }, 500);
+
+          // Lưu vào danh sách đã xem gần đây
+          const p = res.data.data;
+          const loc = p.dia_chi?.quan?.ten
+            ? `${p.dia_chi.quan.ten}, ${p.dia_chi.tinh?.ten || ''}`
+            : 'Đang cập nhật';
+          saveToRecentlyViewed({
+            id: p.id,
+            name: p.tieu_de || 'Bất động sản',
+            image: p.anh_dai_dien_url || (p.hinh_anh?.[0]?.url) || null,
+            gia: p.gia,
+            loai: p.loai?.ten_loai || 'BĐS',
+            location: loc,
+          });
         } else { this.error = 'Bất động sản không tồn tại'; }
       } catch (err) { this.error = 'Lỗi kết nối máy chủ'; } finally { this.loading = false; }
     },
