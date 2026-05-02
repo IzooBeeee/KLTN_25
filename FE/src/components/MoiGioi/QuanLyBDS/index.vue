@@ -624,20 +624,30 @@ const handleEdit = async (property) => {
       editingProperty.value.mo_ta = detail.mo_ta || "";
       
       if (detail.dia_chi) {
-        editingProperty.value.tinh_id = detail.dia_chi.tinh_id ? String(detail.dia_chi.tinh_id) : "";
-        editingProperty.value.quan_id = detail.dia_chi.quan_id ? String(detail.dia_chi.quan_id) : "";
-        editingProperty.value.phuong_id = detail.dia_chi.phuong_xa_id ? String(detail.dia_chi.phuong_xa_id) : "";
+        const t_id = detail.dia_chi.tinh_id ? String(detail.dia_chi.tinh_id) : "";
+        const q_id = detail.dia_chi.quan_id ? String(detail.dia_chi.quan_id) : "";
+        const p_id = detail.dia_chi.phuong_xa_id ? String(detail.dia_chi.phuong_xa_id) : "";
+
+        // 1. Gán Tỉnh và load Quận
+        editingProperty.value.tinh_id = t_id;
+        if (t_id) {
+          await onTinhChange(false);
+          
+          // 2. Sau khi có danh sách Quận, gán Quận và load Phường
+          if (q_id) {
+            editingProperty.value.quan_id = q_id;
+            await onQuanChange(false);
+            
+            // 3. Sau khi có danh sách Phường, gán Phường
+            if (p_id) {
+              editingProperty.value.phuong_id = p_id;
+            }
+          }
+        }
+        
         editingProperty.value.dia_chi_chi_tiet = detail.dia_chi.dia_chi_chi_tiet || "";
         editingProperty.value.latitude = detail.dia_chi.latitude;
         editingProperty.value.longitude = detail.dia_chi.longitude;
-
-        if (editingProperty.value.tinh_id) await onTinhChange();
-        if (editingProperty.value.quan_id) await onQuanChange();
-        
-        // Gán lại sau khi load xong list để đảm bảo v-model mapping đúng
-        editingProperty.value.tinh_id = detail.dia_chi.tinh_id ? String(detail.dia_chi.tinh_id) : "";
-        editingProperty.value.quan_id = detail.dia_chi.quan_id ? String(detail.dia_chi.quan_id) : "";
-        editingProperty.value.phuong_id = detail.dia_chi.phuong_xa_id ? String(detail.dia_chi.phuong_xa_id) : "";
       }
 
       if (detail.hinh_anh) {
@@ -654,10 +664,12 @@ const handleEdit = async (property) => {
 
 
 
-const onTinhChange = async () => {
+const onTinhChange = async (shouldReset = true) => {
   quanHuyenList.value = [];
-  editingProperty.value.quan_id = "";
-  editingProperty.value.phuong_id = "";
+  if (shouldReset) {
+    editingProperty.value.quan_id = "";
+    editingProperty.value.phuong_id = "";
+  }
   if (!editingProperty.value.tinh_id) return;
   try {
     const res = await api.get(`/quan-huyen-by-tinh`, { params: { tinh_id: editingProperty.value.tinh_id } });
@@ -665,14 +677,22 @@ const onTinhChange = async () => {
   } catch (error) {}
 };
 
-const onQuanChange = async () => {
+const onQuanChange = async (shouldReset = true) => {
   phuongList.value = [];
-  editingProperty.value.phuong_id = "";
+  if (shouldReset) {
+    editingProperty.value.phuong_id = "";
+  }
   if (!editingProperty.value.quan_id) return;
   try {
-    const res = await api.get(`/phuong-xa-by-quan`, { params: { quan_id: editingProperty.value.quan_id } });
-    if (res.data?.status) phuongList.value = res.data.data.map(x => ({...x, id: String(x.id)}));
-  } catch (error) {}
+    const res = await api.get(`/phuong-xa-by-quan-huyen`, { 
+      params: { quan_huyen_id: editingProperty.value.quan_id } 
+    });
+    if (res.data?.status === 'success' || res.data?.status === true) {
+      phuongList.value = res.data.data.map(x => ({...x, id: String(x.id)}));
+    }
+  } catch (error) {
+    console.error("Lỗi lấy danh sách phường xã:", error);
+  }
 };
 
 const handleFileSelect = (event) => {

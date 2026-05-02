@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <transition name="chat-slide">
     <div v-if="visible" class="chat-wrapper">
       
@@ -111,7 +111,9 @@ export default {
       propertyName: "",
       messages: [],
       text: "",
-      isTyping: false
+      isTyping: false,
+      isSending: false,
+      lastMessageId: null
     };
   },
  
@@ -135,77 +137,135 @@ export default {
   mounted() {
   this._handler = (e) => this.openChat(e);
   window.addEventListener("open-chat", this._handler);
-
-  this.interval = setInterval(() => {
-    if (this.visible && this.conversationId) {
-      this.loadMessages();
-    }
-  }, 3000);
 },
 
 beforeUnmount() {
   window.removeEventListener("open-chat", this._handler);
-  clearInterval(this.interval);
+  if (this.interval) clearInterval(this.interval);
 },
 
 
   methods: {
   // 🔥 MỞ CHAT
   async openChat(e) {
+    const newConvId = e.detail.conversationId;
+
+    // Nếu đang mở cùng conversation → chỉ show lại, không reset
+    if (this.visible && this.conversationId === newConvId) {
+      return;
+    }
+
     this.visible = true;
-    this.conversationId = e.detail.conversationId;
+    this.conversationId = newConvId;
     this.brokerName = e.detail.brokerName;
     this.propertyName = e.detail.propertyName;
+    this.messages = [];
+    this.lastMessageId = null;
+
+    // Reset polling interval
+    if (this.interval) clearInterval(this.interval);
+    this.interval = setInterval(() => {
+      if (this.visible && this.conversationId) {
+        this.pollMessages();
+      }
+    }, 3000);
 
     await this.loadMessages();
     this.$nextTick(() => this.scrollToBottom());
   },
 
-  // 🔥 LOAD TIN NHẮN
+  // 🔥 LOAD TIN NHẮN (lần đầu hoặc khi cần full reload)
   async loadMessages() {
     try {
-      const token = localStorage.getItem("khach_hang_auth_token");
-
       const res = await api.get(`/khach-hang/chat/${this.conversationId}/messages`);
+      const data = res.data.data || [];
 
-      // 🔥 FIX FIELD THEO BE
-      this.messages = res.data.data.map(msg => ({
+      this.messages = data.map(msg => ({
         ...msg,
-        noi_dung: msg.content || msg.noi_dung, // 🔥 fallback
+        noi_dung: msg.content || msg.noi_dung,
         isMine: msg.sender_type === "khach_hang"
       }));
 
-      this.$nextTick(() => this.scrollToBottom());
+      if (data.length > 0) {
+        this.lastMessageId = data[data.length - 1].id;
+      }
 
+      this.$nextTick(() => this.scrollToBottom());
     } catch (err) {
       console.error("Lỗi load chat:", err.response?.data || err);
     }
   },
 
+  // 🔥 POLLING - Chỉ load tin MỚI hơn lastMessageId để tránh duplicate
+  async pollMessages() {
+    if (this.isSending) return; // Đang gửi → không poll để tránh race condition
+    try {
+      const res = await api.get(`/khach-hang/chat/${this.conversationId}/messages`);
+      const data = res.data.data || [];
+
+      if (data.length === 0) return;
+
+      const newLastId = data[data.length - 1].id;
+      if (newLastId === this.lastMessageId) return; // Không có tin mới
+
+      // Chỉ thêm tin nhắn mới (có id > lastMessageId)
+      const newMessages = data.filter(msg => !this.messages.find(m => m.id === msg.id));
+      if (newMessages.length > 0) {
+        const mapped = newMessages.map(msg => ({
+          ...msg,
+          noi_dung: msg.content || msg.noi_dung,
+          isMine: msg.sender_type === "khach_hang"
+        }));
+        this.messages.push(...mapped);
+        this.lastMessageId = newLastId;
+        this.$nextTick(() => this.scrollToBottom());
+      }
+    } catch (err) {
+      console.error("Lỗi poll chat:", err.response?.data || err);
+    }
+  },
+
   // 🔥 GỬI TIN
   async sendMessage() {
-    if (!this.text.trim()) return;
+    if (!this.text.trim() || this.isSending) return;
 
     const content = this.text.trim();
+    this.text = ""; // Xóa input ngay để tránh double-send
+    this.isSending = true;
+
+    // Optimistic UI - tạo ID tạm để track
+    const tempId = `temp_${Date.now()}`;
+    this.messages.push({
+      id: tempId,
+      noi_dung: content,
+      isMine: true,
+      created_at: new Date().toISOString()
+    });
+    this.$nextTick(() => this.scrollToBottom());
 
     try {
-      const token = localStorage.getItem("khach_hang_auth_token");
+      const res = await api.post(`/khach-hang/chat/${this.conversationId}/message`, { content });
 
-      await api.post(`/khach-hang/chat/${this.conversationId}/message`, { content });
-
-      // 🔥 HIỆN NGAY (optimistic UI)
-      this.messages.push({
-        noi_dung: content,
-        isMine: true,
-        created_at: new Date().toISOString()
-      });
-
-      this.text = "";
-
-      this.$nextTick(() => this.scrollToBottom());
-
+      // Thay tin tạm bằng tin thật từ server
+      const idx = this.messages.findIndex(m => m.id === tempId);
+      if (idx !== -1 && res.data?.data) {
+        const realMsg = res.data.data;
+        this.messages[idx] = {
+          ...realMsg,
+          noi_dung: realMsg.content || realMsg.noi_dung || content,
+          isMine: true
+        };
+        this.lastMessageId = realMsg.id;
+      } else if (idx !== -1) {
+        // Không có data trả về, chỉ update ID bằng cách reload
+        await this.loadMessages();
+      }
     } catch (err) {
       console.error("Lỗi gửi:", err.response?.data || err);
+      // Xóa tin tạm nếu gửi thất bại
+      this.messages = this.messages.filter(m => m.id !== tempId);
+    } finally {
+      this.isSending = false;
     }
   },
 

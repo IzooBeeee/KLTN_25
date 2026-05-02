@@ -415,12 +415,13 @@ export default {
     // ========== ✅ ECHO REALTIME (dùng service) ==========
     subscribeEcho() {
       const userId = this.user?.id;
-      console.log('[Header] subscribeEcho called, userId:', userId, '| Echo ready:', !!window.Echo);
       if (!userId) return;
 
       subscribeUser(userId, (data) => {
+        console.log('[Echo] Broker received notification:', data);
+        
         // ✅ Nếu là tin nhắn của chính mình gửi (từ tab khác) thì bỏ qua
-        if (data.loai === 'tin_nhan' && data.sender_type === 'moi_gioi') {
+        if (data.sender_type === 'moi_gioi') {
           return;
         }
 
@@ -439,29 +440,24 @@ export default {
         this.unreadCount += 1;
         this.hasNewNotifications = true;
 
-        // ✅ Hiển thị toast với nội dung phù hợp theo loại thông báo
+        // ✅ Hiển thị toast
         const toastMsg = this._buildToastMessage(data);
         if (this.$toast) {
-          if (data.loai === 'tin_nhan') {
-            this.$toast.info(toastMsg, { 
-              position: 'top-right', 
-              duration: 6000,
-              onClick: () => {
-                // Điều hướng sang trang chat
+          const toastType = data.loai === 'tu_choi' ? 'error' : (data.loai === 'approved' ? 'success' : 'info');
+          this.$toast[toastType](toastMsg, { 
+            position: 'top-right', 
+            duration: 7000,
+            onClick: () => {
+              if (data.loai === 'tin_nhan') {
                 this.$router.push({
                   path: '/moi-gioi/quan-ly-khach-hang',
                   query: { active_chat_id: data.conversation_id }
                 });
+              } else {
+                this.showNotifications = true;
               }
-            });
-          } else if (data.loai === 'tu_choi') {
-            this.$toast.error(toastMsg, { position: 'top-right', duration: 6000 });
-          } else if (data.loai === 'approved') {
-            this.$toast.success(toastMsg, { position: 'top-right', duration: 6000 });
-          } else {
-            // yeu_thich / khach_moi / pending
-            this.$toast.info(toastMsg, { position: 'top-right', duration: 6000 });
-          }
+            }
+          });
         }
         
         // Cập nhật lại stats ở dropdown nếu đang mở
@@ -474,6 +470,11 @@ export default {
 
     // ✅ Build nội dung toast rõ ràng theo loại thông báo
     _buildToastMessage(data) {
+      if (data.loai === 'tin_nhan') {
+        const sender = data.sender_name || 'Khách hàng';
+        const content = data.content || data.noi_dung || 'đã gửi một tin nhắn';
+        return `💬 ${sender}: ${content}`;
+      }
       if (data.loai === 'lich_hen' || data.tieu_de?.includes('Lịch hẹn')) {
         return `📅 ${data.noi_dung || data.tieu_de}`;
       }

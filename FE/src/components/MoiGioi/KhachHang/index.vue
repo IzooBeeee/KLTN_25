@@ -206,8 +206,31 @@ const filteredContacts = computed(() => {
   if (filterType.value === 'unread') {
     list = list.filter(c => c.unread_count > 0);
   }
+
+  // 🔥 Gộp theo ID khách hàng để tránh lặp
+  const groups = {};
+  list.forEach(c => {
+    const cid = c.khach_hang?.id;
+    if (!cid) return;
+    
+    if (!groups[cid]) {
+      groups[cid] = { ...c };
+    } else {
+      // Nếu có cuộc hội thoại mới hơn thì cập nhật
+      const currentDate = new Date(c.updated_at || c.created_at);
+      const existingDate = new Date(groups[cid].updated_at || groups[cid].created_at);
+      
+      const totalUnread = (groups[cid].unread_count || 0) + (c.unread_count || 0);
+      
+      if (currentDate > existingDate) {
+        groups[cid] = { ...c, unread_count: totalUnread };
+      } else {
+        groups[cid].unread_count = totalUnread;
+      }
+    }
+  });
   
-  return list.sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
+  return Object.values(groups).sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
 });
 
 const activeContact = computed(() => {
@@ -301,7 +324,7 @@ async function sendMessage() {
   sending.value = true;
   
   try {
-    const tempId = Date.now();
+    const tempId = `temp-${Date.now()}`;
     
     messages.value.push({
       id: tempId,
@@ -401,9 +424,20 @@ function listenRealtime(conversationId) {
     .listen('.message.sent', (e) => {
       console.log('🔥 Chat realtime received:', e);
 
-      // 🔥 Tránh duplicate: kiểm tra message đã tồn tại chưa
+      // 🔥 Tránh duplicate: Kiểm tra nếu đã có tin nhắn này (theo ID)
       if (messages.value.find(m => m.id === e.id)) {
         return;
+      }
+
+      // 🔥 Tránh duplicate: Tìm và xóa tin nhắn tạm (optimistic UI) trước khi thêm tin thật
+      const tempIndex = messages.value.findIndex(m => 
+        m.sender === 'me' && 
+        m.text === e.content && 
+        String(m.id).startsWith('temp-')
+      );
+      
+      if (tempIndex !== -1) {
+        messages.value.splice(tempIndex, 1);
       }
 
       // 🔥 Nếu đang xem đúng conversation này → push vào UI

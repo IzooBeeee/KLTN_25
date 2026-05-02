@@ -38,29 +38,35 @@ export const updateEchoToken = (token) => {
     console.log('[Echo] Token updated:', !!token);
 };
 
-export const subscribeUser = (userId, onNotify) => {
+export const subscribeUser = (userId, onNotify, isCustomer = false) => {
     if (!window.Echo || !userId) return null;
 
+    const channelPrefix = isCustomer ? 'khach-hang' : 'user';
+    const channelName = `${channelPrefix}.${userId}`;
+
     // Tránh subscribe lặp lại
-    if (_subscribedUserId === userId && _userChannel) return _userChannel;
+    if (_subscribedUserId === channelName && _userChannel) return _userChannel;
 
-    if (_subscribedUserId) safeLeave(`user.${_subscribedUserId}`);
+    if (_subscribedUserId) safeLeave(_subscribedUserId);
 
-    _subscribedUserId = userId;
-    _userChannel = window.Echo.private(`user.${userId}`);
+    _subscribedUserId = channelName;
+    _userChannel = window.Echo.private(channelName);
 
     if (onNotify) {
+        // 1. Lắng nghe thông báo hệ thống (Laravel Notifications)
         _userChannel.notification((notification) => {
-            console.log('[Echo] User notification:', notification);
-            try {
-                onNotify(notification);
-            } catch (error) {
-                console.error('[Echo] User notification handler failed:', error);
-            }
+            console.log('[Echo] System notification:', notification);
+            onNotify({ ...notification, loai: notification.loai || 'system' });
+        });
+
+        // 2. Lắng nghe tin nhắn chat trực tiếp (Custom Event)
+        _userChannel.listen('.message.sent', (data) => {
+            console.log('[Echo] Chat event received:', data);
+            onNotify({ ...data, loai: 'tin_nhan' });
         });
     }
 
-    console.log(`[Echo] Subscribed to private-user.${userId}`);
+    console.log(`[Echo] Subscribed to private-${channelName}`);
     return _userChannel;
 };
 
@@ -89,3 +95,6 @@ export const subscribeAdmin = (adminId, onNotify) => {
     console.log(`[Echo] Subscribed to private-admin.${adminId}`);
     return _adminChannel;
 };
+
+// Aliases for compatibility
+export const subscribeCustomer = subscribeUser;

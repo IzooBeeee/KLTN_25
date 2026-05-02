@@ -556,32 +556,37 @@ export default {
       const userId = this.user?.id;
       if (!userId) return;
 
+      console.log('[Echo] Subscribing customer:', userId);
+      // 🔥 Truyền true để dùng channel 'khach-hang.{id}'
       subscribeCustomer(userId, (data) => {
+        console.log('[Echo] Customer received notification:', data);
+        
         // Nếu là tin nhắn của chính mình gửi (từ tab khác) thì bỏ qua
-        if (data.loai === 'tin_nhan' && data.sender_type === 'khach_hang') {
+        if (data.sender_type === 'khach_hang') {
           return;
         }
 
-        if (this.$toast && data.loai === 'tin_nhan') {
-          this.$toast.info(data.tieu_de || "Tin nhắn mới", { 
-            position: 'top-right', 
-            duration: 6000,
-            onClick: () => {
-              // Dispatch event to open chat panel
-              this.showMenu = false;
-              this.showChatPanel = true;
-              this.loadConversations().then(() => {
-                const conv = this.conversations.find(c => Number(c.id) === Number(data.conversation_id));
-                if (conv) {
-                  this.openChat(conv);
-                }
-              });
-            }
-          });
-          // Update unread chat badge
+        const isChat = data.loai === 'tin_nhan';
+        
+        if (isChat) {
+          if (this.$toast) {
+            const msgContent = data.content || data.noi_dung || "Bạn có tin nhắn mới";
+            const senderName = data.sender_name || "Môi giới";
+            
+            this.$toast.info(`${senderName}: ${msgContent}`, { 
+              position: 'top-right', 
+              duration: 7000,
+              onClick: () => {
+                this.showChatPanel = true;
+                this.openChat({ id: data.conversation_id });
+              }
+            });
+          }
           this.unreadCount += 1;
+        } else if (this.$toast) {
+          this.$toast.success(data.tieu_de || "Thông báo mới", { position: 'top-right' });
         }
-      });
+      }, true);
     },
 
     // ✅ Handler khi có auth thay đổi trong cùng tab
