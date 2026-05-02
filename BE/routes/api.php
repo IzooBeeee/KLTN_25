@@ -18,6 +18,7 @@ use App\Http\Controllers\ChucNangController;
 use App\Http\Controllers\ChucVuController;
 use App\Http\Controllers\ClientHomeController;
 use App\Http\Controllers\DiaChiController;
+use App\Http\Controllers\LichHenXemNhaController;
 use App\Http\Controllers\LichSuGoiTinController;
 use App\Http\Controllers\LoaiBatDongSanController;
 use App\Http\Controllers\MapController;
@@ -283,6 +284,15 @@ Route::prefix('moi-gioi')->middleware('MoiGioiMiddleware')->group(function () {
         Route::get('/tong-khach-hang', [ThongKeMoGioiController::class, 'tongKhachHang']);
     });
 
+    //---------------------------LỊCH HẸN XEM NHÀ---------------------------
+    Route::prefix('lich-hen')->group(function () {
+        Route::get('/danh-sach', [LichHenXemNhaController::class, 'danhSachMoiGioi']);
+        Route::post('/{id}/xac-nhan', [LichHenXemNhaController::class, 'xacNhan']);
+        Route::post('/{id}/hoan-thanh', [LichHenXemNhaController::class, 'hoanThanh']);
+        Route::post('/{id}/huy', [LichHenXemNhaController::class, 'huyLich']);
+        Route::get('/thong-ke', [LichHenXemNhaController::class, 'thongKe']);
+    });
+
     //---------------------------CHAT---------------------------
     Route::prefix('chat')->group(function () {
         Route::post('/start', [ChatController::class, 'startConversation']);
@@ -322,6 +332,13 @@ Route::prefix('khach-hang')->middleware('KhachHangMiddleware')->group(function (
         Route::get('/conversations', [ChatController::class, 'getConversations']);
         Route::get('/{id}/messages', [ChatController::class, 'getMessages']);
         Route::post('/{id}/read', [ChatController::class, 'markAsRead']);
+    });
+
+    //---------------------------LỊCH HẸN XEM NHÀ---------------------------
+    Route::prefix('lich-hen')->group(function () {
+        Route::post('/dat', [LichHenXemNhaController::class, 'datLich']);
+        Route::get('/danh-sach', [LichHenXemNhaController::class, 'danhSachKhachHang']);
+        Route::post('/{id}/huy', [LichHenXemNhaController::class, 'huyLich']);
     });
 });
 

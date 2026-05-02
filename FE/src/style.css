@@ -297,6 +297,17 @@ html.dark .mg-spending__amount { color: #f1f5f9 !important; }
 html.dark .mg-quick-btn.secondary { background: #334155 !important; color: #e2e8f0 !important; border-color: #475569 !important; }
 html.dark .mg-plan--empty p { color: #94a3b8 !important; }
 
+/* ── ChatBot ── */
+html.dark .chatbot-window { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .chatbot-messages { background: #0f172a !important; }
+html.dark .chatbot-message .message-content { background: #1e293b !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+html.dark .chatbot-message.user .message-content { background: linear-gradient(135deg, #2563eb, #3b82f6) !important; }
+html.dark .chatbot-quick { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .chatbot-input { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .chatbot-input input { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+html.dark .quick-btn { background: #0f172a !important; border-color: #334155 !important; color: #94a3b8 !important; }
+html.dark .quick-btn:hover { background: #1e3a5f !important; border-color: #3b82f6 !important; color: #60a5fa !important; }
+
 /* ── SweetAlert2 dark ── */
 html.dark .swal2-popup {
   background: #1e293b !important;
@@ -304,3 +315,26 @@ html.dark .swal2-popup {
 }
 html.dark .swal2-title { color: #f1f5f9 !important; }
 html.dark .swal2-html-container { color: #cbd5e1 !important; }
+
+/* ── Lịch Hẹn ── */
+html.dark .lh-title { color: #f1f5f9 !important; }
+html.dark .lh-stat { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .lh-stat__label { color: #94a3b8 !important; }
+html.dark .lh-card { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .lh-card__title { color: #f1f5f9 !important; }
+html.dark .lh-card__type { color: #60a5fa !important; }
+html.dark .lh-card__address { color: #94a3b8 !important; }
+html.dark .lh-detail { color: #cbd5e1 !important; }
+html.dark .lh-detail i { color: #94a3b8 !important; }
+html.dark .lh-empty { background: #1e293b !important; }
+html.dark .lh-empty h3 { color: #f1f5f9 !important; }
+html.dark .lh-empty p { color: #94a3b8 !important; }
+html.dark .dl-modal { background: #1e293b !important; }
+html.dark .dl-header { border-color: #334155 !important; }
+html.dark .dl-header__title { color: #f1f5f9 !important; }
+html.dark .dl-header__subtitle { color: #94a3b8 !important; }
+html.dark .dl-input { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+html.dark .dl-textarea { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+html.dark .dl-time-btn { background: #0f172a !important; border-color: #334155 !important; color: #94a3b8 !important; }
+html.dark .dl-footer { border-color: #334155 !important; }
+html.dark .dl-btn--secondary { background: #334155 !important; color: #e2e8f0 !important; }

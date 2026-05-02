@@ -53,6 +53,51 @@
             <span class="label">Đăng tin</span>
           </button>
 
+          <!-- 🔔 Nút Thông báo lịch hẹn -->
+          <div class="notif-trigger-wrapper" v-if="isLoggedIn">
+            <button @click.stop="toggleAppointmentNotifPanel" class="btn-notif" aria-label="Thông báo lịch hẹn">
+              <span class="material-symbols-outlined icon">notifications</span>
+              <span v-if="appointmentNotifUnreadCount > 0" class="notif-badge">{{ appointmentNotifUnreadCount }}</span>
+            </button>
+
+            <!-- 🔔 APPOINTMENT NOTIFICATION PANEL -->
+            <transition name="notif-slide">
+              <div v-if="showAppointmentNotifPanel" class="notif-panel appointment-panel" @click.stop>
+                <div class="notif-header">
+                  <h3 class="notif-title flex items-center gap-2">
+                    <span class="material-symbols-outlined text-emerald-500">calendar_month</span>
+                    Thông báo lịch hẹn
+                  </h3>
+                  <span class="notif-count">{{ appointmentNotifs.length }} thông báo</span>
+                </div>
+
+                <div class="notif-list">
+                  <div v-for="item in appointmentNotifs.slice(0, 5)" :key="item.id" class="notif-item-wrapper"
+                    :class="{ unread: !item.da_doc }">
+                    <div class="notif-item" @click="handleAppointmentNotifClick(item)">
+                      <div class="notif-content">
+                        <p class="notif-text font-semibold" :class="item.loai === 'lich_hen' ? 'text-emerald-600' : ''">{{ item.tieu_de || 'Thông báo lịch hẹn' }}</p>
+                        <p class="notif-detail text-sm text-gray-500">{{ item.noi_dung || 'Xem chi tiết lịch hẹn' }}</p>
+                        <span class="notif-time">{{ item.thoi_gian ? formatTime(item.thoi_gian) : 'Vừa xong' }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div v-if="appointmentNotifs.length === 0" class="notif-empty">
+                    <div class="notif-empty-icon">📭</div>
+                    <p class="notif-empty-title">Chưa có thông báo lịch hẹn</p>
+                  </div>
+                </div>
+
+                <div class="notif-footer">
+                  <router-link to="/khach-hang/lich-hen" class="notif-btn-primary" @click="showAppointmentNotifPanel = false">
+                    Xem tất cả lịch hẹn
+                  </router-link>
+                </div>
+              </div>
+            </transition>
+          </div>
+
           <!-- ✅ Nút Tin đã lưu -->
           <div class="saved-trigger-wrapper" v-if="isLoggedIn">
             <button @click.stop="toggleNotifPanel" class="btn-saved" aria-label="Tin đã lưu">
@@ -230,6 +275,13 @@
                     <span class="item-arrow-new">→</span>
                   </router-link>
 
+                  <!-- Lịch hẹn xem nhà -->
+                  <router-link to="/khach-hang/lich-hen" class="dropdown-item-new" @click="showMenu = false">
+                    <span class="item-icon-new material-symbols-outlined text-emerald-500">calendar_month</span>
+                    <span class="item-label-new">Lịch hẹn xem nhà</span>
+                    <span class="item-arrow-new">→</span>
+                  </router-link>
+
                   <!-- Chat với môi giới -->
                   <div class="dropdown-item-new chat-broker-item" @click="handleChatWithBroker">
                     <span class="item-icon-new">💬</span>
@@ -341,6 +393,13 @@ export default {
       conversations: [],
       unreadCount: 0,
       loadingChat: false,
+      
+      // 📅 Appointment Notifications
+      appointmentNotifs: [],
+      previousAppointmentNotifCount: 0,
+      appointmentPollInterval: null,
+      showAppointmentNotifPanel: false,
+      appointmentNotifUnreadCount: 0,
     };
   },
 
@@ -402,6 +461,7 @@ export default {
     const isLogged = this.checkLogin();
     if (isLogged) {
       await this.loadSavedNotifications();
+      this.startAppointmentPolling(); // 📅 Start polling for appointment notifications
     }
 
     // Event Listeners
@@ -431,6 +491,12 @@ export default {
       clearTimeout(this.menuTimer);
       this.menuTimer = null;
     }
+    
+    // 📅 Cleanup appointment polling
+    if (this.appointmentPollInterval) {
+      clearInterval(this.appointmentPollInterval);
+      this.appointmentPollInterval = null;
+    }
   },
 
   methods: {
@@ -452,10 +518,13 @@ export default {
           this.user = JSON.parse(userStr);
           this.userType = "khach-hang";
           
-          import("@/js/services/echo").then(({ updateEchoToken, subscribeCustomer }) => {
-            updateEchoToken(this.token);
-            this.subscribeEchoCustomer(subscribeCustomer);
-          });
+          import("@/js/services/echo").then((module) => {
+            const { updateEchoToken, subscribeCustomer } = module;
+            if (updateEchoToken) updateEchoToken(this.token);
+            if (subscribeCustomer && typeof subscribeCustomer === 'function') {
+              this.subscribeEchoCustomer(subscribeCustomer);
+            }
+          }).catch(err => console.log('Echo service not available:', err));
           
           return true;
         } catch (e) {
@@ -468,10 +537,13 @@ export default {
         this.userType = "khach-hang";
         this.user = this.user || { ten: "Khách hàng" };
         
-        import("@/js/services/echo").then(({ updateEchoToken, subscribeCustomer }) => {
-          updateEchoToken(this.token);
-          this.subscribeEchoCustomer(subscribeCustomer);
-        });
+        import("@/js/services/echo").then((module) => {
+          const { updateEchoToken, subscribeCustomer } = module;
+          if (updateEchoToken) updateEchoToken(this.token);
+          if (subscribeCustomer && typeof subscribeCustomer === 'function') {
+            this.subscribeEchoCustomer(subscribeCustomer);
+          }
+        }).catch(err => console.log('Echo service not available:', err));
         
         return true;
       } else {
@@ -552,6 +624,10 @@ export default {
       // 🔥 Close chat panel when clicking outside
       if (!e.target.closest(".chat-trigger-wrapper")) {
         this.showChatPanel = false;
+      }
+      // 📅 Close appointment notification panel when clicking outside
+      if (!e.target.closest(".notif-trigger-wrapper")) {
+        this.showAppointmentNotifPanel = false;
       }
     },
 
@@ -689,6 +765,95 @@ export default {
       }
     },
 
+    // 📅 Fetch appointment notifications
+    async fetchAppointmentNotifications() {
+      const token = localStorage.getItem("khach_hang_auth_token");
+      if (!token) return;
+      
+      try {
+        // Lấy lịch hẹn để hiển thị thông báo
+        const res = await api.get('/khach-hang/lich-hen/danh-sach');
+        if (res.data?.status && res.data.data) {
+          const appointments = res.data.data;
+          
+          // Map to notification format
+          console.log('[Appointments] Raw data:', appointments);
+          this.appointmentNotifs = appointments.map(item => {
+            const tieu_de = item.status_label || (
+              item.trang_thai === 'cho_xac_nhan' ? '⏰ Chờ xác nhận' : 
+              item.trang_thai === 'da_xac_nhan' ? '✅ Đã xác nhận' :
+              item.trang_thai === 'hoan_thanh' ? '🎉 Hoàn thành' : '❌ Đã hủy'
+            );
+            const noi_dung = item.bat_dong_san?.tieu_de 
+              ? `${item.bat_dong_san.tieu_de} - ${item.ngay_hen} ${item.gio_hen}`
+              : `${item.ngay_hen || 'N/A'} ${item.gio_hen || ''}`;
+            const thoi_gian = item.updated_at || item.created_at || new Date().toISOString();
+            
+            return {
+              id: item.id,
+              tieu_de,
+              noi_dung,
+              thoi_gian,
+              da_doc: item.trang_thai !== 'cho_xac_nhan',
+              loai: 'lich_hen',
+              trang_thai: item.trang_thai,
+            };
+          });
+          console.log('[Appointments] Mapped:', this.appointmentNotifs);
+          
+          // Count unread (cho_xac_nhan)
+          this.appointmentNotifUnreadCount = this.appointmentNotifs.filter(
+            n => n.trang_thai === 'cho_xac_nhan'
+          ).length;
+        }
+      } catch (err) {
+        console.error("Lỗi fetch appointment notifications:", err);
+      }
+    },
+
+    // 📅 Appointment Notification Polling
+    startAppointmentPolling() {
+      console.log('[Customer Polling] Appointment notifications started - 10s');
+      this.appointmentPollInterval = setInterval(() => {
+        if (this.isLoggedIn) {
+          this.fetchAppointmentNotifications();
+        }
+      }, 10000);
+    },
+
+    async fetchAppointmentNotifications() {
+      const token = localStorage.getItem("khach_hang_auth_token");
+      if (!token) return;
+      
+      try {
+        // Lấy lịch hẹn để kiểm tra status change
+        const res = await api.get('/khach-hang/lich-hen/danh-sach');
+        if (res.data?.status && res.data.data) {
+          const appointments = res.data.data;
+          
+          // Check for status changes
+          if (this.appointmentNotifs.length > 0) {
+            appointments.forEach(newItem => {
+              const oldItem = this.appointmentNotifs.find(o => o.id === newItem.id);
+              if (oldItem && oldItem.trang_thai !== newItem.trang_thai) {
+                if (oldItem.trang_thai === 'cho_xac_nhan') {
+                  if (newItem.trang_thai === 'da_xac_nhan') {
+                    this.$toast?.success(`✅ Lịch hẹn ${newItem.ngay_hen} lúc ${newItem.gio_hen} đã được xác nhận!`, { duration: 5000 });
+                  } else if (newItem.trang_thai === 'huy') {
+                    this.$toast?.error(`❌ Lịch hẹn ${newItem.ngay_hen} lúc ${newItem.gio_hen} đã bị từ chối. ${newItem.ly_do_huy || ''}`, { duration: 5000 });
+                  }
+                }
+              }
+            });
+          }
+          
+          this.appointmentNotifs = appointments;
+        }
+      } catch (err) {
+        console.error("Lỗi fetch appointment notifications:", err);
+      }
+    },
+
     formatTime(dateStr) {
       if (!dateStr) return "Vừa xong";
       const now = new Date();
@@ -721,15 +886,42 @@ export default {
       this.showNotifPanel = !this.showNotifPanel;
       this.showMenu = false;
       this.showChatPanel = false;
+      this.showAppointmentNotifPanel = false;
       if (this.showNotifPanel && this.isLoggedIn) {
         this.loadSavedNotifications();
       }
     },
 
+    // 📅 Appointment Notification Panel
+    toggleAppointmentNotifPanel() {
+      this.showAppointmentNotifPanel = !this.showAppointmentNotifPanel;
+      this.showMenu = false;
+      this.showChatPanel = false;
+      this.showNotifPanel = false;
+      if (this.showAppointmentNotifPanel && this.isLoggedIn) {
+        this.fetchAppointmentNotifications();
+      }
+    },
+
+    handleAppointmentNotifClick(item) {
+      this.showAppointmentNotifPanel = false;
+      if (!item.da_doc) {
+        item.da_doc = true;
+        this.appointmentNotifUnreadCount = Math.max(0, this.appointmentNotifUnreadCount - 1);
+      }
+      this.$router.push('/khach-hang/lich-hen');
+    },
+
     handleNotifClick(item) {
       if (item.swipeOffset < -80) return;
       this.showNotifPanel = false;
-      this.$router.push(`/khach-hang/chi-tiet-bat-dong-san/${item.propertyId}`);
+      
+      // 📅 Navigate to appointment page for appointment notifications
+      if (item.loai === 'lich_hen' || item.text?.includes('Lịch hẹn') || item.text?.includes('đã đặt lịch')) {
+        this.$router.push('/khach-hang/lich-hen');
+      } else {
+        this.$router.push(`/khach-hang/chi-tiet-bat-dong-san/${item.propertyId}`);
+      }
     },
 
     handleMouseDown(e, item) {
@@ -1157,6 +1349,82 @@ export default {
   .btn-saved .label {
     display: inline;
   }
+}
+
+/* 🔔 Notification Button */
+.notif-trigger-wrapper {
+  position: relative;
+}
+
+.btn-notif {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.btn-notif:hover {
+  background: #f0f9ff;
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.btn-notif .icon {
+  font-size: 18px;
+  color: #64748b;
+}
+
+.btn-notif:hover .icon {
+  color: #3b82f6;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+}
+
+/* Appointment Panel */
+.appointment-panel {
+  min-width: 320px;
+}
+
+.appointment-panel .notif-item-wrapper.unread {
+  background: #f0fdf4;
+  border-left: 3px solid #10b981;
+}
+
+.notif-btn-primary {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.notif-btn-primary:hover {
+  background: linear-gradient(135deg, #059669, #047857);
 }
 
 .btn-login {

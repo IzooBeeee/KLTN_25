@@ -173,7 +173,15 @@
                     <span class="item-arrow-new">→</span>
                   </router-link>
 
-                  <!-- 🔥 MỚI: Chat với khách hàng -->
+                  <!-- � Lịch hẹn xem nhà -->
+                  <router-link to="/moi-gioi/lich-hen" class="dropdown-item-new primary" role="menuitem"
+                    @click="showMenu = false">
+                    <span class="item-icon-new">📅</span>
+                    <span class="item-label-new">Lịch hẹn xem nhà</span>
+                    <span class="item-badge-new">MỚI</span>
+                  </router-link>
+
+                  <!-- 🔥 Chat với khách hàng -->
                   <div class="dropdown-item-new chat-customer-item" @click="handleChatWithCustomer" role="menuitem">
                     <span class="item-icon-new">💬</span>
                     <span class="item-label-new">Chat với khách hàng</span>
@@ -315,6 +323,7 @@ export default {
       remainingPosts: null, // null = đang loading, -1 = không giới hạn
       loadingPosts: false,
       hasNewNotifications: false, // ✅ Theo dõi thông báo mới
+      previousUnreadCount: 0, // ✅ Theo dõi số thông báo chưa đọc trước đó
       statsListings: 0,
       statsCustomers: 0,
       selectedBdsId: null,
@@ -465,6 +474,9 @@ export default {
 
     // ✅ Build nội dung toast rõ ràng theo loại thông báo
     _buildToastMessage(data) {
+      if (data.loai === 'lich_hen' || data.tieu_de?.includes('Lịch hẹn')) {
+        return `📅 ${data.noi_dung || data.tieu_de}`;
+      }
       if (data.loai === 'yeu_thich' || data.loai === 'khach_moi') {
         return data.noi_dung || `❤️ ${data.tieu_de}`;
       }
@@ -474,7 +486,7 @@ export default {
       if (data.loai === 'tu_choi') {
         return data.noi_dung || `❌ ${data.tieu_de}`;
       }
-      return data.tieu_de || 'Bạn có thông báo mới!';
+      return data.noi_dung || data.tieu_de || 'Bạn có thông báo mới!';
     },
 
     leaveEcho() {
@@ -528,12 +540,12 @@ export default {
       }
     },
     // ========== TOAST & COPY ==========
-    triggerToast(message) {
+    triggerToast(message, duration = 3000) {
       this.toastMessage = message;
       this.showToast = true;
       setTimeout(() => {
         this.showToast = false;
-      }, 3000);
+      }, duration);
     },
     async copyToClipboard(text, label) {
       if (!text) return;
@@ -600,14 +612,14 @@ export default {
       }, 600);
     },
     // ========== NOTIFICATIONS ==========
-    async fetchNotifications() {
+    async fetchNotifications(silent = false) {
       this.loadingNotifications = true;
       const token = localStorage.getItem("moi_gioi_auth_token");
       if (!token) return;
       try {
         const res = await api.get("/moi-gioi/thong-bao");
         if (res.data?.status === true && res.data.data) {
-          this.notifications = res.data.data.map((item) => ({
+          const newNotifications = res.data.data.map((item) => ({
             id: item.id,
             loai: this.determineNotificationType(item),
             tieu_de: item.tieu_de || "Thông báo mới",
@@ -619,7 +631,26 @@ export default {
             khach_hang_id: item.khach_hang_id || null,
             bat_dong_san_id: item.bat_dong_san_id || null,
           }));
+          
+          // 🔔 Detect new notifications and show toast
+          const newUnreadCount = newNotifications.filter((n) => !n.da_doc).length;
+          console.log(`[Polling] Unread: ${newUnreadCount}, Previous: ${this.previousUnreadCount}`);
+          
+          // Show toast for new notifications (not on initial load when previousUnreadCount is 0)
+          if (this.previousUnreadCount > 0 && newUnreadCount > this.previousUnreadCount) {
+            // Find new unread notifications
+            const newItems = newNotifications.filter(
+              n => !n.da_doc && !this.notifications.find(o => o.id === n.id)
+            );
+            console.log(`[Polling] New items detected:`, newItems);
+            newItems.forEach(item => {
+              this.triggerToast(this._buildToastMessage(item), 5000);
+            });
+          }
+          
+          this.notifications = newNotifications;
           this.unreadCount = this.notifications.filter((n) => !n.da_doc).length;
+          this.previousUnreadCount = this.unreadCount;
         } else {
           this.notifications = [];
           this.unreadCount = 0;
@@ -632,6 +663,8 @@ export default {
     },
     determineNotificationType(item) {
       const tieuDe = (item.tieu_de || "").toLowerCase();
+      if (tieuDe.includes("lịch hẹn") || tieuDe.includes("appointment"))
+        return "lich_hen";
       if (tieuDe.includes("khách hàng") || tieuDe.includes("user"))
         return "khach_moi";
       if (tieuDe.includes("duyệt") || tieuDe.includes("phê duyệt"))
@@ -675,10 +708,18 @@ export default {
     },
     handleNotificationClick(item) {
       if (this.isDragging) return;
+      
+      // Đánh dấu đã đọc
       if (!item.da_doc) {
         item.da_doc = true;
         this.unreadCount = Math.max(0, this.unreadCount - 1);
         this.markAsRead(item.id);
+      }
+      
+      // 📅 Navigate based on notification type
+      if (item.loai === 'lich_hen' || item.tieu_de?.includes('Lịch hẹn')) {
+        this.showNotifications = false;
+        this.$router.push('/moi-gioi/lich-hen');
       }
     },
     async markAsRead(id) {
@@ -808,15 +849,16 @@ export default {
       }
     },
 
-    // ✅ Cập nhật polling để refresh số tin mỗi 30s
+    // ✅ Cập nhật polling để refresh số tin mỗi 5s (nhanh hơn cho real-time)
     startPolling() {
+      console.log('[Polling] Started - checking every 5s');
       this.pollingInterval = setInterval(() => {
         if (this.isLoggedIn) {
-          this.fetchNotifications();
-          this.fetchRemainingPosts(); // ✅ Refresh số tin cùng lúc
-          this.fetchDropdownStats();
+          console.log('[Polling] Checking notifications...');
+          this.fetchNotifications(true); // silent mode - show toast if new
+          this.fetchRemainingPosts();
         }
-      }, 30000);
+      }, 5000); // 5s cho real-time hơn
     },
   },
 };

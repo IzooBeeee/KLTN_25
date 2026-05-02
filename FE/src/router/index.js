@@ -173,6 +173,12 @@ const routes = [
     name: "KhachHangTinhVay",
     meta: { layout: "khach-hang" }
   },
+  {
+    path: "/khach-hang/lich-hen",
+    component: () => import("../components/KhachHang/LichHen/index.vue"),
+    name: "KhachHangLichHen",
+    meta: { layout: "khach-hang", roles: ["khach-hang"] }
+  },
   // {
   //   path: "/khach-hang/ve-chung-toi",
   //   component: () => import("../components/KhachHang/VeChungToi/index.vue"),
@@ -263,6 +269,12 @@ const routes = [
     path: "/moi-gioi/lich-su-mua-tin",
     component: () => import("../components/MoiGioi/LichSuMuaTin/index.vue"),
     name: "MoiGioiLichSuMuaTin",
+    meta: { layout: "moi-gioi", roles: ["moi-gioi"] }
+  },
+  {
+    path: "/moi-gioi/lich-hen",
+    component: () => import("../components/MoiGioi/LichHen/index.vue"),
+    name: "MoiGioiLichHen",
     meta: { layout: "moi-gioi", roles: ["moi-gioi"] }
   },
 
