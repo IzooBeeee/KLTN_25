@@ -288,4 +288,47 @@ class GoiTinController extends Controller
             'so_tin_con_lai' => $user->fresh()->so_tin_con_lai,
         ]);
     }
+
+    public function giaHan(Request $request)
+    {
+        $request->validate([
+            'goi_tin_id' => 'required|exists:goi_tins,id',
+        ]);
+
+        $user = Auth::guard('sanctum')->user();
+        $goi = GoiTin::find($request->goi_tin_id);
+
+        if (!$goi) {
+            return response()->json(['status' => false, 'message' => 'Gói không tồn tại'], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            $currentExpiry = $user->ngay_het_han_goi && !$user->ngay_het_han_goi->isPast()
+                ? $user->ngay_het_han_goi
+                : now();
+
+            $user->update([
+                'goi_tin_id' => $goi->id,
+                'so_tin_con_lai' => ($user->so_tin_con_lai ?? 0) + $goi->so_luong_tin,
+                'ngay_het_han_goi' => $currentExpiry->addDays($goi->so_ngay),
+            ]);
+
+            LichSuGoiTin::create([
+                'moi_gioi_id' => $user->id,
+                'goi_tin_id' => $goi->id,
+                'so_tien' => $goi->gia,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Gia hạn gói thành công! Đã cộng thêm ' . $goi->so_ngay . ' ngày và ' . $goi->so_luong_tin . ' lượt đăng tin.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'message' => 'Lỗi: ' . $e->getMessage()]);
+        }
+    }
 }

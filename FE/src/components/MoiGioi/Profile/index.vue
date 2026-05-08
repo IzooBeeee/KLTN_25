@@ -12,11 +12,14 @@
       <!-- Profile Header -->
       <div class="bg-white rounded-3xl shadow-xl p-6 mb-6 flex flex-col sm:flex-row items-center sm:items-end gap-5">
         <div class="relative -mt-12 sm:-mt-16 flex-shrink-0">
-          <img :src="profile.avatar || defaultAvatar" alt="Avatar"
+          <img :src="avatarPreview || profile.avatar || defaultAvatar" alt="Avatar"
             class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-4 border-white shadow-lg object-cover" />
-          <span class="absolute -bottom-2 -right-2 w-7 h-7 bg-green-500 border-2 border-white rounded-full flex items-center justify-center">
-            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          </span>
+          <label
+            class="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 border-2 border-white rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 transition shadow-lg"
+            title="Đổi ảnh đại diện">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <input type="file" accept="image/*" class="hidden" @change="onAvatarChange" />
+          </label>
         </div>
         <div class="flex-1 text-center sm:text-left">
           <div class="flex items-center justify-center sm:justify-start gap-2 mb-0.5">
@@ -267,7 +270,8 @@ export default {
 
       defaultAvatar:
         "https://ui-avatars.com/api/?name=Moi+Gioi&background=0a0a4d&color=fff&rounded=true&size=200",
-      // ✅ Lấy token từ key riêng của môi giới
+      avatarPreview: null,
+      avatarFile: null,
       token: getToken("moi-gioi"),
     };
   },
@@ -300,6 +304,25 @@ export default {
       const month = String(date.getMonth() + 1).padStart(2, "0");
       const year = date.getFullYear();
       return `${day}/${month}/${year}`;
+    },
+
+    onAvatarChange(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        Swal.fire("Lỗi", "Vui lòng chọn file hình ảnh", "error");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire("Lỗi", "Kích thước ảnh tối đa 5MB", "error");
+        return;
+      }
+      this.avatarFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.avatarPreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
     },
 
     // ✅ Format tiền VND
@@ -413,6 +436,10 @@ export default {
         const res = await api.get("/moi-gioi/profile");
         if (res.data.status) {
           Object.assign(this.profile, res.data.data);
+          if (this.profile.avatar && !this.profile.avatar.startsWith("http")) {
+            const base = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000';
+            this.profile.avatar = `${base}/storage/${this.profile.avatar}`;
+          }
         }
       } catch (error) {
         Swal.fire("Lỗi", "Không tải được hồ sơ", "error");
@@ -424,7 +451,19 @@ export default {
       this.errors = {};
 
       try {
-        const res = await api.post("/moi-gioi/update-profile", this.profile);
+        const formData = new FormData();
+        formData.append("ten", this.profile.ten || "");
+        formData.append("email", this.profile.email || "");
+        formData.append("so_dien_thoai", this.profile.so_dien_thoai || "");
+        formData.append("zalo_link", this.profile.zalo_link || "");
+        formData.append("mo_ta", this.profile.mo_ta || "");
+        if (this.avatarFile) {
+          formData.append("avatar", this.avatarFile);
+        }
+
+        const res = await api.post("/moi-gioi/update-profile", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
 
         if (res.data.status === 1) {
           Swal.fire(
@@ -432,6 +471,8 @@ export default {
             res.data.message || "Cập nhật hồ sơ thành công",
             "success"
           );
+          this.avatarFile = null;
+          this.avatarPreview = null;
           await this.fetchProfile();
         } else {
           Swal.fire(

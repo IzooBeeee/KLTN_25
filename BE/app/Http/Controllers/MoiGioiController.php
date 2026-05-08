@@ -90,13 +90,21 @@ class MoiGioiController extends Controller
         $data = MoiGioi::find($user->id);
 
         if ($data) {
-            $data->update([
+            $updateData = [
                 'ten'           => $request->ten,
                 'email'         => $request->email,
                 'so_dien_thoai' => $request->so_dien_thoai,
                 'mo_ta'         => $request->mo_ta,
                 'zalo_link'     => $request->zalo_link,
-            ]);
+            ];
+
+            if ($request->hasFile('avatar')) {
+                $file = $request->file('avatar');
+                $path = $file->store('avatars/moi-gioi', 'public');
+                $updateData['avatar'] = $path;
+            }
+
+            $data->update($updateData);
 
             return response()->json([
                 'status'  => 1,

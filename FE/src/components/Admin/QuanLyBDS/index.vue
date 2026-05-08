@@ -195,6 +195,7 @@
                     <span class="d-flex align-items-center"><i class="bi bi-hash me-1"></i>RE-{{ String(bds.id).padStart(4, "0") }}</span>
                     <span class="d-flex align-items-center"><i class="bi bi-house me-1"></i>{{ bds.loai?.ten_loai || "—" }}</span>
                     <span class="d-flex align-items-center text-truncate" style="max-width:300px;"><i class="bi bi-geo-alt me-1"></i>{{ bds.dia_chi?.dia_chi_chi_tiet || bds.dia_chi || "—" }}</span>
+                    <span class="d-flex align-items-center"><i class="bi bi-calendar-event me-1"></i>{{ formatDate(bds.created_at) }}</span>
                   </div>
                 </div>
 
@@ -938,6 +939,17 @@ export default {
         6: 'Bị từ chối'
       };
       return map[statusId] || 'Không xác định';
+    },
+
+    formatDate(dateString) {
+      if (!dateString) return "—";
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
     },
   },
 };

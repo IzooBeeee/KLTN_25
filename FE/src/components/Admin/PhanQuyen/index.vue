@@ -275,7 +275,6 @@
               @click="themChucVu()"
               type="button"
               class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm"
-              data-bs-dismiss="modal"
             >
               Xác nhận tạo
             </button>
@@ -513,6 +512,7 @@
 <script>
 import api from "@/axios/config";
 import { createToaster } from "@meforma/vue-toaster";
+import * as bootstrap from "bootstrap";
 const toaster = createToaster({ position: "top-right" });
 
 export default {
@@ -585,11 +585,15 @@ export default {
               `<div style="text-align:left"><strong>✅ Thành công!</strong><p style="margin:4px 0 0 0">${response.data.message}</p></div>`
             );
             this.loadDuLieu();
-            // ✅ Reset form
             this.chuc_vu = {
               ten_chuc_vu: "",
-              tinh_trang: 1, // ✅ Reset về 1
+              tinh_trang: 1,
             };
+            const modalEl = document.getElementById("createModal");
+            if (modalEl) {
+              const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+              modal.hide();
+            }
           } else {
             this.$toast.error(
               `<div style="text-align:left"><strong>❌ Thất bại!</strong><p style="margin:4px 0 0 0">${
@@ -837,7 +841,7 @@ export default {
     // Xóa quyền
     xoaQuyen(payload) {
       api
-        .post("/admin/phan-quyen/chuc-vu/delete", payload)
+        .delete("/admin/phan-quyen/chuc-vu/delete", { data: { id_chuc_vu: payload.id_chuc_vu, id_chuc_nang: payload.id_chuc_nang } })
         .then((res) => {
           if (res.data.status || res.data.success) {
             toaster.success(res.data.message);

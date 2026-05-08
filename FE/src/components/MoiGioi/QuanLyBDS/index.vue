@@ -169,6 +169,9 @@
             <p class="text-muted small mb-3 text-truncate" :title="item.dia_chi_id">
               <span class="me-1">📍</span> {{ item.dia_chi_id }}
             </p>
+            <p class="text-muted small mb-3">
+              <span class="me-1">📅</span> Đăng ngày: {{ item.ngay_dang }}
+            </p>
             <div class="d-flex gap-3 text-muted small fw-medium">
               <span v-if="item.dien_tich">📐 {{ item.dien_tich }} m²</span>
               <span v-if="item.so_phong_ngu">🛏️ {{ item.so_phong_ngu }} PN</span>
@@ -508,6 +511,7 @@ const loadBatDongSan = async (page = 1) => {
           dien_tich: item.dien_tich,
           so_phong_ngu: item.so_phong_ngu,
           so_phong_tam: item.so_phong_tam,
+          ngay_dang: formatNgayDang(item.created_at),
           raw: item,
         };
       });
@@ -532,6 +536,17 @@ const loadBatDongSan = async (page = 1) => {
 
 
 // Helper: Format địa chỉ
+const formatNgayDang = (dateString) => {
+  if (!dateString) return "—";
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
+
 const formatDiaChi = (item) => {
   if (!item.dia_chi) return `Địa chỉ ID: ${item.dia_chi_id}`;
   const quan =

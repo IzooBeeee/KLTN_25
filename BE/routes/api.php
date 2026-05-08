@@ -252,6 +252,7 @@ Route::prefix('moi-gioi')->middleware('MoiGioiMiddleware')->group(function () {
     //MUA GÓI
     Route::get('/goi-tin/data', [GoiTinController::class, 'getAll']);
     Route::post('/goi-tin/mua', [GoiTinController::class, 'muaGoi']); //chưa làm
+    Route::post('/goi-tin/gia-han', [GoiTinController::class, 'giaHan']);
     Route::post('/credit/mua', [GoiTinController::class, 'muaCredit']);
 
     //THÔNG BÁO KHÁCH THẢ TIM
