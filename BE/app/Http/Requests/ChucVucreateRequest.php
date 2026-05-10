@@ -21,6 +21,8 @@ class ChucVucreateRequest extends FormRequest
         return [
             'ten_chuc_vu' => 'required|string|max:255|unique:chuc_vus,ten_chuc_vu',
             'tinh_trang' => 'required|in:0,1',
+            'email' => 'nullable|email|unique:chuc_vus,email',
+            'password' => 'nullable|string|min:6',
         ];
     }
     public function messages(): array
@@ -32,6 +34,9 @@ class ChucVucreateRequest extends FormRequest
             'ten_chuc_vu.unique' => 'Tên chức vụ đã tồn tại',
             'tinh_trang.required' => 'Tình trạng không được để trống',
             'tinh_trang.in' => 'Tình trạng phải là 0 hoặc 1',
+            'email.email' => 'Email không hợp lệ',
+            'email.unique' => 'Email đã được sử dụng bởi chức vụ khác',
+            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự',
         ];
     }
 }

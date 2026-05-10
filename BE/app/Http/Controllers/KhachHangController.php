@@ -26,7 +26,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\PDF;
 use Illuminate\Validation\ValidationException;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class KhachHangController extends Controller
 {
@@ -182,31 +185,31 @@ class KhachHangController extends Controller
     //Khách hàng cập nhật mật khẩu
     public function updatePassword(KhachHangUpdatePasswordRequest $request)
     {
-        $user = Auth::guard('sanctum')->user();
-        $data = KhachHang::find($user->id);
+        // ✅ Lấy user trực tiếp từ token đã được xác thực (không phụ thuộc Auth guard)
+        $user = $request->user();
 
-        if ($data) {
-            if (!Hash::check($request->old_password, $data->password)) {
-                return response()->json([
-                    'status'  => 0,
-                    'message' => 'Mật khẩu cũ không đúng!',
-                ], 400);
-            }
-
-            $data->update([
-                'password' => bcrypt($request->password),
-            ]);
-
+        if (!$user || !($user instanceof KhachHang)) {
             return response()->json([
-                'status'  => 1,
-                'message' => 'Cập nhật mật khẩu thành công!',
-            ]);
-        } else {
-            return response()->json([
-                'status'  => 0,
-                'message' => 'Thông tin khách hàng không tồn tại!',
-            ]);
+                'status'  => false,
+                'message' => 'Unauthorized: Không xác thực được người dùng',
+            ], 401);
         }
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Mật khẩu cũ không đúng!',
+            ], 400);
+        }
+
+        $user->update([
+            'password' => bcrypt($request->password),
+        ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Cập nhật mật khẩu thành công!',
+        ]);
     }
 
     // Admin lấy danh sách khách hàng
@@ -320,6 +323,40 @@ class KhachHangController extends Controller
             'status' => false,
             'message' => 'Không tìm thấy khách hàng để xóa'
         ], 404);
+    }
+
+    // Admin đổi trạng thái khách hàng (active/inactive)
+    public function changeStatus(Request $request)
+    {
+        $id_chuc_nang = 68;
+        $user = Auth::guard('sanctum')->user();
+        $check = PhanQuyen::where('id_chuc_vu', $user->id_chuc_vu)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$user->is_super && !$check) {
+            return response()->json([
+                'status' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này"
+            ], 403);
+        }
+
+        $khachHang = KhachHang::find($request->id);
+        if (!$khachHang) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Không tìm thấy khách hàng'
+            ], 404);
+        }
+
+        $khachHang->update([
+            'is_active' => $request->is_active
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cập nhật trạng thái thành công',
+            'data' => $khachHang
+        ]);
     }
 
     //MoiGioi xem thông tin chi tiết khách hàng
@@ -467,5 +504,124 @@ class KhachHangController extends Controller
             'status'  => 1,
             'message' => 'Đặt lại mật khẩu thành công!',
         ]);
+    }
+
+    // ============================================================
+    // EXPORT KHÁCH HÀNG (CSV / Excel / PDF)
+    // ============================================================
+    public function exportKhachHang(Request $request)
+    {
+        $format = $request->input('format', 'csv');
+        $filename = "khach_hang_" . now()->format('Ymd_His');
+
+        $query = KhachHang::query();
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('ten', 'like', "%{$request->search}%")
+                  ->orWhere('email', 'like', "%{$request->search}%")
+                  ->orWhere('so_dien_thoai', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', 1);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', 0);
+            }
+        }
+
+        return match ($format) {
+            'excel' => $this->exportExcel($query, $filename),
+            'pdf'   => $this->exportPdf($query, $filename),
+            default => $this->exportCsv($query, $filename)
+        };
+    }
+
+    private function exportCsv($query, $filename)
+    {
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}.csv\"",
+        ];
+
+        return response()->stream(function () use ($query) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($file, ['ID', 'Họ tên', 'Email', 'SĐT', 'Trạng thái', 'Ngày đăng ký'], ';');
+
+            $query->chunk(500, function ($items) use ($file) {
+                foreach ($items as $item) {
+                    fputcsv($file, [
+                        $item->id,
+                        $item->ten,
+                        $item->email,
+                        $item->so_dien_thoai,
+                        $item->is_active ? 'Đang hoạt động' : 'Bị khóa',
+                        $item->created_at->format('d/m/Y H:i'),
+                    ], ';');
+                }
+            });
+            fclose($file);
+        }, 200, $headers);
+    }
+
+    private function exportExcel($query, $filename)
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headers = ['ID', 'Họ tên', 'Email', 'SĐT', 'Trạng thái', 'Ngày đăng ký'];
+        $sheet->fromArray([$headers], null, 'A1');
+        $sheet->getStyle('A1:F1')->getFont()->setBold(true);
+
+        $row = 2;
+        $query->chunk(500, function ($items) use ($sheet, &$row) {
+            foreach ($items as $item) {
+                $sheet->fromArray([
+                    $item->id,
+                    $item->ten,
+                    $item->email,
+                    $item->so_dien_thoai,
+                    $item->is_active ? 'Đang hoạt động' : 'Bị khóa',
+                    $item->created_at->format('d/m/Y H:i'),
+                ], null, 'A' . $row);
+                $row++;
+            }
+        });
+
+        foreach (range('A', 'F') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        return response()->stream(fn() => $writer->save('php://output'), 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => "attachment; filename=\"{$filename}.xlsx\"",
+        ]);
+    }
+
+    private function exportPdf($query, $filename)
+    {
+        $data = $query->limit(1000)->get()->map(fn($item) => [
+            'id'     => $item->id,
+            'ten'    => $item->ten,
+            'email'  => $item->email,
+            'sdt'    => $item->so_dien_thoai,
+            'trang_thai' => $item->is_active ? 'Đang hoạt động' : 'Bị khóa',
+            'ngay'   => $item->created_at->format('d/m/Y H:i'),
+        ]);
+
+        $html = view('khach_hang_pdf', [
+            'data' => $data,
+            'date' => now()->format('d/m/Y H:i'),
+        ])->render();
+
+        $pdf = PDF::loadHTML($html)->setPaper('a4', 'landscape');
+
+        return response($pdf->output())
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "attachment; filename=\"{$filename}.pdf\"; filename*=UTF-8''{$filename}.pdf");
     }
 }

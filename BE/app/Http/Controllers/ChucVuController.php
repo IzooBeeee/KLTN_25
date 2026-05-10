@@ -46,9 +46,22 @@ class ChucVuController extends Controller
                 'message' => "bạn không có quyền thực hiện chức năng này!"
             ]);
         }
+        // Validate email unique
+        if ($request->filled('email')) {
+            $existing = ChucVu::where('email', $request->email)->first();
+            if ($existing) {
+                return response()->json([
+                    'data' => false,
+                    'message' => 'Email đã được sử dụng bởi chức vụ khác!'
+                ]);
+            }
+        }
+
         $data = ChucVu::create([
             'ten_chuc_vu' => $request->ten_chuc_vu,
             'tinh_trang' => $request->tinh_trang ?? 1,
+            'email' => $request->email ?? null,
+            'password' => $request->filled('password') ? bcrypt($request->password) : null,
         ]);
         return response()->json([
             'status' => true,
@@ -69,11 +82,30 @@ class ChucVuController extends Controller
                 'message' => "bạn không có quyền thực hiện chức năng này!"
             ]);
         }
-        $data = ChucVu::where('id', $request->id)
-            ->update([
-                'ten_chuc_vu' => $request->ten_chuc_vu,
-                'tinh_trang' => $request->tinh_trang,
-            ]);
+        // Validate email unique (exclude current record)
+        if ($request->filled('email')) {
+            $existing = ChucVu::where('email', $request->email)->where('id', '!=', $request->id)->first();
+            if ($existing) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Email đã được sử dụng bởi chức vụ khác!'
+                ]);
+            }
+        }
+
+        $updateData = [
+            'ten_chuc_vu' => $request->ten_chuc_vu,
+            'tinh_trang' => $request->tinh_trang,
+            'email' => $request->email ?? null,
+        ];
+
+        // Only update password if provided
+        if ($request->filled('password')) {
+            $updateData['password'] = bcrypt($request->password);
+        }
+
+        ChucVu::where('id', $request->id)->update($updateData);
+
         return response()->json([
             'status' => true,
             'message' => 'Cập nhật chức vụ ' . $request->ten_chuc_vu . ' thành công',

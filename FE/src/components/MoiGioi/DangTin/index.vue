@@ -27,6 +27,9 @@
             <div class="progress-mini">
               <div class="progress-bar-mini" :style="{ width: (soTinConLai / 10 * 100) + '%' }"></div>
             </div>
+            <div v-if="ngayHetHanGoi" class="credit-expiry mt-2">
+              <i class="fas fa-clock me-1"></i> Hết hạn: {{ formatDate(ngayHetHanGoi) }}
+            </div>
             <p class="credit-hint">Nâng cấp để nhận thêm nhiều ưu đãi và lượt đăng tin VIP.</p>
           </div>
         </div>
@@ -387,7 +390,7 @@
                 </div>
                 <div class="p-stat">
                   <span class="p-label">Ngày hết hạn</span>
-                  <span class="p-value">{{ formatDate(form.ngay_het_han_goi) || '30/12/2026' }}</span>
+                  <span class="p-value">{{ formatDate(ngayHetHanGoi) || 'Chưa có' }}</span>
                 </div>
                 <div class="p-stat">
                   <span class="p-label">Chi phí đăng tin</span>
@@ -559,6 +562,7 @@ const currentWardFeature = ref(null);
 
 // ✅ THÊM: Số tin còn lại
 const soTinConLai = ref(0);
+const ngayHetHanGoi = ref(null);
 const dangTaiDuLieu = ref(false);
 
 const steps = [
@@ -1288,6 +1292,7 @@ const loadSoTinConLai = async () => {
     const res = await api.get("/moi-gioi/profile");
     if (res.data?.status && res.data?.data) {
       soTinConLai.value = res.data.data.so_tin_con_lai || 0;
+      ngayHetHanGoi.value = res.data.data.ngay_het_han_goi || null;
     }
   } catch (error) {
     console.error("Error loading remaining posts:", error);
@@ -2554,6 +2559,16 @@ select.form-select {
   color: #94a3b8;
   margin: 0;
   line-height: 1.4;
+}
+
+.credit-expiry {
+  font-size: 0.75rem;
+  color: #ef4444;
+  font-weight: 600;
+  background: #fef2f2;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-align: center;
 }
 
 .guide-list {

@@ -154,10 +154,15 @@ class LichSuGoiTinController extends Controller
             ];
         });
 
-        // Stats
+        // Stats - tính active theo expiry chứ không phải trạng thái giao dịch
+        $activeCount = $giaoDichs->filter(function ($gd) {
+            $ngayHetHan = $gd->paid_at ? Carbon::parse($gd->paid_at)->addDays($gd->so_ngay) : null;
+            return $ngayHetHan && $ngayHetHan->isFuture();
+        })->count();
+
         $stats = [
             'tong_don' => $giaoDichs->count(),
-            'don_dang_hoat_dong' => $giaoDichs->where('trang_thai', 'active')->count(),
+            'don_dang_hoat_dong' => $activeCount,
             'don_pending' => $giaoDichs->where('trang_thai', 'pending')->count(),
             'tong_tien' => $giaoDichs->where('trang_thai', 'success')->sum('so_tien'),
         ];

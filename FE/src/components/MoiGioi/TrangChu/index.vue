@@ -40,6 +40,7 @@
           </div>
         </div>
         <p class="text-xs text-gray-400">Sẵn sàng đăng tin</p>
+        <p v-if="stats.ngayHetHanGoi" class="text-xs text-red-500 font-semibold mt-1">Hết hạn: {{ stats.ngayHetHanGoi }}</p>
         <div class="absolute -bottom-3 -right-3 w-20 h-20 bg-green-50 rounded-full opacity-50"></div>
       </div>
 
@@ -190,6 +191,7 @@ export default {
         totalFavorites: 0,
         totalPaid: 0,
         transactionCount: 0,
+        ngayHetHanGoi: null,
       },
       chartPeriod: "week",
       customers: [],
@@ -279,21 +281,16 @@ export default {
     async fetchAllStats() {
       this.loading.stats = true;
       try {
-        const token = localStorage.getItem("moi_gioi_auth_token");
-        const [postedRes, remainingRes, favoritesRes, paymentRes] =
-          await Promise.all([
-            api.get("/moi-gioi/thong-ke/tong-tin-da-dang"),
-            api.get("/moi-gioi/thong-ke/tin-con-lai"),
-            api.get("/moi-gioi/thong-ke/tong-yeu-thich"),
-            api.get("/moi-gioi/thong-ke/tong-tien"),
-          ]);
-
-        this.stats.totalPosted = postedRes.data.data || 0;
-        this.stats.remainingPosts = remainingRes.data.data || 0;
-        this.stats.totalFavorites = favoritesRes.data.data || 0;
-        this.stats.totalPaid = paymentRes.data.data || 0;
-        this.stats.transactionCount =
-          Math.floor(this.stats.totalPaid / 200000000) || 12;
+        const res = await api.get("/moi-gioi/thong-ke/dashboard-stats");
+        if (res.data?.status && res.data?.data) {
+          const d = res.data.data;
+          this.stats.totalPosted = d.tongTinDaDang || 0;
+          this.stats.remainingPosts = d.soTinConLai || 0;
+          this.stats.ngayHetHanGoi = d.ngayHetHanGoi || null;
+          this.stats.totalFavorites = d.tongYeuThich || 0;
+          this.stats.totalPaid = d.tongTien || 0;
+          this.stats.transactionCount = Math.floor((d.tongTien || 0) / 200000000) || 12;
+        }
       } catch (error) {
         console.error("Lỗi khi lấy thống kê:", error);
         this.showError("Không thể tải dữ liệu thống kê");

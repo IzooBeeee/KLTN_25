@@ -33,9 +33,14 @@
                   v-model="packageFilter"
                   class="form-select custom-input text-muted rounded-pill"
                 >
-                  <option value="">Tất cả các gói</option>
-                  <option value="VIP">Gói VIP</option>
-                  <option value="Cơ bản">Gói Cơ bản</option>
+                <option value="">Tất cả các gói</option>
+                <option
+                  v-for="pkg in availablePackages"
+                  :key="pkg.ten_goi"
+                  :value="pkg.ten_goi"
+                >
+                  {{ pkg.ten_goi }} - {{ formatCurrency(pkg.gia) }}
+                </option>
                 </select>
               </div>
 
@@ -642,6 +647,7 @@ export default {
 
       currentPage: 1,
       itemsPerPage: 5,
+      availablePackages: [],
 
     };
   },
@@ -705,9 +711,9 @@ export default {
         data = data.filter((v) => v.is_active === false || v.is_active === 0);
       }
 
-      // Filter package
+      // Filter package - so sánh với ten_goi (không dùng trường goi)
       if (this.packageFilter) {
-        data = data.filter((v) => v.goi === this.packageFilter);
+        data = data.filter((v) => v.ten_goi === this.packageFilter);
       }
 
       return data;
@@ -774,6 +780,14 @@ export default {
         return `https://ui-avatars.com/api/?name=?&background=F4F7FE&color=11047A`;
       return `https://ui-avatars.com/api/?name=${name}&background=F4F7FE&color=11047A`;
     },
+    formatCurrency(value) {
+      if (value === null || value === undefined) return "0 đ";
+      return new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+        maximumFractionDigits: 0,
+      }).format(value);
+    },
 
     openAdd() {
       this.showAdd = true;
@@ -819,6 +833,11 @@ export default {
       this.isLoading = true;
       try {
         const res = await api.get("/admin/moi-gioi/data");
+        const pkgRes = await api.get("/goi-tin/data");
+
+        if (pkgRes.data?.status) {
+          this.availablePackages = pkgRes.data.data || [];
+        }
 
         if (res.data?.status) {
           this.moiGioiList = res.data.data.map((v) => ({
@@ -826,7 +845,7 @@ export default {
             ten_goi: v.ten_goi || "Chưa mua",
             so_tin: v.so_tin_con_lai || 0,
             is_active: v.is_active,
-            goi: v.ngay_het_han_goi ? "VIP" : "Cơ bản",
+            goi: v.ten_goi || "",
           }));
         } else {
           this.moiGioiList = [];

@@ -249,6 +249,32 @@
               />
             </div>
 
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-uppercase text-muted"
+                >Email (đăng nhập)</label
+              >
+              <input
+                v-model="chuc_vu.email"
+                type="email"
+                class="form-control form-control-lg border-2 shadow-none bg-light"
+                placeholder="admin@email.com"
+                style="font-size: 1rem; border-radius: 12px"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-uppercase text-muted"
+                >Mật khẩu (đăng nhập)</label
+              >
+              <input
+                v-model="chuc_vu.password"
+                type="password"
+                class="form-control form-control-lg border-2 shadow-none bg-light"
+                placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                style="font-size: 1rem; border-radius: 12px"
+              />
+            </div>
+
             <div>
               <label class="form-label fw-bold small text-uppercase text-muted"
                 >Tình trạng</label
@@ -316,6 +342,32 @@
                 v-model="edit.ten_chuc_vu"
                 type="text"
                 class="form-control form-control-lg border-2 shadow-none bg-light"
+                style="font-size: 1rem; border-radius: 12px"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-uppercase text-muted"
+                >Email (đăng nhập)</label
+              >
+              <input
+                v-model="edit.email"
+                type="email"
+                class="form-control form-control-lg border-2 shadow-none bg-light"
+                placeholder="admin@email.com"
+                style="font-size: 1rem; border-radius: 12px"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-uppercase text-muted"
+                >Mật khẩu mới (để trống nếu không đổi)</label
+              >
+              <input
+                v-model="edit.password"
+                type="password"
+                class="form-control form-control-lg border-2 shadow-none bg-light"
+                placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
                 style="font-size: 1rem; border-radius: 12px"
               />
             </div>
@@ -524,6 +576,8 @@ export default {
       chuc_vu: {
         ten_chuc_vu: "",
         tinh_trang: 1,
+        email: "",
+        password: "",
       },
       edit: {},
       delete: {},
@@ -565,16 +619,11 @@ export default {
         return;
       }
 
-      // ✅ Debug: xem giá trị trước khi gửi
-      console.log("Data gửi đi:", {
-        ten_chuc_vu: this.chuc_vu.ten_chuc_vu.trim(),
-        tinh_trang: this.chuc_vu.tinh_trang,
-        type: typeof this.chuc_vu.tinh_trang,
-      });
-
       const payload = {
         ten_chuc_vu: this.chuc_vu.ten_chuc_vu.trim(),
-        tinh_trang: Number(this.chuc_vu.tinh_trang), // ✅ Convert sang number
+        tinh_trang: Number(this.chuc_vu.tinh_trang),
+        email: this.chuc_vu.email?.trim() || null,
+        password: this.chuc_vu.password || null,
       };
 
       api
@@ -588,6 +637,8 @@ export default {
             this.chuc_vu = {
               ten_chuc_vu: "",
               tinh_trang: 1,
+              email: "",
+              password: "",
             };
             const modalEl = document.getElementById("createModal");
             if (modalEl) {
@@ -622,17 +673,12 @@ export default {
         return;
       }
 
-      console.log("Update data:", {
-        id: this.edit.id,
-        ten_chuc_vu: this.edit.ten_chuc_vu.trim(),
-        tinh_trang: this.edit.tinh_trang,
-        type: typeof this.edit.tinh_trang,
-      });
-
       const payload = {
         id: this.edit.id,
         ten_chuc_vu: this.edit.ten_chuc_vu.trim(),
-        tinh_trang: Number(this.edit.tinh_trang), // Convert sang number
+        tinh_trang: Number(this.edit.tinh_trang),
+        email: this.edit.email?.trim() || null,
+        password: this.edit.password || null,
       };
 
       api
@@ -779,6 +825,11 @@ export default {
         return;
       }
 
+      if (this.quyen_dang_chon.tinh_trang === 0) {
+        this.$toast.error("Chức vụ đã nghỉ làm, không thể cấp thêm quyền!");
+        return;
+      }
+
       //  Kiểm tra xem chức năng này đã được cấp chưa
       const daTonTai = this.list_chi_tiet.some(
         (item) => item.id_chuc_nang == chuc_nang.id
@@ -840,6 +891,12 @@ export default {
 
     // Xóa quyền
     xoaQuyen(payload) {
+      const chucVu = this.quyen_dang_chon;
+      if (chucVu.tinh_trang === 0) {
+        this.$toast.error("Chức vụ đã nghỉ làm, không thể gỡ quyền!");
+        return;
+      }
+
       api
         .delete("/admin/phan-quyen/chuc-vu/delete", { data: { id_chuc_vu: payload.id_chuc_vu, id_chuc_nang: payload.id_chuc_nang } })
         .then((res) => {

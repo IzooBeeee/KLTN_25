@@ -12,6 +12,55 @@ use Illuminate\Support\Facades\DB;
 
 class ThongKeMoGioiController extends Controller
 {
+    public function dashboardStats()
+    {
+        try {
+            $user = auth('sanctum')->user();
+
+            // 1. Tổng tin đã đăng (đã duyệt + chưa hết hạn)
+            $tongTinDaDang = $user->batDongSans()
+                ->where('is_duyet', true)
+                ->where(function ($q) {
+                    $q->whereNull('expires_at')
+                        ->orWhere('expires_at', '>', now());
+                })
+                ->count();
+
+            // 2. Số tin còn lại + ngày hết hạn
+            $ngayHetHan = $user->ngay_het_han_goi
+                ? $user->ngay_het_han_goi->format('d/m/Y')
+                : null;
+
+            // 3. Tổng lượt yêu thích
+            $tongYeuThich = YeuThich::whereHas('batDongSan', function ($q) use ($user) {
+                    $q->where('moi_gioi_id', $user->id);
+                })
+                ->distinct('khach_hang_id')
+                ->count('khach_hang_id');
+
+            // 4. Tổng số giao dịch
+            $tongTien = GiaoDich::where('moi_gioi_id', $user->id)
+                ->where('trang_thai', 'success')
+                ->sum('so_tien');
+
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'tongTinDaDang' => $tongTinDaDang,
+                    'soTinConLai' => $user->so_tin_con_lai ?? 0,
+                    'ngayHetHanGoi' => $ngayHetHan,
+                    'tongYeuThich' => $tongYeuThich,
+                    'tongTien' => $tongTien,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function tongTinDaDang()
     {
         try {
@@ -44,10 +93,15 @@ class ThongKeMoGioiController extends Controller
         try {
             $user = auth('sanctum')->user();
 
+            $ngayHetHan = $user->ngay_het_han_goi
+                ? $user->ngay_het_han_goi->format('d/m/Y')
+                : null;
+
             return response()->json([
                 'status' => true,
                 'message' => 'Thành công',
-                'data' => $user->so_tin_con_lai ?? 0
+                'data' => $user->so_tin_con_lai ?? 0,
+                'ngay_het_han_goi' => $ngayHetHan,
             ]);
         } catch (\Exception $e) {
             return response()->json([

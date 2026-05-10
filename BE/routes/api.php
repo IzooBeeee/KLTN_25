@@ -49,7 +49,6 @@ Route::prefix('admin')->group(function () {
     Route::post('/quen-mat-khau/gui-ma', [AdminController::class, 'guiMaQuenMatKhau']);
     Route::post('/quen-mat-khau/dat-lai', [AdminController::class, 'datLaiMatKhau']);
     Route::get('/giao-dich/export', [GiaoDichController::class, 'exportGiaoDich']);
-    Route::get('/khach-hang/export', [KhachHangController::class, 'exportKhachHang']);
     Route::get('/moi-gioi/export', [MoiGioiController::class, 'exportMoiGioi']);
     Route::get('/moi-gioi/export/{id}', [MoiGioiController::class, 'exportChiTietMoiGioi']);
 });
@@ -276,6 +275,7 @@ Route::prefix('moi-gioi')->middleware('MoiGioiMiddleware')->group(function () {
 
     Route::prefix('thong-ke')->group(function () {
         Route::get('/dashboard', [ThongKeMoGioiController::class, 'getDashboard']);
+        Route::get('/dashboard-stats', [ThongKeMoGioiController::class, 'dashboardStats']); // ✅ Tổng hợp 1 API thay 4
         Route::get('/tong-tin-da-dang', [ThongKeMoGioiController::class, 'tongTinDaDang']);
         Route::get('/tin-con-lai', [ThongKeMoGioiController::class, 'tinConLai']);
         Route::get('/tong-yeu-thich', [ThongKeMoGioiController::class, 'tongYeuThich']);

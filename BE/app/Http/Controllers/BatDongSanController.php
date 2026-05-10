@@ -34,7 +34,8 @@ class BatDongSanController extends Controller
     {
         $query = BatDongSan::with([
             'loai', 'moiGioi', 'diaChi.tinh', 'diaChi.quan', 'hinhAnh'
-        ]);
+        ])
+            ->where('status', '!=', 'draft'); // Ẩn bài nháp với admin
 
         if ($request->filled('trang_thai')) {
             $query->where('trang_thai_id', $request->trang_thai);
@@ -55,10 +56,10 @@ class BatDongSanController extends Controller
             ->paginate(10);
 
         $stats = [
-            'total'    => BatDongSan::count(),
-            'pending'  => BatDongSan::where('trang_thai_id', 1)->count(),
-            'approved' => BatDongSan::where('trang_thai_id', 2)->count(),
-            'featured' => BatDongSan::where('is_noi_bat', true)->count(),
+            'total'    => BatDongSan::where('status', '!=', 'draft')->count(),
+            'pending'  => BatDongSan::where('status', '!=', 'draft')->where('trang_thai_id', 1)->count(),
+            'approved' => BatDongSan::where('status', '!=', 'draft')->where('trang_thai_id', 2)->count(),
+            'featured' => BatDongSan::where('status', '!=', 'draft')->where('is_noi_bat', true)->count(),
         ];
 
         return response()->json([
@@ -306,8 +307,9 @@ class BatDongSanController extends Controller
             'stats' => [
                 'total'     => (clone $baseQuery)->count(),
                 'approved'  => (clone $baseQuery)->where('is_duyet', 1)->count(),
-                'pending'   => (clone $baseQuery)->where('is_duyet', 0)->count(),
+                'pending'   => (clone $baseQuery)->where('is_duyet', 0)->where('status', '!=', 'draft')->count(),
                 'rejected'  => (clone $baseQuery)->where('is_duyet', 2)->count(),
+                'draft'     => (clone $baseQuery)->where('status', 'draft')->count(),
             ]
         ]);
     }

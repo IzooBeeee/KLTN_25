@@ -185,7 +185,7 @@
                   </span>
                 </td>
                 <td>
-                  <button style="width: 150px" @click="changeStatus(v, !v.is_active)"
+                  <button style="width: 150px" @click="toggleStatus(v)"
                     :class="v.is_active ? 'badge-active' : 'badge-inactive'"
                     class="badge px-3 py-2 rounded-pill small fw-bold border-0">
                     {{ v.is_active ? "Đang hoạt động" : "Bị khóa" }}
@@ -577,24 +577,57 @@ export default {
         status: this.statusFilter || "",
       });
 
-      // URL phải khớp với route backend: /api/admin/khach-hang/export
       const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
       const exportUrl = `${apiBase}/admin/khach-hang/export?${params}`;
-      console.log("📤 Export URL:", exportUrl); // Debug
 
-      window.open(exportUrl, "_blank");
+      fetch(exportUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': format === 'csv' ? 'text/csv' : format === 'excel'
+            ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            : 'application/pdf',
+        },
+      })
+        .then(response => {
+          if (!response.ok) throw new Error('Export failed');
+          return response.blob();
+        })
+        .then(blob => {
+          const contentDisposition = decodeURIComponent(
+            new URL(exportUrl).searchParams.toString()
+          );
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `khach_hang_${format}_${Date.now()}.${format === 'excel' ? 'xlsx' : format}`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+          this.showToast(`Tải file ${format.toUpperCase()} thành công!`, "success");
+        })
+        .catch(() => {
+          this.showToast("Tải file thất bại", "error");
+        });
+
       this.showExportMenu = false;
-      this.showToast(`Đang tải file ${format.toUpperCase()}...`, "success");
+    },
+
+    async toggleStatus(customer) {
+      const newStatus = !(customer.is_active === true || customer.is_active === 1);
+      await this.changeStatus(customer, newStatus);
     },
 
     async changeStatus(customer, newStatus) {
       try {
         const token = this.getToken();
         if (!token) return;
-        const res = await api.post('/admin/khach-hang/change-status', { id: customer.id, is_active: newStatus ? 1 : 0 });
+        const res = await api.post('/admin/khach-hang/change-status', { id: customer.id, is_active: newStatus });
         if (res.data?.status) {
           customer.is_active = newStatus;
           this.showToast(newStatus ? "Đã kích hoạt" : "Đã khóa", "success");
+          this.loadKhachHang();
         }
       } catch (err) {
         this.handleError(err, "Cập nhật trạng thái thất bại");

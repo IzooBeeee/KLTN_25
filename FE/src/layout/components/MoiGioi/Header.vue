@@ -395,6 +395,7 @@ export default {
     // ✅ Lắng nghe auth thay đổi trong cùng tab
     window.addEventListener("moi-gioi-auth-changed", this.checkLogin);
     window.addEventListener("moi-gioi-posts-updated", this.fetchRemainingPosts);
+    window.addEventListener("notifications-updated", this.handleNotificationsUpdated);
     this.$router.afterEach(() => {
       this.showMenu = false;
       this.showNotifications = false;
@@ -406,6 +407,7 @@ export default {
     window.removeEventListener("storage", this._onStorageChange);
     window.removeEventListener("moi-gioi-auth-changed", this.checkLogin);
     window.removeEventListener("moi-gioi-posts-updated", this.fetchRemainingPosts);
+    window.removeEventListener("notifications-updated", this.handleNotificationsUpdated);
     if (this.menuTimer) clearTimeout(this.menuTimer);
     if (this.pollingInterval) clearInterval(this.pollingInterval);
     // ✅ Leave Echo channel khi unmount
@@ -729,6 +731,17 @@ export default {
         await api.post(`/moi-gioi/thong-bao/${id}/da-doc`);
       } catch (error) {
         console.error(error);
+      }
+    },
+    handleNotificationsUpdated(event) {
+      const { unreadCount, action } = event.detail || {};
+      if (action === "markAllRead") {
+        this.unreadCount = 0;
+        this.previousUnreadCount = 0;
+        this.notifications.forEach((n) => (n.da_doc = true));
+      } else if (typeof unreadCount === "number") {
+        this.unreadCount = unreadCount;
+        this.previousUnreadCount = unreadCount;
       }
     },
     async markAllAsRead() {

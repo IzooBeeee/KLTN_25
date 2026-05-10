@@ -46,6 +46,7 @@
                 <th>Họ tên</th>
                 <th>Số điện thoại</th>
                 <th>Email</th>
+                <th>Trạng thái</th>
                 <th>Ngày tạo</th>
             </tr>
         </thead>
@@ -56,7 +57,8 @@
                 <td>{{ $row['ten'] }}</td>
                 <td>{{ $row['sdt'] }}</td>
                 <td>{{ $row['email'] }}</td>
-                <td>{{ $row['ngay_tao'] }}</td>
+                <td>{{ $row['trang_thai'] }}</td>
+                <td>{{ $row['ngay'] }}</td>
             </tr>
             @endforeach
         </tbody>

@@ -273,7 +273,7 @@
                 </div>
                 <div class="bg-gray-50 rounded-2xl p-4 text-center">
                   <p class="text-xs text-gray-400 mb-1">Đang active</p>
-                  <div class="text-2xl font-black text-green-600">{{ chiTietData.thong_ke.don_dang_hoat_dong }}</div>
+                  <div class="text-2xl font-black text-green-600">{{ chiTietData.thong_ke?.so_goi_dang_hoat_dong ?? 0 }} gói</div>
                 </div>
                 <div class="bg-gray-50 rounded-2xl p-4 text-center">
                   <p class="text-xs text-gray-400 mb-1">Tổng tiền</p>
@@ -382,7 +382,6 @@ export default {
   },
 
   computed: {
-    // Generate visible page numbers for pagination
     visiblePages() {
       const pages = [];
       const maxVisible = 5;
@@ -482,16 +481,6 @@ export default {
       if (!dateStr) return "-";
       const date = new Date(dateStr);
       return date.toLocaleString("vi-VN");
-    },
-
-    // Watch tab change
-    watch: {
-      activeTab(newTab) {
-        if (newTab === "unmatched") {
-          this.loadUnmatchedPayments();
-          this.loadPendingTransactions();
-        }
-      },
     },
 
     closeModal() {
@@ -717,6 +706,12 @@ export default {
   watch: {
     moiGioiId(newVal) {
       console.log("🆔 moiGioiId changed to:", newVal);
+    },
+    activeTab(newTab) {
+      if (newTab === "unmatched") {
+        this.loadUnmatchedPayments();
+        this.loadPendingTransactions();
+      }
     },
   },
 };

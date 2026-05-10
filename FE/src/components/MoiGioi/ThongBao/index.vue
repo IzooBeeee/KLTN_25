@@ -151,6 +151,10 @@ const markRead = async (item) => {
   try {
     await api.post(`/moi-gioi/thong-bao/${item.id}/da-doc`);
     item.is_read = true;
+    // Cập nhật badge ở Header
+    window.dispatchEvent(new CustomEvent("notifications-updated", {
+      detail: { unreadCount: unreadCount.value, action: "markRead" }
+    }));
   } catch {}
 };
 
@@ -158,13 +162,24 @@ const markAllRead = async () => {
   try {
     await api.post("/moi-gioi/thong-bao/doc-tat-ca");
     list.value.forEach((n) => (n.is_read = true));
+    // Cập nhật badge ở Header
+    window.dispatchEvent(new CustomEvent("notifications-updated", {
+      detail: { unreadCount: 0, action: "markAllRead" }
+    }));
   } catch {}
 };
 
 const deleteNotif = async (item) => {
   try {
     await api.delete(`/moi-gioi/thong-bao/${item.id}`);
+    const wasUnread = !item.is_read;
     list.value = list.value.filter((n) => n.id !== item.id);
+    // Cập nhật badge ở Header
+    if (wasUnread) {
+      window.dispatchEvent(new CustomEvent("notifications-updated", {
+        detail: { unreadCount: unreadCount.value, action: "delete" }
+      }));
+    }
   } catch {}
 };
 

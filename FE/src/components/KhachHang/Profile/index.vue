@@ -237,15 +237,33 @@ const changePassword = async () => {
     Swal.fire("Lưu ý", "Vui lòng điền đầy đủ thông tin mật khẩu", "warning");
     return;
   }
+  if (password.password !== password.password_confirmation) {
+    Swal.fire("Lỗi", "Mật khẩu xác nhận không khớp", "error");
+    return;
+  }
+  if (password.password.length < 6) {
+    Swal.fire("Lỗi", "Mật khẩu mới phải có ít nhất 6 ký tự", "error");
+    return;
+  }
+  if (password.old_password === password.password) {
+    Swal.fire("Lỗi", "Mật khẩu mới phải khác mật khẩu hiện tại", "error");
+    return;
+  }
   changingPwd.value = true;
   try {
     const res = await api.post("/khach-hang/update-password", password);
-    Swal.fire("Thành công", res.data.message || "Đã đổi mật khẩu", "success");
-    password.old_password = "";
-    password.password = "";
-    password.password_confirmation = "";
+    if (res.data?.status) {
+      Swal.fire("Thành công", res.data.message || "Đã đổi mật khẩu", "success");
+      password.old_password = "";
+      password.password = "";
+      password.password_confirmation = "";
+    } else {
+      Swal.fire("Lỗi", res.data?.message || "Đổi mật khẩu thất bại", "error");
+    }
   } catch (e) {
-    Swal.fire("Lỗi", e.response?.data?.message || "Đổi mật khẩu thất bại", "error");
+    const msg = e.response?.data?.message
+      || (e.response?.data?.errors ? Object.values(e.response.data.errors).flat().join("\n") : "Đổi mật khẩu thất bại");
+    Swal.fire("Lỗi", msg, "error");
   } finally {
     changingPwd.value = false;
   }

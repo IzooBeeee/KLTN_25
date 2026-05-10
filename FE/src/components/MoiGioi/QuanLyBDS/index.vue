@@ -21,12 +21,12 @@
     </header>
 
     <div class="row g-3 mb-4">
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-md-2">
         <div class="card h-100 border-0 shadow-sm rounded-4 border-bottom border-primary"
           style="border-width: 0 0 4px 0 !important">
           <div class="card-body p-4">
             <p class="text-uppercase text-muted fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px">
-              Tổng Bất Động Sản
+              Tổng BĐS
             </p>
             <h2 class="text-primary fw-black mb-0 display-6 fw-bold">
               {{ stats?.total || 0 }}
@@ -34,7 +34,7 @@
           </div>
         </div>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-md-2">
         <div class="card h-100 border-0 shadow-sm rounded-4 border-bottom border-success"
           style="border-width: 0 0 4px 0 !important">
           <div class="card-body p-4">
@@ -47,7 +47,7 @@
           </div>
         </div>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-md-2">
         <div class="card h-100 border-0 shadow-sm rounded-4 border-bottom border-warning"
           style="border-width: 0 0 4px 0 !important">
           <div class="card-body p-4">
@@ -60,15 +60,28 @@
           </div>
         </div>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-md-2">
         <div class="card h-100 border-0 shadow-sm rounded-4 border-bottom border-secondary"
+          style="border-width: 0 0 4px 0 !important">
+          <div class="card-body p-4">
+            <p class="text-uppercase text-muted fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px">
+              Nháp
+            </p>
+            <h2 class="text-secondary fw-black mb-0 display-6 fw-bold">
+              {{ stats?.draft || 0 }}
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="card h-100 border-0 shadow-sm rounded-4 border-bottom border-dark"
           style="border-width: 0 0 4px 0 !important">
           <div class="card-body p-4">
             <p class="text-uppercase text-muted fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px">
               Từ Chối / Đã Bán
             </p>
             <h2 class="text-secondary fw-black mb-0 display-6 fw-bold">
-              {{ stats?.rejected || stats?.sold || 0 }}
+              {{ stats?.rejected || 0 }}
             </h2>
           </div>
         </div>
@@ -206,8 +219,10 @@
               Đã bán
             </button>
             <button @click="handleEdit(item)"
-              class="btn btn-light border text-primary rounded-3 btn-sm d-flex align-items-center justify-content-center"
-              style="width: 40px; height: 40px" title="Cập nhật">
+              class="btn btn-light border rounded-3 btn-sm d-flex align-items-center justify-content-center"
+              :class="item.status === 'Nháp' ? 'text-secondary' : 'text-primary'"
+              :style="item.status === 'Nháp' ? 'width: 40px; height: 40px; cursor: not-allowed; opacity: 0.5;' : 'width: 40px; height: 40px'"
+              :title="item.status === 'Nháp' ? 'Không thể chỉnh sửa bài nháp' : 'Cập nhật'">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -346,13 +361,21 @@
             <!-- Hình ảnh -->
             <div class="col-12 mt-4"><h6 class="fw-bold text-primary border-bottom pb-2">3. Hình ảnh</h6></div>
             <div class="col-12">
+              <p class="text-muted small mb-2">Click "Đặt bìa" để chọn ảnh đại diện cho tin đăng. Chỉ áp dụng với ảnh đã lưu trên server.</p>
               <div class="d-flex flex-wrap gap-2 mb-3">
-                <div v-for="(img, idx) in imagePreviewUrls" :key="idx" class="position-relative" style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid #ddd;">
-                  <img :src="img" class="w-100 h-100" style="object-fit: cover" />
-                  <button @click="removeImage(idx)" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 p-0" style="width: 20px; height: 20px; line-height: 1;">&times;</button>
+                <div v-for="(img, idx) in oldImages" :key="'old-' + img.id" class="position-relative" style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden;" :style="representativeIdx === idx ? 'border: 2px solid #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,0.25);' : 'border: 1px solid #ddd;'">
+                  <img :src="getImageUrl(img.url)" class="w-100 h-100" style="object-fit: cover;" />
+                  <button @click="removeImage(idx)" class="btn btn-sm btn-danger position-absolute d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; top: 2px; right: 2px; border-radius: 50%; font-size: 12px; line-height: 1;">&times;</button>
+                  <span v-if="representativeIdx === idx" class="badge bg-primary position-absolute bottom-0 start-0 w-100 text-center" style="font-size: 0.6rem; padding: 2px 4px; border-radius: 0 0 6px 6px; opacity: 0.9;">Ảnh bìa</span>
+                  <span v-else class="badge bg-secondary position-absolute bottom-0 start-0 w-100 text-center" style="font-size: 0.6rem; padding: 2px 4px; border-radius: 0 0 6px 6px; opacity: 0.8; cursor: pointer;" @click="representativeIdx = idx">Đặt bìa</span>
                 </div>
-                <div class="position-relative" style="width: 100px; height: 100px; border-radius: 8px; border: 2px dashed #0d6efd; display: flex; align-items: center; justify-content: center; cursor: pointer;" @click="$refs.fileInput.click()">
-                  <span class="fs-3 text-primary">+</span>
+                <div v-for="(url, idx) in imagePreviewUrls.slice(oldImages.length)" :key="'new-' + idx" class="position-relative" style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid #28a745;">
+                  <img :src="url" class="w-100 h-100" style="object-fit: cover;" />
+                  <button @click="removeImage(oldImages.length + idx)" class="btn btn-sm btn-danger position-absolute d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; top: 2px; right: 2px; border-radius: 50%; font-size: 12px; line-height: 1;">&times;</button>
+                  <span class="badge bg-success position-absolute bottom-0 start-0 w-100 text-center" style="font-size: 0.6rem; padding: 2px 4px; border-radius: 0 0 6px 6px; opacity: 0.9;">Mới</span>
+                </div>
+                <div class="position-relative d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; border-radius: 8px; border: 2px dashed #0d6efd; cursor: pointer;" @click="$refs.fileInput.click()">
+                  <span class="fs-4 text-primary fw-bold">+</span>
                 </div>
                 <input ref="fileInput" type="file" multiple accept="image/*" class="d-none" @change="handleFileSelect" />
               </div>
@@ -466,6 +489,7 @@ const oldImages = ref([]);
 const newImages = ref([]);
 const deletedImages = ref([]);
 const imagePreviewUrls = ref([]);
+const representativeIdx = ref(0); // Index của ảnh đại diện trong danh sách hiện tại (old + new)
 
 
 // CHECK AUTH
@@ -523,9 +547,14 @@ const loadBatDongSan = async (page = 1) => {
         total: result.total,
       };
 
-      if (res.data.stats) {
-        stats.value = res.data.stats;
-      }
+  if (res.data.stats) {
+    stats.value = res.data.stats;
+  }
+
+  // Tính thêm stat "Nháp" từ phản hồi API
+  if (res.data.draft_count !== undefined) {
+    stats.value.draft = res.data.draft_count;
+  }
     }
   } catch (error) {
     errorMessage.value = "Lỗi tải dữ liệu";
@@ -605,6 +634,17 @@ const filteredProperties = computed(() => {
 // ACTIONS
 
 const handleEdit = async (property) => {
+  // Chặn chỉnh sửa bài nháp
+  if (property.status === "Nháp") {
+    Swal.fire({
+      icon: "warning",
+      title: "Không thể chỉnh sửa",
+      text: "Bài đăng đang ở trạng thái nháp. Vui lòng đăng bài trước để chỉnh sửa.",
+      confirmButtonText: "Đã hiểu",
+    });
+    return;
+  }
+
   editingProperty.value = {
     id: property.id,
     title: property.title,
@@ -668,6 +708,9 @@ const handleEdit = async (property) => {
       if (detail.hinh_anh) {
         oldImages.value = detail.hinh_anh;
         imagePreviewUrls.value = detail.hinh_anh.map(img => getImageUrl(img.url));
+        // Tìm ảnh đại diện hiện tại
+        const repIdx = detail.hinh_anh.findIndex(img => img.is_anh_dai_dien || img.is_anh_dai_dien === true);
+        representativeIdx.value = repIdx >= 0 ? repIdx : 0;
       }
     }
   } catch (e) {
@@ -721,6 +764,7 @@ const handleFileSelect = (event) => {
 };
 
 const removeImage = (index) => {
+  const wasRepresentative = representativeIdx.value === index;
   if (index < oldImages.value.length) {
     deletedImages.value.push(oldImages.value[index].id);
     oldImages.value.splice(index, 1);
@@ -729,6 +773,17 @@ const removeImage = (index) => {
     newImages.value.splice(newIdx, 1);
   }
   imagePreviewUrls.value.splice(index, 1);
+  // Nếu xóa ảnh đại diện hoặc ảnh trước nó, cập nhật lại index
+  if (wasRepresentative) {
+    representativeIdx.value = 0;
+  } else if (representativeIdx.value > index) {
+    representativeIdx.value--;
+  }
+};
+
+// Đặt ảnh đại diện
+const setRepresentativeImage = (index) => {
+  representativeIdx.value = index;
 };
 
 
@@ -772,6 +827,21 @@ const submitEdit = async () => {
     if (res.data.status) {
       successMessage.value = "✅ Cập nhật thành công! Đang chờ duyệt lại...";
       showEditModal.value = false;
+
+      // Đặt ảnh đại diện nếu có thay đổi
+      if (representativeIdx.value !== undefined && oldImages.value.length > 0) {
+        const repImg = oldImages.value[representativeIdx.value];
+        if (repImg && repImg.id) {
+          try {
+            await api.post(`/moi-gioi/bds/${editingProperty.value.id}/anh-dai-dien`, {
+              anh_id: repImg.id,
+            });
+          } catch (e) {
+            console.warn("Không đặt được ảnh đại diện:", e);
+          }
+        }
+      }
+
       setTimeout(() => {
         loadBatDongSan();
         successMessage.value = "";
@@ -791,6 +861,7 @@ const submitEdit = async () => {
 const cancelEdit = () => {
   showEditModal.value = false;
   editingProperty.value = null;
+  representativeIdx.value = 0;
 };
 
 const handleDelete = (property) => {

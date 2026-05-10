@@ -628,27 +628,24 @@ const getRemainingText = (plan) => {
 
 // ✅ Handle modal close
 const handleModalClose = () => {
-  stopCountdown(); // ✅ DỪNG ĐẾM NGƯỢC
+  stopCountdown();
   stopPolling();
   showPaymentModal.value = false;
-  // ✅ 1. Chặn ngay lập tức không cho API cũ mở lại modal
   isPaymentCompleted.value = true;
 
-  // ✅ 2. Dừng mọi polling
-  stopPolling();
+  // Lưu kết quả TRƯỚC KHI xóa
+  const wasSuccess = paymentResult.value === "success";
 
-  // ✅ 3. Đóng modal và xóa trạng thái
   paymentResult.value = null;
   paymentErrorMessage.value = "";
   orderCode.value = null;
   paymentData.value = {};
 
-  // ✅ 4. Load lại dữ liệu ngầm (silent = true) để bảng giá không bị biến mất
-  if (paymentResult.value === "success") {
+  // Load lại dữ liệu nếu thanh toán thành công
+  if (wasSuccess) {
     loadPlans(true);
   }
 
-  // 5. Xóa param trên URL
   router.replace({ query: {} });
 };
 
@@ -760,10 +757,40 @@ const handlePaymentRedirect = async () => {
   }
 };
 
+// Gia hạn gói hiện tại (không qua thanh toán)
+const handleRenew = async (plan) => {
+  selectedPlan.value = plan;
+  selectedId.value = plan.id;
+  paymentLoading.value = true;
+  try {
+    const res = await api.post("/moi-gioi/goi-tin/gia-han", {
+      goi_tin_id: plan.id,
+    });
+    if (res.data?.status) {
+      paymentResult.value = "success";
+      orderCode.value = res.data.order_code || "RENEW-" + Date.now();
+      await loadPlans(true);
+    } else {
+      paymentResult.value = "error";
+      paymentErrorMessage.value = res.data?.message || "Gia hạn thất bại";
+    }
+  } catch (e) {
+    paymentResult.value = "error";
+    paymentErrorMessage.value = e.response?.data?.message || "Lỗi kết nối khi gia hạn";
+  } finally {
+    paymentLoading.value = false;
+  }
+};
+
 // Select plan & show confirmation modal
 const selectPlan = (plan) => {
   selectedPlan.value = plan;
   selectedId.value = plan.id;
+  // Nếu là gói hiện tại → gia hạn trực tiếp
+  if (getPlanRelation(plan) === 'current') {
+    handleRenew(plan);
+    return;
+  }
   showModal.value = true;
 };
 
