@@ -23,8 +23,8 @@
                   class="form-select custom-input text-muted rounded-pill"
                 >
                   <option value="">Tất cả trạng thái</option>
-                  <option :value="true">Đã xác minh</option>
-                  <option :value="false">Chờ xác minh</option>
+                  <option :value="true">Đang hoạt động</option>
+                  <option :value="false">Bị khóa</option>
                 </select>
               </div>
 
@@ -262,16 +262,13 @@
                 </td>
                 <td class="text-center">
                   <span
-                    :class="{
-                      'bg-warning-subtle text-warning border-warning':
-                        (v.ten_goi || '').includes('VIP') ||
-                        (v.ten_goi || '').includes('Kim'),
-                      'bg-primary-subtle text-primary border-primary':
-                        (v.ten_goi || '').includes('Vàng') ||
-                        (v.ten_goi || '').includes('Bạc'),
-                      'bg-secondary-subtle text-secondary border-secondary':
-                        !v.ten_goi || v.ten_goi === 'Chưa mua',
-                    }"
+                    :class="[
+                      !v.ten_goi || v.ten_goi === 'Chưa mua' 
+                        ? 'bg-secondary text-white border-secondary'
+                        : ((v.ten_goi || '').includes('VIP') || (v.ten_goi || '').includes('Kim') || (v.ten_goi || '').includes('Cao Cấp'))
+                          ? 'bg-warning text-dark border-warning'
+                          : 'bg-primary text-white border-primary'
+                    ]"
                     class="badge border px-3 py-2 rounded-pill small fw-bold mb-1"
                   >
                     {{ v.ten_goi || "Chưa mua" }}

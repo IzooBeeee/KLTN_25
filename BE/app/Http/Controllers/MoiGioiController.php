@@ -242,13 +242,9 @@ class MoiGioiController extends Controller
         $user = Auth::guard('sanctum')->user();
         if (!$user) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
 
-        // ✅ Join 2 bảng, lấy tên gói từ lịch sử mua MỚI NHẤT
+        // ✅ Lấy tên gói từ trường goi_tin_id hiện tại của môi giới
         $data = MoiGioi::select('moi_giois.*', 'gt.ten_goi', 'gt.gia')
-            ->leftJoin('lich_su_goi_tins as lst', function ($join) {
-                $join->on('lst.moi_gioi_id', '=', 'moi_giois.id')
-                    ->whereRaw('lst.id = (SELECT id FROM lich_su_goi_tins WHERE moi_gioi_id = moi_giois.id ORDER BY created_at DESC LIMIT 1)');
-            })
-            ->leftJoin('goi_tins as gt', 'lst.goi_tin_id', '=', 'gt.id')
+            ->leftJoin('goi_tins as gt', 'moi_giois.goi_tin_id', '=', 'gt.id')
             ->orderBy('moi_giois.created_at', 'desc')
             ->get();
 

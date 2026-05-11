@@ -1423,16 +1423,21 @@ const saveDraft = async (isManual = false) => {
     lastSaveTime.value = "Vừa xong";
 
     if (isManual) {
+      clearDraftLocal();
+      
       Swal.fire({
         icon: "success",
         title: "Đã lưu nháp",
         text: "Bạn có muốn xem danh sách tin nháp không?",
         showCancelButton: true,
         confirmButtonText: "Đến danh sách",
-        cancelButtonText: "Ở lại",
+        cancelButtonText: "Đăng tin mới",
       }).then((result) => {
         if (result.isConfirmed) {
           window.location.href = "/moi-gioi/quan-ly-bat-dong-san";
+        } else {
+          // They want to stay to post a new one => reset the form
+          resetForm();
         }
       });
     } else {
@@ -1649,6 +1654,38 @@ const clearDraftLocal = () => {
   localStorage.removeItem(DRAFT_ID_KEY);
   localStorage.removeItem(DRAFT_FORM_KEY);
   localStorage.removeItem('dang_tin_images');
+};
+
+const resetForm = () => {
+  clearDraftLocal();
+  draftId.value = null;
+  currentStep.value = 1;
+  imagePreviewUrls.value = [];
+  soNha.value = "";
+  addressFromMap.value = "";
+  Object.assign(form, {
+    tieu_de: "",
+    mo_ta: "",
+    gia: 0,
+    dien_tich: 0,
+    loai_id: "",
+    trang_thai_id: 1,
+    moi_gioi_id: null,
+    dia_chi_id: null,
+    latitude: null,
+    longitude: null,
+    dia_chi_chi_tiet: "",
+    so_phong_ngu: 1,
+    so_phong_tam: 1,
+    ten_du_an: "",
+    tinh_id: "",
+    quan_id: "",
+    phuong_id: "",
+    is_duyet: false,
+    is_noi_bat: false,
+    images: [],
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 // ===== LIFECYCLE =====
