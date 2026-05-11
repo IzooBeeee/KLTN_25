@@ -8,9 +8,12 @@ use App\Models\MoiGioi;
 use App\Models\KhachHang;
 use App\Http\Requests\AdminLoginRequest;
 use App\Http\Requests\AdminUpdateProfileRequest;
+use App\Http\Requests\DatLaiMatKhauRequest;
+use App\Http\Requests\GuiMaQuenMatKhauRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendOtpRequest;
 use App\Http\Requests\VerifyOtpRequest;
+use App\Http\Requests\XacThucMaQuenMatKhauRequest;
 use App\Mail\ResetPasswordCodeMail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -178,263 +181,130 @@ class AdminController extends Controller
         }
     }
 
-    //Gửi OTP
-    public function sendOtp(SendOtpRequest $request)
+    // 1. Gửi mã xác nhận quên mật khẩu
+    public function guiMaQuenMatKhau(GuiMaQuenMatKhauRequest $request)
     {
+        $admin = Admin::where('email', $request->email)->first();
 
-        $user = Admin::where('email', $request->email)->first();
-
-        if (!$user) {
+        if (!$admin) {
             return response()->json([
-                'status' => false,
-                'message' => 'Email không tồn tại'
-            ]);
+                'status'  => 0,
+                'message' => 'Email không tồn tại trong hệ thống!',
+            ], 404);
         }
 
-        $otp = rand(100000, 999999);
+        $code = rand(100000, 999999);
 
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
-            [
-                'token' => bcrypt($otp),
-                'created_at' => now()
-            ]
-        );
+        $admin->update([
+            'hash_reset' => bcrypt($code),
+            'hash_reset_expires_at' => now()->addMinutes(5),
+        ]);
+
+        // Gửi mail
+        Mail::to($admin->email)->send(new ResetPasswordCodeMail($code));
+        // Mail::raw('Test mail', function ($message) {
+        //     $message->to('songviet011@gmail.com')
+        //         ->subject('Test');
+        // });
 
         return response()->json([
-            'status' => true,
-            'message' => 'OTP đã gửi',
-            'otp' => $otp // dev thôi
+            'status'  => 1,
+            'message' => 'Đã gửi mã xác nhận quên mật khẩu đến email của bạn!',
         ]);
     }
 
-    public function verifyOtp(VerifyOtpRequest $request)
+    // 2) Xác thực mã
+    public function xacThucMaQuenMatKhau(XacThucMaQuenMatKhauRequest $request)
     {
-        $record = DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->first();
+        $admin = Admin::where('email', $request->email)->first();
 
-        if (!$record) {
+        if (!$admin || !$admin->hash_reset) {
             return response()->json([
-                'status' => false,
-                'message' => 'OTP không đúng'
-            ]);
+                'status'  => 0,
+                'message' => 'Mã không hợp lệ!',
+            ], 400);
         }
 
-        if (!Hash::check($request->otp, $record->token)) {
+        // Check hết hạn
+        if ($admin->hash_reset_expires_at < now()) {
             return response()->json([
-                'status' => false,
-                'message' => 'OTP không đúng'
-            ]);
+                'status' => 0,
+                'message' => 'Mã đã hết hạn!',
+            ], 400);
         }
 
-        if (Carbon::parse($record->created_at)->addMinutes(5)->isPast()) {
+        // Check đúng mã
+        if (!Hash::check(trim((string)$request->code), $admin->hash_reset)) {
             return response()->json([
-                'status' => false,
-                'message' => 'OTP đã hết hạn'
-            ]);
+                'status' => 0,
+                'message' => 'Mã không đúng!',
+            ], 400);
         }
 
         return response()->json([
-            'status' => true,
-            'message' => 'OTP hợp lệ'
+            'status'  => 1,
+            'message' => 'Mã xác nhận hợp lệ.',
         ]);
     }
 
-    //Reset password
-    public function resetPassword(ResetPasswordRequest $request)
+    // 3) Đặt lại mật khẩu
+    public function datLaiMatKhau(DatLaiMatKhauRequest $request)
     {
+        \Log::info('Reset password attempt:', [
+            'email' => $request->email,
+            'code' => $request->code,
+        ]);
 
-        $record = DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->first();
+        $admin = Admin::where('email', $request->email)->first();
 
-        if (!$record) {
+        if (!$admin) {
+            \Log::error('Email not found');
             return response()->json([
-                'status' => false,
-                'message' => 'OTP không đúng'
-            ]);
+                'status'  => 0,
+                'message' => 'Email không tồn tại!',
+            ], 400);
         }
 
-        if (!Hash::check($request->otp, $record->token)) {
+        if (!$admin->hash_reset) {
+            \Log::error('Hash reset is null - code already used or not generated');
             return response()->json([
-                'status' => false,
-                'message' => 'OTP không đúng'
-            ]);
+                'status'  => 0,
+                'message' => 'Mã xác nhận không tồn tại! Có thể đã được sử dụng.',
+                'debug' => [
+                    'hash_reset' => $admin->hash_reset,
+                    'expires_at' => $admin->hash_reset_expires_at,
+                    'now' => now(),
+                ]
+            ], 400);
         }
 
-        if (Carbon::parse($record->created_at)->addMinutes(5)->isPast()) {
+        if ($admin->hash_reset_expires_at < now()) {
             return response()->json([
-                'status' => false,
-                'message' => 'OTP đã hết hạn'
-            ]);
+                'status' => 0,
+                'message' => 'Mã đã hết hạn!',
+                'debug' => [
+                    'expires_at' => $admin->hash_reset_expires_at,
+                    'now' => now(),
+                ]
+            ], 400);
         }
 
-        $user = Admin::where('email', $request->email)->first();
-
-        if (!$user) {
+        if (!Hash::check($request->code, $admin->hash_reset)) {
             return response()->json([
-                'status' => false,
-                'message' => 'Không tìm thấy tài khoản'
-            ]);
+                'status' => 0,
+                'message' => 'Mã không đúng!',
+            ], 400);
         }
 
-        $user->password = bcrypt($request->password);
-        $user->save();
-
-        DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->delete();
+        $admin->update([
+            'password' => bcrypt($request->password),
+            'hash_reset' => null,
+            'hash_reset_expires_at' => null,
+        ]);
 
         return response()->json([
-            'status' => true,
-            'message' => 'Đổi mật khẩu thành công'
-        ]);
-    }
-
-    // Gửi mã xác nhận quên mật khẩu cho Admin
-    public function guiMaQuenMatKhau(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-        ], [
-            'email.required' => 'Email không được để trống',
-            'email.email' => 'Email không hợp lệ',
-        ]);
-
-        $user = Admin::where('email', $request->email)->first();
-
-        if (!$user) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Email không tồn tại trong hệ thống'
-            ]);
-        }
-
-        $otp = rand(100000, 999999);
-
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
-            [
-                'token' => bcrypt($otp),
-                'created_at' => now()
-            ]
-        );
-
-        // Gửi email OTP
-        Mail::to($request->email)->send(new ResetPasswordCodeMail($otp));
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Mã xác nhận đã được gửi đến email của bạn',
-        ]);
-    }
-
-    // Xác thực mã quên mật khẩu
-    public function xacThucMaQuenMatKhau(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'code' => 'required|digits:6',
-        ], [
-            'email.required' => 'Email không được để trống',
-            'email.email' => 'Email không hợp lệ',
-            'code.required' => 'Mã xác nhận không được để trống',
-            'code.digits' => 'Mã xác nhận phải có 6 chữ số',
-        ]);
-
-        $record = DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->first();
-
-        if (!$record) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Mã xác nhận không đúng'
-            ]);
-        }
-
-        if (!Hash::check($request->code, $record->token)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Mã xác nhận không đúng'
-            ]);
-        }
-
-        if (Carbon::parse($record->created_at)->addMinutes(5)->isPast()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Mã xác nhận đã hết hạn'
-            ]);
-        }
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Mã xác nhận hợp lệ'
-        ]);
-    }
-
-    // Đặt lại mật khẩu mới
-    public function datLaiMatKhau(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'code' => 'required|digits:6',
-            'password' => 'required|min:6|confirmed',
-        ], [
-            'email.required' => 'Email không được để trống',
-            'email.email' => 'Email không hợp lệ',
-            'code.required' => 'Mã xác nhận không được để trống',
-            'code.digits' => 'Mã xác nhận phải có 6 chữ số',
-            'password.required' => 'Mật khẩu không được để trống',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự',
-            'password.confirmed' => 'Xác nhận mật khẩu không khớp',
-        ]);
-
-        $record = DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->first();
-
-        if (!$record) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Mã xác nhận không đúng'
-            ]);
-        }
-
-        if (!Hash::check($request->code, $record->token)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Mã xác nhận không đúng'
-            ]);
-        }
-
-        if (Carbon::parse($record->created_at)->addMinutes(5)->isPast()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Mã xác nhận đã hết hạn'
-            ]);
-        }
-
-        $user = Admin::where('email', $request->email)->first();
-
-        if (!$user) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Không tìm thấy tài khoản'
-            ]);
-        }
-
-        $user->password = bcrypt($request->password);
-        $user->save();
-
-        DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->delete();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Đặt lại mật khẩu thành công'
+            'status'  => 1,
+            'message' => 'Đặt lại mật khẩu thành công!',
         ]);
     }
 

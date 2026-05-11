@@ -216,11 +216,6 @@ export default {
         this.$refs.otpInputs[index + 1].focus();
       }
 
-      // Auto submit when full
-      if (this.otpArray.every((d) => d !== "") && !this.isLoading) {
-        this.xacThucMa();
-      }
-
       this.error = "";
     },
 
@@ -312,8 +307,11 @@ export default {
           }
         }
       } catch (err) {
-        this.error = "Xác thực thất bại. Vui lòng thử lại";
-        toaster.error("Xác thực thất bại");
+        this.error = err?.response?.data?.message || "Xác thực thất bại";
+
+        toaster.error(this.error);
+
+        console.log(err.response?.data);
       } finally {
         this.isLoading = false;
       }
