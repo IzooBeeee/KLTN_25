@@ -3,7 +3,9 @@
     <div class="row g-0 flex-grow-1">
       <div class="col-lg-7 d-none d-lg-flex left-panel position-relative">
         <div class="overlay"></div>
-        <div class="content position-relative p-5 d-flex flex-column justify-content-center text-white w-100">
+        <div
+          class="content position-relative p-5 d-flex flex-column justify-content-center text-white w-100"
+        >
           <div class="badge-custom mb-4 fw-semibold">
             THE INTELLIGENT ESTATE
           </div>
@@ -15,7 +17,8 @@
       </div>
 
       <div
-        class="col-lg-5 d-flex flex-column justify-content-center align-items-center right-panel p-4 p-md-5 bg-white">
+        class="col-lg-5 d-flex flex-column justify-content-center align-items-center right-panel p-4 p-md-5 bg-white"
+      >
         <div class="form-container w-100">
           <div class="mb-4">
             <h5 class="brand-text mb-4">The Intelligent Estate</h5>
@@ -29,38 +32,79 @@
 
           <form @submit.prevent="xuLyDangNhap">
             <div class="mb-3 w-100">
-              <label class="form-label text-uppercase text-muted fw-bold small-label">Email Admin</label>
+              <label
+                class="form-label text-uppercase text-muted fw-bold small-label"
+                >Email Admin</label
+              >
               <div class="custom-field">
                 <i class="fa-solid fa-envelope"></i>
-                <input type="email" v-model="email" placeholder="admin@intelligentestate.com" required />
+                <input
+                  type="email"
+                  v-model="email"
+                  placeholder="admin@intelligentestate.com"
+                  required
+                />
               </div>
             </div>
 
             <div class="mb-3 w-100">
-              <label class="form-label text-uppercase text-muted fw-bold small-label mb-2">Mật khẩu</label>
+              <label
+                class="form-label text-uppercase text-muted fw-bold small-label mb-2"
+                >Mật khẩu</label
+              >
               <div class="custom-field position-relative">
                 <i class="fa-solid fa-lock"></i>
-                <input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="••••••••••••"
-                  required />
-                <i class="fa-solid cursor-pointer ms-auto text-muted" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"
-                  @click="showPassword = !showPassword" style="cursor: pointer;"></i>
+                <input
+                  :type="showPassword ? 'text' : 'password'"
+                  v-model="password"
+                  placeholder="••••••••••••"
+                  required
+                />
+                <i
+                  class="fa-solid cursor-pointer ms-auto text-muted"
+                  :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+                  @click="showPassword = !showPassword"
+                  style="cursor: pointer"
+                ></i>
               </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-4 w-100">
+            <div
+              class="d-flex justify-content-between align-items-center mb-4 w-100"
+            >
               <div class="form-check mb-0 d-flex align-items-center gap-2">
-                <input class="form-check-input mt-0" type="checkbox" v-model="rememberMe" id="rememberMe"
-                  style="cursor: pointer;" />
-                <label class="form-check-label text-muted small fw-semibold" for="rememberMe" style="cursor: pointer;">
+                <input
+                  class="form-check-input mt-0"
+                  type="checkbox"
+                  v-model="rememberMe"
+                  id="rememberMe"
+                  style="cursor: pointer"
+                />
+                <label
+                  class="form-check-label text-muted small fw-semibold"
+                  for="rememberMe"
+                  style="cursor: pointer"
+                >
                   Ghi nhớ đăng nhập
                 </label>
               </div>
-              <a href="#" class="text-primary text-decoration-none small fw-semibold">Quên mật khẩu?</a>
+              <a
+                href="/admin/quen-mat-khau"
+                class="text-primary text-decoration-none small fw-semibold"
+                >Quên mật khẩu?</a
+              >
             </div>
 
             <div class="w-100">
-              <button type="submit" class="btn btn-submit w-100 py-3 fw-bold" :disabled="isLoading">
-                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              <button
+                type="submit"
+                class="btn btn-submit w-100 py-3 fw-bold"
+                :disabled="isLoading"
+              >
+                <span
+                  v-if="isLoading"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
                 <span v-else>
                   Đăng nhập Hệ thống
                   <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
@@ -71,7 +115,10 @@
 
           <div class="info-box mt-4 p-3 d-flex align-items-start gap-3">
             <i class="fa-solid fa-shield-halved text-primary mt-1"></i>
-            <p class="mb-0 text-muted" style="font-size: 12px; line-height: 1.6">
+            <p
+              class="mb-0 text-muted"
+              style="font-size: 12px; line-height: 1.6"
+            >
               Đây là hệ thống quản trị nội bộ. Mọi hoạt động truy cập đều được
               ghi lại theo <strong>Chính sách Bảo mật 2.4.0</strong>. Hành vi
               truy cập trái phép sẽ bị xử lý theo quy định.
@@ -82,17 +129,33 @@
     </div>
 
     <div
-      class="footer d-flex flex-column flex-md-row justify-content-between align-items-center px-4 py-3 bg-light border-top">
-      <span class="text-muted fw-semibold mb-2 mb-md-0" style="font-size: 10px; letter-spacing: 1px">
+      class="footer d-flex flex-column flex-md-row justify-content-between align-items-center px-4 py-3 bg-light border-top"
+    >
+      <span
+        class="text-muted fw-semibold mb-2 mb-md-0"
+        style="font-size: 10px; letter-spacing: 1px"
+      >
         © 2026 KLTN NHOM 25.
       </span>
       <div class="d-flex gap-4">
-        <a href="#" class="text-muted text-decoration-none fw-semibold"
-          style="font-size: 10px; letter-spacing: 1px">SECURITY POLICY</a>
-        <a href="#" class="text-muted text-decoration-none fw-semibold"
-          style="font-size: 10px; letter-spacing: 1px">SYSTEM STATUS</a>
-        <a href="#" class="text-muted text-decoration-none fw-semibold"
-          style="font-size: 10px; letter-spacing: 1px">ADMIN HELP</a>
+        <a
+          href="#"
+          class="text-muted text-decoration-none fw-semibold"
+          style="font-size: 10px; letter-spacing: 1px"
+          >SECURITY POLICY</a
+        >
+        <a
+          href="#"
+          class="text-muted text-decoration-none fw-semibold"
+          style="font-size: 10px; letter-spacing: 1px"
+          >SYSTEM STATUS</a
+        >
+        <a
+          href="#"
+          class="text-muted text-decoration-none fw-semibold"
+          style="font-size: 10px; letter-spacing: 1px"
+          >ADMIN HELP</a
+        >
       </div>
     </div>
   </div>
@@ -115,7 +178,6 @@ const rememberMe = ref(false);
 const router = useRouter();
 const internalInstance = getCurrentInstance();
 const toaster = internalInstance.appContext.config.globalProperties.$toast;
-
 
 onMounted(() => {
   // Khôi phục email nếu có
@@ -226,9 +288,11 @@ const xuLyDangNhap = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg,
-      rgba(15, 23, 42, 0.7) 0%,
-      rgba(15, 23, 42, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.7) 0%,
+    rgba(15, 23, 42, 0.2) 100%
+  );
 }
 
 .badge-custom {
