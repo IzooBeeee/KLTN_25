@@ -306,9 +306,9 @@ class BatDongSanController extends Controller
 
             'stats' => [
                 'total'     => (clone $baseQuery)->count(),
-                'approved'  => (clone $baseQuery)->where('is_duyet', 1)->count(),
-                'pending'   => (clone $baseQuery)->where('is_duyet', 0)->where('status', '!=', 'draft')->count(),
-                'rejected'  => (clone $baseQuery)->where('is_duyet', 2)->count(),
+                'approved'  => (clone $baseQuery)->where('trang_thai_id', 2)->count(),
+                'pending'   => (clone $baseQuery)->where('trang_thai_id', 1)->where('status', '!=', 'draft')->count(),
+                'rejected'  => (clone $baseQuery)->whereIn('trang_thai_id', [3, 6])->count(),
                 'draft'     => (clone $baseQuery)->where('status', 'draft')->count(),
             ]
         ]);

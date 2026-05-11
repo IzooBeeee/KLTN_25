@@ -19,7 +19,7 @@ class ThongKeMoGioiController extends Controller
 
             // 1. Tổng tin đã đăng (đã duyệt + chưa hết hạn)
             $tongTinDaDang = $user->batDongSans()
-                ->where('is_duyet', true)
+                ->where('trang_thai_id', 2)
                 ->where(function ($q) {
                     $q->whereNull('expires_at')
                         ->orWhere('expires_at', '>', now());
@@ -68,7 +68,7 @@ class ThongKeMoGioiController extends Controller
 
             // ✅ Đếm BĐS đã được duyệt VÀ chưa hết hạn
             $count = $user->batDongSans()
-                ->where('is_duyet', true)           // Đã duyệt
+                ->where('trang_thai_id', 2)           // Đã duyệt
                 ->where(function ($q) {               // VÀ (chưa có hạn HOẶC còn hạn)
                     $q->whereNull('expires_at')
                         ->orWhere('expires_at', '>', now());
@@ -269,14 +269,15 @@ class ThongKeMoGioiController extends Controller
 
             // Số BĐS đang hoạt động
             $activeBds = $user->batDongSans()
-                ->where('is_duyet', true)
+                ->where('trang_thai_id', 2)
                 ->where(function ($q) {
                     $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
                 })->count();
 
             // Số BĐS chờ duyệt
             $pendingBds = $user->batDongSans()
-                ->where('is_duyet', false)
+                ->where('trang_thai_id', 1)
+                ->where('status', '!=', 'draft')
                 ->count();
 
             // Số BĐS đã hết hạn
