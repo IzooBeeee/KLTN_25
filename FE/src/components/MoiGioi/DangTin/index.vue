@@ -618,8 +618,12 @@ const isFormValid = computed(() => {
   return true;
 });
 
-// ✅ COMPUTED: Kiểm tra còn tin không
-const hetTin = computed(() => soTinConLai.value <= 0);
+// ✅ COMPUTED: Kiểm tra còn tin không hoặc gói hết hạn
+const hetTin = computed(() => {
+  if (soTinConLai.value <= 0) return true;
+  if (ngayHetHanGoi.value && new Date(ngayHetHanGoi.value) < new Date()) return true;
+  return false;
+});
 
 // ===== FILE HANDLING =====
 const triggerFileInput = () => fileInput.value?.click();
@@ -1303,6 +1307,9 @@ const loadSoTinConLai = async () => {
 
 // ===== SAVE & SUBMIT =====
 const saveDraft = async (isManual = false) => {
+  // ✅ Block multiple concurrent saves to prevent duplicate drafts
+  if (isSaving.value) return;
+
   // Chỉ block auto-save khi không có dữ liệu gì
   // Manual save (bấm nút) luôn cho phép gọi API
   if (!isManual && !form.tieu_de && form.images.length === 0) {
@@ -1349,9 +1356,12 @@ const saveDraft = async (isManual = false) => {
     formData.append(key, value);
   });
 
-  form.images.forEach((image, index) => {
-    formData.append(`hinh_anh[${index}]`, image);
-  });
+  if (isManual) {
+    form.images.forEach((image, index) => {
+      formData.append(`hinh_anh[${index}]`, image);
+    });
+    formData.append("replace_images", 1);
+  }
 
   // ✅ KHÔNG append thêm trang_thai_id=0 ở đây (đã xử lý trong forEach phía trên)
 
@@ -1460,8 +1470,8 @@ const submitForm = async () => {
   if (hetTin.value) {
     Swal.fire({
       icon: "error",
-      title: "Hết số tin đăng!",
-      text: "Bạn đã hết số tin trong gói. Vui lòng mua thêm gói tin để tiếp tục.",
+      title: "Không thể đăng tin!",
+      text: "Bạn đã hết số tin trong gói hoặc gói tin đã hết hạn. Vui lòng gia hạn hoặc mua thêm gói tin để tiếp tục.",
       confirmButtonText: "Mua gói tin",
       confirmButtonColor: "#001f7c",
       showCancelButton: true,
@@ -1527,6 +1537,7 @@ const submitForm = async () => {
     form.images.forEach((image, index) => {
       formData.append(`hinh_anh[${index}]`, image);
     });
+    formData.append("replace_images", 1);
 
     if (draftId.value) {
       await api.post("/moi-gioi/bds/update", formData, { headers: { "Content-Type": "multipart/form-data" } });

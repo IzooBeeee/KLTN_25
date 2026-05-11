@@ -81,13 +81,7 @@ class GiaoDichController extends Controller
         if (!$user) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
         if (!$goi) return response()->json(['status' => false, 'message' => 'Package not found'], 404);
 
-        // ✅ CHẶN MUA TRÙNG GÓI NGAY TẠI BACKEND
-        if ($user->goi_tin_id == $request->goi_tin_id) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Bạn đang sử dụng gói này rồi. Vui lòng đợi hết hạn hoặc nâng cấp gói cao hơn.'
-            ], 400);
-        }
+        // Đã gỡ bỏ chặn mua trùng gói để user có thể gia hạn (cộng dồn tin và ngày)
 
         try {
             $paymentData = DB::transaction(function () use ($goi, $user) {

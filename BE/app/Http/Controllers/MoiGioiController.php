@@ -44,6 +44,13 @@ class MoiGioiController extends Controller
             ], 401);
         }
 
+        if ($user->is_active != 1) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Tài khoản của bạn đã bị khoá'
+            ], 403);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

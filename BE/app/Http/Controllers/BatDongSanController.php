@@ -383,14 +383,18 @@ class BatDongSanController extends Controller
             }
 
             // 1. Tạo hoặc lấy địa chỉ
-            $diaChi = DiaChi::create([
-                'tinh_id'           => $request->tinh_id,
-                'quan_id'           => $request->quan_id,
-                'phuong_xa_id'      => $request->phuong_id,
-                'dia_chi_chi_tiet'  => $request->dia_chi_chi_tiet,
-                'latitude'          => $request->latitude,
-                'longitude'         => $request->longitude,
-            ]);
+            $diaChiId = null;
+            if ($request->tinh_id) {
+                $diaChi = DiaChi::create([
+                    'tinh_id'           => $request->tinh_id,
+                    'quan_id'           => $request->quan_id,
+                    'phuong_xa_id'      => $request->phuong_id,
+                    'dia_chi_chi_tiet'  => $request->dia_chi_chi_tiet,
+                    'latitude'          => $request->latitude,
+                    'longitude'         => $request->longitude,
+                ]);
+                $diaChiId = $diaChi->id;
+            }
 
             // 2. Tạo Bất động sản
             $batDongSan = BatDongSan::create([
@@ -400,7 +404,7 @@ class BatDongSanController extends Controller
                 'loai_id'       => $request->loai_id,
                 'trang_thai_id' => $request->trang_thai_id ?? 1,
                 'mo_ta'         => $request->mo_ta,
-                'dia_chi_id'    => $diaChi->id,
+                'dia_chi_id'    => $diaChiId,
                 'so_phong_ngu'  => $request->so_phong_ngu,
                 'so_phong_tam'  => $request->so_phong_tam,
 
@@ -588,15 +592,41 @@ class BatDongSanController extends Controller
                         'longitude'        => $request->longitude ?? $diaChi->longitude,
                     ]);
                 }
+            } else {
+                if ($request->tinh_id) {
+                    $diaChi = \App\Models\DiaChi::create([
+                        'tinh_id'           => $request->tinh_id,
+                        'quan_id'           => $request->quan_id,
+                        'phuong_xa_id'      => $request->phuong_id,
+                        'dia_chi_chi_tiet'  => $request->dia_chi_chi_tiet,
+                        'latitude'          => $request->latitude,
+                        'longitude'         => $request->longitude,
+                    ]);
+                    $data->dia_chi_id = $diaChi->id;
+                    $data->save();
+                }
             }
 
-            // Xóa ảnh cũ được chỉ định xóa
-            if ($request->has('deleted_images')) {
-                $deletedIds = $request->input('deleted_images');
-                if (is_array($deletedIds) && count($deletedIds) > 0) {
-                    \App\Models\HinhAnhBatDongSan::whereIn('id', $deletedIds)
-                        ->where('bds_id', $data->id)
-                        ->delete();
+            // Xóa toàn bộ ảnh cũ nếu có cờ replace_images (từ màn hình Đăng tin)
+            if ($request->boolean('replace_images')) {
+                $oldImages = \App\Models\HinhAnhBatDongSan::where('bds_id', $data->id)->get();
+                foreach ($oldImages as $img) {
+                    \Storage::disk('public')->delete($img->url);
+                    $img->delete();
+                }
+            } else {
+                // Xóa ảnh cũ được chỉ định xóa (từ màn hình chỉnh sửa)
+                if ($request->has('deleted_images')) {
+                    $deletedIds = $request->input('deleted_images');
+                    if (is_array($deletedIds) && count($deletedIds) > 0) {
+                        $oldImages = \App\Models\HinhAnhBatDongSan::whereIn('id', $deletedIds)
+                            ->where('bds_id', $data->id)
+                            ->get();
+                        foreach ($oldImages as $img) {
+                            \Storage::disk('public')->delete($img->url);
+                            $img->delete();
+                        }
+                    }
                 }
             }
 

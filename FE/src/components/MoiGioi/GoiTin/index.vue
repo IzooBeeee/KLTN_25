@@ -409,9 +409,10 @@ const canPurchase = (plan) => {
 
 // Phân loại gói so với gói hiện tại
 const getPlanRelation = (plan) => {
-  const hasActivePlan = !!currentPlanId.value && !brokerInfo.value.het_han;
-  if (!hasActivePlan) return 'new';             // Chưa có gói
-  if (plan.id === currentPlanId.value) return 'current'; // Gói đang dùng
+  // Nhận dạng gói hiện tại dù còn hạn hay đã hết hạn
+  if (plan.id === currentPlanId.value) return 'current';
+  const hasActivePlan = !!currentPlanId.value;
+  if (!hasActivePlan) return 'new';             // Chưa từng mua gói
   if (plan.monthlyPrice > brokerInfo.value.gia_hien_tai) return 'upgrade'; // Nâng cấp
   return 'addon';                               // Mua thêm
 };
@@ -428,7 +429,9 @@ const getButtonClass = (plan) => {
 const getButtonText = (plan) => {
   if (paymentLoading.value && selectedId.value === plan.id) return 'Đang xử lý...';
   const rel = getPlanRelation(plan);
-  if (rel === 'current') return 'Gia hạn';
+  if (rel === 'current') {
+    return brokerInfo.value.het_han ? '🔄 Gia hạn ngay' : 'Gia hạn';
+  }
   if (rel === 'upgrade') return 'Nâng cấp';
   if (rel === 'addon') return 'Mua thêm';
   return plan.btnText || 'Chọn gói';
@@ -757,40 +760,11 @@ const handlePaymentRedirect = async () => {
   }
 };
 
-// Gia hạn gói hiện tại (không qua thanh toán)
-const handleRenew = async (plan) => {
-  selectedPlan.value = plan;
-  selectedId.value = plan.id;
-  paymentLoading.value = true;
-  try {
-    const res = await api.post("/moi-gioi/goi-tin/gia-han", {
-      goi_tin_id: plan.id,
-    });
-    if (res.data?.status) {
-      paymentResult.value = "success";
-      orderCode.value = res.data.order_code || "RENEW-" + Date.now();
-      await loadPlans(true);
-    } else {
-      paymentResult.value = "error";
-      paymentErrorMessage.value = res.data?.message || "Gia hạn thất bại";
-    }
-  } catch (e) {
-    paymentResult.value = "error";
-    paymentErrorMessage.value = e.response?.data?.message || "Lỗi kết nối khi gia hạn";
-  } finally {
-    paymentLoading.value = false;
-  }
-};
-
 // Select plan & show confirmation modal
 const selectPlan = (plan) => {
   selectedPlan.value = plan;
   selectedId.value = plan.id;
-  // Nếu là gói hiện tại → gia hạn trực tiếp
-  if (getPlanRelation(plan) === 'current') {
-    handleRenew(plan);
-    return;
-  }
+  // Bỏ logic "gia hạn miễn phí", tất cả đều đi qua cổng thanh toán
   showModal.value = true;
 };
 
