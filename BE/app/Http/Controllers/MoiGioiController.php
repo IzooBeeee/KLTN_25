@@ -514,7 +514,7 @@ class MoiGioiController extends Controller
         }
 
         $mg->update([
-            'password' => $request->password,
+            'password' => bcrypt($request->password),
             'hash_reset' => null,
             'hash_reset_expires_at' => null,
         ]);
@@ -763,7 +763,7 @@ class MoiGioiController extends Controller
         ];
 
         $html = view('chi_tiet_moi_gioi_pdf', compact('data'))->render();
-        return \PDF::loadHTML($html)
+        return Pdf::loadHTML($html)
             ->setPaper('a4', 'portrait')
             ->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
             ->download("{$filename}.pdf");

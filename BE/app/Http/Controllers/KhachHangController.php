@@ -11,10 +11,10 @@ use App\Http\Requests\UpdateKhachHangRequest;
 use App\Http\Requests\SearchRequest;
 use App\Http\Requests\DestroyRequest;
 use App\Http\Requests\GuiMaQuenMatKhauRequest;
-use App\Http\Requests\KhachHangUpdatePasswordRequest;
+use App\Http\Requests\UpdatePasswordKhachHangRequest as KhachHangUpdatePasswordRequest;
 use App\Http\Requests\KhachHangUpdateProfileRequest;
 use App\Http\Requests\SearchKhachHangRequest;
-use App\Http\Requests\updatePasswordKhachHangRequest;
+
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendOtpRequest;
 use App\Http\Requests\VerifyOtpRequest;
@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Validation\ValidationException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -43,6 +43,14 @@ class KhachHangController extends Controller
                 'status' => 0,
                 'message' => 'Email hoặc mật khẩu không đúng'
             ], 401);
+        }
+
+        // Kiểm tra tài khoản có bị khóa không
+        if (!$user->is_active) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.'
+            ], 403);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -618,7 +626,7 @@ class KhachHangController extends Controller
             'date' => now()->format('d/m/Y H:i'),
         ])->render();
 
-        $pdf = PDF::loadHTML($html)->setPaper('a4', 'landscape');
+        $pdf = Pdf::loadHTML($html)->setPaper('a4', 'landscape');
 
         return response($pdf->output())
             ->header('Content-Type', 'application/pdf')

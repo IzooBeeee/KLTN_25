@@ -28,6 +28,13 @@ class KhachHangMiddleware
         }
 
         if ($user && $user instanceof \App\Models\KhachHang) {
+            // Kiểm tra tài khoản có bị khóa không
+            if (!$user->is_active) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.',
+                ], 403);
+            }
             return $next($request);
         }
 

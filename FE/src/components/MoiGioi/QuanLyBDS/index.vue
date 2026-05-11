@@ -219,10 +219,9 @@
               Đã bán
             </button>
             <button @click="handleEdit(item)"
-              class="btn btn-light border rounded-3 btn-sm d-flex align-items-center justify-content-center"
-              :class="item.status === 'Nháp' ? 'text-secondary' : 'text-primary'"
-              :style="item.status === 'Nháp' ? 'width: 40px; height: 40px; cursor: not-allowed; opacity: 0.5;' : 'width: 40px; height: 40px'"
-              :title="item.status === 'Nháp' ? 'Không thể chỉnh sửa bài nháp' : 'Cập nhật'">
+              class="btn btn-light border rounded-3 btn-sm d-flex align-items-center justify-content-center text-primary"
+              style="width: 40px; height: 40px"
+              title="Chỉnh sửa">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -634,17 +633,6 @@ const filteredProperties = computed(() => {
 // ACTIONS
 
 const handleEdit = async (property) => {
-  // Chặn chỉnh sửa bài nháp
-  if (property.status === "Nháp") {
-    Swal.fire({
-      icon: "warning",
-      title: "Không thể chỉnh sửa",
-      text: "Bài đăng đang ở trạng thái nháp. Vui lòng đăng bài trước để chỉnh sửa.",
-      confirmButtonText: "Đã hiểu",
-    });
-    return;
-  }
-
   editingProperty.value = {
     id: property.id,
     title: property.title,
@@ -671,6 +659,7 @@ const handleEdit = async (property) => {
   newImages.value = [];
   deletedImages.value = [];
   imagePreviewUrls.value = [];
+  representativeIdx.value = 0;
 
   try {
     const res = await api.get(`/client/bat-dong-san/${property.id}`);
@@ -820,6 +809,9 @@ const submitEdit = async () => {
       formData.append("hinh_anh[]", file);
     });
 
+    // Gửi index ảnh đại diện để backend xử lý sau khi upload
+    formData.append("representative_index", representativeIdx.value);
+
     const res = await api.post("/moi-gioi/bds/update", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -827,21 +819,6 @@ const submitEdit = async () => {
     if (res.data.status) {
       successMessage.value = "✅ Cập nhật thành công! Đang chờ duyệt lại...";
       showEditModal.value = false;
-
-      // Đặt ảnh đại diện nếu có thay đổi
-      if (representativeIdx.value !== undefined && oldImages.value.length > 0) {
-        const repImg = oldImages.value[representativeIdx.value];
-        if (repImg && repImg.id) {
-          try {
-            await api.post(`/moi-gioi/bds/${editingProperty.value.id}/anh-dai-dien`, {
-              anh_id: repImg.id,
-            });
-          } catch (e) {
-            console.warn("Không đặt được ảnh đại diện:", e);
-          }
-        }
-      }
-
       setTimeout(() => {
         loadBatDongSan();
         successMessage.value = "";

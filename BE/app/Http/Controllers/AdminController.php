@@ -11,11 +11,13 @@ use App\Http\Requests\AdminUpdateProfileRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendOtpRequest;
 use App\Http\Requests\VerifyOtpRequest;
+use App\Mail\ResetPasswordCodeMail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class AdminController extends Controller
@@ -319,13 +321,12 @@ class AdminController extends Controller
             ]
         );
 
-        // TODO: Gửi email thực sự khi production
-        // Mail::to($request->email)->send(new ResetPasswordCodeMail($otp));
+        // Gửi email OTP
+        Mail::to($request->email)->send(new ResetPasswordCodeMail($otp));
 
         return response()->json([
             'status' => true,
             'message' => 'Mã xác nhận đã được gửi đến email của bạn',
-            'otp' => $otp // Dev only — xóa ở production
         ]);
     }
 

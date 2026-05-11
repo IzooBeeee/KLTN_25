@@ -121,7 +121,11 @@ const fetchData = async () => {
   try {
     const res = await api.get("/moi-gioi/thong-bao");
     if (res.data?.data) {
-      list.value = res.data.data;
+      // Map trang_thai (0/1) → is_read (false/true) vì FE dùng is_read
+      list.value = res.data.data.map((n) => ({
+        ...n,
+        is_read: n.trang_thai === 1 || n.is_read === true,
+      }));
     }
   } catch (e) {
     console.error("Lỗi tải thông báo:", e);
@@ -151,6 +155,7 @@ const markRead = async (item) => {
   try {
     await api.post(`/moi-gioi/thong-bao/${item.id}/da-doc`);
     item.is_read = true;
+    item.trang_thai = 1;
     // Cập nhật badge ở Header
     window.dispatchEvent(new CustomEvent("notifications-updated", {
       detail: { unreadCount: unreadCount.value, action: "markRead" }
@@ -161,7 +166,10 @@ const markRead = async (item) => {
 const markAllRead = async () => {
   try {
     await api.post("/moi-gioi/thong-bao/doc-tat-ca");
-    list.value.forEach((n) => (n.is_read = true));
+    list.value.forEach((n) => {
+      n.is_read = true;
+      n.trang_thai = 1;
+    });
     // Cập nhật badge ở Header
     window.dispatchEvent(new CustomEvent("notifications-updated", {
       detail: { unreadCount: 0, action: "markAllRead" }

@@ -573,8 +573,24 @@ class BatDongSanController extends Controller
                         'bds_id'          => $data->id,
                         'url'             => $path,
                         'thu_tu'          => $currentMaxThuTu + $index + 1,
-                        'is_anh_dai_dien' => $index == 0 && !$data->hinhAnh()->where('is_anh_dai_dien', true)->exists(),
+                        'is_anh_dai_dien' => false, // Sẽ set lại bên dưới theo representative_index
                     ]);
+                }
+            }
+
+            // Xử lý ảnh đại diện theo representative_index (nếu FE gửi lên)
+            if ($request->has('representative_index')) {
+                $repIdx = (int) $request->input('representative_index');
+                // Lấy danh sách ảnh hiện tại theo thứ tự (sau khi đã xóa và upload mới)
+                $allImages = $data->hinhAnh()->orderBy('thu_tu')->get();
+                // Bỏ chọn tất cả ảnh đại diện cũ
+                HinhAnhBatDongSan::where('bds_id', $data->id)->update(['is_anh_dai_dien' => false]);
+                // Đặt ảnh tại vị trí repIdx làm đại diện
+                if ($allImages->count() > 0) {
+                    $repImage = $allImages->get(min($repIdx, $allImages->count() - 1));
+                    if ($repImage) {
+                        $repImage->update(['is_anh_dai_dien' => true]);
+                    }
                 }
             }
 

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100 p-6">
     <div
       class="flex w-full max-w-6xl bg-white rounded-[40px] shadow-2xl overflow-hidden min-h-[650px]"
@@ -228,6 +228,7 @@ export default {
 
     // Trong DatLaiMatKhau.vue
     async datLaiMatKhau() {
+      this.isLoading = true;
       try {
         const res = await api.post("/admin/quen-mat-khau/dat-lai", {
           email: this.email,
@@ -241,6 +242,8 @@ export default {
           setTimeout(() => {
             this.$router.replace("/admin/dang-nhap");
           }, 1500);
+        } else {
+          toaster.error(res.data.message || "Đặt lại mật khẩu thất bại");
         }
       } catch (error) {
         if (error.response?.status === 422) {
@@ -248,7 +251,11 @@ export default {
           // Hiển thị lỗi đầu tiên
           const firstError = Object.values(errors)[0]?.[0];
           toaster.error(firstError || "Dữ liệu không hợp lệ");
+        } else {
+          toaster.error(error.response?.data?.message || "Đặt lại mật khẩu thất bại. Vui lòng thử lại.");
         }
+      } finally {
+        this.isLoading = false;
       }
     },
   },

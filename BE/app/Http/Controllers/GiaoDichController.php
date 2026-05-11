@@ -6,6 +6,7 @@ use App\Models\GoiTin;
 use App\Models\GiaoDich;
 use App\Models\MoiGioi;
 use App\Services\SePayService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -483,7 +484,7 @@ class GiaoDichController extends Controller
         ]);
 
         $html = view('giao_dich_pdf', compact('data'))->render();
-        return \PDF::loadHTML($html)
+        return Pdf::loadHTML($html)
             ->setPaper('a4', 'landscape')
             ->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
             ->download("{$filename}.pdf");
