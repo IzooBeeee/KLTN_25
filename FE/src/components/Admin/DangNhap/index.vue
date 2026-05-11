@@ -88,7 +88,11 @@
                   Ghi nhớ đăng nhập
                 </label>
               </div>
-              <a href="#" class="text-primary text-decoration-none small fw-semibold">Quên mật khẩu?</a>
+              <a
+                href="/admin/quen-mat-khau"
+                class="text-primary text-decoration-none small fw-semibold"
+                >Quên mật khẩu?</a
+              >
             </div>
 
             <div class="w-100">
