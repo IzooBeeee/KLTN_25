@@ -2,7 +2,7 @@
   <div class="bg-slate-50 min-h-screen font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
     
     <!-- 1. HERO SECTION -->
-    <section class="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+    <section class="relative h-[85vh] min-h-[600px]  flex items-center justify-center overflow-hidden">
       <!-- Background Image -->
       <div class="absolute inset-0 z-0">
         <img

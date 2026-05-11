@@ -662,7 +662,7 @@ const handleEdit = async (property) => {
   representativeIdx.value = 0;
 
   try {
-    const res = await api.get(`/client/bat-dong-san/${property.id}`);
+    const res = await api.get(`/moi-gioi/bds/${property.id}`);
     if (res.data?.status) {
       const detail = res.data.data;
       editingProperty.value.mo_ta = detail.mo_ta || "";

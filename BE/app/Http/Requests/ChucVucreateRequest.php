@@ -19,6 +19,7 @@ class ChucVucreateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'slug_chuc_vu' => 'nullable|string|max:255|unique:chuc_vus,slug',
             'ten_chuc_vu' => 'required|string|max:255|unique:chuc_vus,ten_chuc_vu',
             'tinh_trang' => 'required|in:0,1',
             'email' => 'nullable|email|unique:chuc_vus,email',
@@ -28,6 +29,7 @@ class ChucVucreateRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'slug_chuc_vu.unique' => 'Slug chức vụ đã tồn tại',
             'ten_chuc_vu.required' => 'Tên chức vụ không được để trống',
             'ten_chuc_vu.string' => 'Tên chức vụ phải là chuỗi',
             'ten_chuc_vu.max' => 'Tên chức vụ không được vượt quá 255 ký tự',

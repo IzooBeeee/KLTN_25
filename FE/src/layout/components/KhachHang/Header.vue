@@ -400,6 +400,7 @@ export default {
       appointmentPollInterval: null,
       showAppointmentNotifPanel: false,
       appointmentNotifUnreadCount: 0,
+      appointmentIsFetching: false, // Prevent concurrent requests
     };
   },
 
@@ -770,73 +771,35 @@ export default {
       }
     },
 
-    // 📅 Fetch appointment notifications
-    async fetchAppointmentNotifications() {
-      const token = localStorage.getItem("khach_hang_auth_token");
-      if (!token) return;
-      
-      try {
-        // Lấy lịch hẹn để hiển thị thông báo
-        const res = await api.get('/khach-hang/lich-hen/danh-sach');
-        if (res.data?.status && res.data.data) {
-          const appointments = res.data.data;
-          
-          // Map to notification format
-          console.log('[Appointments] Raw data:', appointments);
-          this.appointmentNotifs = appointments.map(item => {
-            const tieu_de = item.status_label || (
-              item.trang_thai === 'cho_xac_nhan' ? '⏰ Chờ xác nhận' : 
-              item.trang_thai === 'da_xac_nhan' ? '✅ Đã xác nhận' :
-              item.trang_thai === 'hoan_thanh' ? '🎉 Hoàn thành' : '❌ Đã hủy'
-            );
-            const noi_dung = item.bat_dong_san?.tieu_de 
-              ? `${item.bat_dong_san.tieu_de} - ${item.ngay_hen} ${item.gio_hen}`
-              : `${item.ngay_hen || 'N/A'} ${item.gio_hen || ''}`;
-            const thoi_gian = item.updated_at || item.created_at || new Date().toISOString();
-            
-            return {
-              id: item.id,
-              tieu_de,
-              noi_dung,
-              thoi_gian,
-              da_doc: item.trang_thai !== 'cho_xac_nhan',
-              loai: 'lich_hen',
-              trang_thai: item.trang_thai,
-            };
-          });
-          console.log('[Appointments] Mapped:', this.appointmentNotifs);
-          
-          // Count unread (cho_xac_nhan)
-          this.appointmentNotifUnreadCount = this.appointmentNotifs.filter(
-            n => n.trang_thai === 'cho_xac_nhan'
-          ).length;
-        }
-      } catch (err) {
-        console.error("Lỗi fetch appointment notifications:", err);
-      }
-    },
-
-    // 📅 Appointment Notification Polling
+    // 📅 Appointment Notification Polling (3s interval for faster updates)
     startAppointmentPolling() {
-      console.log('[Customer Polling] Appointment notifications started - 10s');
+      // Clear old interval if exists to prevent duplicates
+      if (this.appointmentPollInterval) {
+        clearInterval(this.appointmentPollInterval);
+      }
+      
       this.appointmentPollInterval = setInterval(() => {
         if (this.isLoggedIn) {
           this.fetchAppointmentNotifications();
         }
-      }, 10000);
+      }, 3000); // 3s for faster real-time updates
     },
 
     async fetchAppointmentNotifications() {
       const token = localStorage.getItem("khach_hang_auth_token");
       if (!token) return;
       
+      // Prevent concurrent requests
+      if (this.appointmentIsFetching) return;
+      
       try {
-        // Lấy lịch hẹn để kiểm tra status change
+        this.appointmentIsFetching = true;
+        
         const res = await api.get('/khach-hang/lich-hen/danh-sach');
         if (res.data?.status && res.data.data) {
           const appointments = res.data.data;
           
-          // Check for status changes
+          // Check for status changes to show toast notifications
           if (this.appointmentNotifs.length > 0) {
             appointments.forEach(newItem => {
               const oldItem = this.appointmentNotifs.find(o => o.id === newItem.id);
@@ -852,10 +815,32 @@ export default {
             });
           }
           
-          this.appointmentNotifs = appointments;
+          // Update appointment notifications with unread count
+          this.appointmentNotifs = appointments.map(item => ({
+            id: item.id,
+            tieu_de: item.status_label || (
+              item.trang_thai === 'cho_xac_nhan' ? '⏰ Chờ xác nhận' : 
+              item.trang_thai === 'da_xac_nhan' ? '✅ Đã xác nhận' :
+              item.trang_thai === 'hoan_thanh' ? '🎉 Hoàn thành' : '❌ Đã hủy'
+            ),
+            noi_dung: item.bat_dong_san?.tieu_de 
+              ? `${item.bat_dong_san.tieu_de} - ${item.ngay_hen} ${item.gio_hen}`
+              : `${item.ngay_hen || 'N/A'} ${item.gio_hen || ''}`,
+            thoi_gian: item.updated_at || item.created_at || new Date().toISOString(),
+            da_doc: item.trang_thai !== 'cho_xac_nhan',
+            loai: 'lich_hen',
+            trang_thai: item.trang_thai,
+          }));
+          
+          // Count unread (cho_xac_nhan only)
+          this.appointmentNotifUnreadCount = this.appointmentNotifs.filter(
+            n => n.trang_thai === 'cho_xac_nhan'
+          ).length;
         }
       } catch (err) {
-        console.error("Lỗi fetch appointment notifications:", err);
+        // Silent fail for polling requests
+      } finally {
+        this.appointmentIsFetching = false;
       }
     },
 

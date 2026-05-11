@@ -119,6 +119,7 @@ const previousCount = ref(0);
 const lastUpdated = ref('');
 let pollInterval = null;
 const previousAppointments = ref([]); // Track previous state for status change detection
+const isFetching = ref(false); // Prevent concurrent requests
 
 const stats = computed(() => ({
   total: appointments.value.length,
@@ -133,7 +134,11 @@ const filteredAppointments = computed(() => {
 });
 
 async function fetchAppointments(silent = false) {
+  // Prevent concurrent requests
+  if (isFetching.value) return;
+  
   try {
+    isFetching.value = true;
     const res = await api.get('/khach-hang/lich-hen/danh-sach');
     const newData = res.data?.data || [];
     
@@ -169,12 +174,17 @@ async function fetchAppointments(silent = false) {
     if (!silent) toaster.error('Không thể tải danh sách lịch hẹn');
   } finally {
     loading.value = false;
+    isFetching.value = false;
   }
 }
 
 function startPolling() {
-  console.log('[Polling] KhachHang LichHen started - checking every 10s');
-  pollInterval = setInterval(() => fetchAppointments(true), 10000); // 10s for faster real-time
+  // Clear old interval if exists to prevent duplicates
+  if (pollInterval) {
+    clearInterval(pollInterval);
+  }
+  
+  pollInterval = setInterval(() => fetchAppointments(true), 3000); // 3s for faster real-time updates
 }
 
 function cancelAppointment(item) {
@@ -188,7 +198,7 @@ async function confirmCancel() {
     await api.post(`/khach-hang/lich-hen/${selectedAppointment.value.id}/huy`, { ly_do: cancelReason.value });
     toaster.success('Đã hủy lịch hẹn');
     showCancelModal.value = false;
-    await fetchAppointments();
+    await fetchAppointments(false); // Refresh data after cancel
   } catch (e) {
     toaster.error('Không thể hủy lịch');
   }

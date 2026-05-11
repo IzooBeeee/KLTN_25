@@ -314,6 +314,42 @@ class BatDongSanController extends Controller
         ]);
     }
 
+    public function showDanhChoMoiGioi($id)
+    {
+        $user = Auth::guard('sanctum')->user();
+
+        if (!$user) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Chưa đăng nhập hoặc token không hợp lệ!'
+            ], 401);
+        }
+
+        $data = BatDongSan::with([
+            'anhDaiDien',
+            'hinhAnh',
+            'loai',
+            'diaChi',
+            'diaChi.tinh',
+            'diaChi.quan',
+        ])
+            ->where('id', $id)
+            ->where('moi_gioi_id', $user->id)
+            ->first();
+
+        if (!$data) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Không tìm thấy bất động sản hoặc bạn không có quyền'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $data,
+        ]);
+    }
+
     // Tạo bài đăng BĐS (Dành cho môi giới)
     public function store(CreateBatDongSanRequest $request)
     {
@@ -401,7 +437,7 @@ class BatDongSanController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => $status === 'published' ? 'Đăng tin thành công' : 'Đã lưu nháp',
-                'data' => $batDongSan
+                'data' => $batDongSan->load(['hinhAnh', 'diaChi'])
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -481,7 +517,7 @@ class BatDongSanController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Đăng tin thành công',
-                'data' => $bds
+                'data' => $bds->load(['hinhAnh', 'diaChi'])
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -506,7 +542,7 @@ class BatDongSanController extends Controller
         }
 
         return response()->json([
-            'data' => $query->latest()->get()
+            'data' => $query->latest()->with(['hinhAnh', 'diaChi'])->get()
         ]);
     }
 

@@ -55,7 +55,7 @@
                   Ghi nhớ đăng nhập
                 </label>
               </div>
-              <a href="#" class="text-primary text-decoration-none small fw-semibold">Quên mật khẩu?</a>
+              <a href="#" @click.prevent="goToForgotPassword" class="text-primary text-decoration-none small fw-semibold">Quên mật khẩu?</a>
             </div>
 
             <div class="w-100">
@@ -202,6 +202,10 @@ const xuLyDangNhap = async () => {
   } finally {
     isLoading.value = false;
   }
+};
+
+const goToForgotPassword = () => {
+  router.push("/admin/quen-mat-khau");
 };
 </script>
 

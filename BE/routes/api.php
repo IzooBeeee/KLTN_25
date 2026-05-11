@@ -235,6 +235,7 @@ Route::prefix('moi-gioi')->middleware('MoiGioiMiddleware')->group(function () {
     //QUẢN LÝ BĐS
     Route::prefix('bds')->group(function () {
         Route::get('/data', [BatDongSanController::class, 'getDataDanhChoMoiGioi']);
+        Route::get('/{id}', [BatDongSanController::class, 'showDanhChoMoiGioi']);
         Route::post('/create', [BatDongSanController::class, 'store']);
         Route::post('/{id}/publish', [BatDongSanController::class, 'publish']);
         Route::post('/update', [BatDongSanController::class, 'update']);
