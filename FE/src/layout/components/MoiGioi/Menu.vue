@@ -7,13 +7,8 @@
 
     <nav class="broker-sidebar__nav" aria-label="Menu môi giới">
       <div class="broker-sidebar__group">
-        <RouterLink
-          v-for="item in primaryItems"
-          :key="item.id"
-          :to="item.route"
-          class="broker-sidebar__link"
-          :class="{ 'is-active': route.path.startsWith(item.route) }"
-        >
+        <RouterLink v-for="item in primaryItems" :key="item.id" :to="item.route" class="broker-sidebar__link"
+          :class="{ 'is-active': route.path.startsWith(item.route) }">
           <span class="material-symbols-outlined">{{ item.icon }}</span>
           <span class="broker-sidebar__label">{{ item.label }}</span>
           <span v-if="item.badge" class="broker-sidebar__badge">{{
@@ -26,13 +21,8 @@
 
       <div class="broker-sidebar__group">
         <div class="broker-sidebar__group-title">Quản lý BĐS</div>
-        <RouterLink
-          v-for="item in propertyItems"
-          :key="item.id"
-          :to="item.route"
-          class="broker-sidebar__link"
-          :class="{ 'is-active': route.path.startsWith(item.route) }"
-        >
+        <RouterLink v-for="item in propertyItems" :key="item.id" :to="item.route" class="broker-sidebar__link"
+          :class="{ 'is-active': route.path.startsWith(item.route) }">
           <span class="material-symbols-outlined">{{ item.icon }}</span>
           <span class="broker-sidebar__label">{{ item.label }}</span>
           <span v-if="item.badge" class="broker-sidebar__badge">{{
@@ -44,16 +34,10 @@
       <div class="broker-sidebar__divider"></div>
 
       <div class="broker-sidebar__group broker-sidebar__group--bottom">
-        <RouterLink
-          v-for="item in secondaryItems"
-          :key="item.id"
-          :to="item.route"
-          class="broker-sidebar__link"
-          :class="{ 
-    'is-active': route.path.startsWith(item.route),
-    'broker-sidebar__link--upgrade': item.id === 'packages'
-  }"
-        >
+        <RouterLink v-for="item in secondaryItems" :key="item.id" :to="item.route" class="broker-sidebar__link" :class="{
+          'is-active': route.path.startsWith(item.route),
+          'broker-sidebar__link--upgrade': item.id === 'packages'
+        }">
           <span class="material-symbols-outlined">{{ item.icon }}</span>
           <span class="broker-sidebar__label">{{ item.label }}</span>
           <span v-if="item.badge" class="broker-sidebar__badge">{{
@@ -80,10 +64,11 @@
 
 <script setup>
 import { RouterLink, useRoute } from "vue-router";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import api from "@/axios/config";
 
 const route = useRoute();
+let interval = null;
 
 const primaryItems = ref([
   {
@@ -149,9 +134,19 @@ const loadUnreadNotifications = async () => {
   try {
     const res = await api.get("/moi-gioi/thong-bao");
     if (res.data?.data) {
-      const unread = res.data.data.filter((n) => !n.is_read).length;
-      const notifItem = secondaryItems.value.find((i) => i.id === "notifications");
-      if (notifItem) notifItem.badge = unread > 0 ? unread : null;
+      const unread = res.data.data.filter(
+        (n) => n.trang_thai === 0
+      ).length;
+      const notifIndex = secondaryItems.value.findIndex(
+        (i) => i.id === "notifications"
+      );
+
+      if (notifIndex !== -1) {
+        secondaryItems.value[notifIndex] = {
+          ...secondaryItems.value[notifIndex],
+          badge: unread > 0 ? unread : null,
+        };
+      }
     }
   } catch {
     // silent
@@ -160,6 +155,14 @@ const loadUnreadNotifications = async () => {
 
 onMounted(() => {
   loadUnreadNotifications();
+
+  interval = setInterval(() => {
+    loadUnreadNotifications();
+  }, 3000);
+});
+
+onUnmounted(() => {
+  clearInterval(interval);
 });
 </script>
 
