@@ -3,10 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
-class KhachHangUpdatePasswordRequest extends FormRequest
+class UpdatePasswordKhachHangRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,29 +14,28 @@ class KhachHangUpdatePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'old_password' => 'required|string|min:6',
-            'password'     => 'required|string|min:6|confirmed|different:old_password',
+            'old_password'  => 'required|min:6|max:20',
+            'password'      => 'required|min:6|max:20|different:old_password',
+            're_password'   => 'required|min:6|max:20|same:password',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'old_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
-            'old_password.min'      => 'Mật khẩu hiện tại phải có ít nhất 6 ký tự.',
-            'password.required'     => 'Vui lòng nhập mật khẩu mới.',
-            'password.min'          => 'Mật khẩu mới phải có ít nhất 6 ký tự.',
-            'password.confirmed'    => 'Mật khẩu xác nhận không khớp với mật khẩu mới.',
-            'password.different'    => 'Mật khẩu mới phải khác mật khẩu hiện tại.',
-        ];
-    }
+            'old_password.required' => 'Mật khẩu cũ không được để trống',
+            'old_password.min'      => 'Mật khẩu cũ phải có ít nhất 6 ký tự',
+            'old_password.max'      => 'Mật khẩu cũ không được quá 20 ký tự',
 
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(response()->json([
-            'status'  => false,
-            'message' => $validator->errors()->first(),
-            'errors' => $validator->errors(),
-        ], 422));
+            'password.required'     => 'Mật khẩu mới không được để trống',
+            'password.min'          => 'Mật khẩu mới phải có ít nhất 6 ký tự',
+            'password.max'          => 'Mật khẩu mới không được quá 20 ký tự',
+            'password.different'    => 'Mật khẩu mới phải khác mật khẩu cũ',
+
+            're_password.required'  => 'Nhập lại mật khẩu không được để trống',
+            're_password.min'       => 'Nhập lại mật khẩu phải có ít nhất 6 ký tự',
+            're_password.max'       => 'Nhập lại mật khẩu không được quá 20 ký tự',
+            're_password.same'      => 'Nhập lại mật khẩu không khớp với mật khẩu mới',
+        ];
     }
 }

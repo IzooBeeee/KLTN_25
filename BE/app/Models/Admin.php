@@ -22,6 +22,8 @@ class Admin extends Authenticatable
         'mo_ta',
         'so_dien_thoai',
         'is_super',
+        'hash_reset',
+        'hash_reset_expires_at',
     ];
 
 

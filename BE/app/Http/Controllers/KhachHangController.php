@@ -17,6 +17,7 @@ use App\Http\Requests\SearchKhachHangRequest;
 
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendOtpRequest;
+use App\Http\Requests\UpdatePasswordKhachHangRequest;
 use App\Http\Requests\VerifyOtpRequest;
 use App\Http\Requests\XacThucMaQuenMatKhauRequest;
 use App\Mail\ResetPasswordCodeMail;
@@ -191,18 +192,18 @@ class KhachHangController extends Controller
     }
 
     //Khách hàng cập nhật mật khẩu
-    public function updatePassword(KhachHangUpdatePasswordRequest $request)
+    public function updatePassword(UpdatePasswordKhachHangRequest $request)
     {
-        // ✅ Lấy user trực tiếp từ token đã được xác thực (không phụ thuộc Auth guard)
-        $user = $request->user();
+        $user = Auth::guard('sanctum')->user();
 
-        if (!$user || !($user instanceof KhachHang)) {
+        if (!$user) {
             return response()->json([
                 'status'  => false,
-                'message' => 'Unauthorized: Không xác thực được người dùng',
+                'message' => 'Không xác thực được người dùng!',
             ], 401);
         }
 
+        // Kiểm tra mật khẩu cũ
         if (!Hash::check($request->old_password, $user->password)) {
             return response()->json([
                 'status'  => false,
@@ -210,13 +211,19 @@ class KhachHangController extends Controller
             ], 400);
         }
 
-        $user->update([
-            'password' => bcrypt($request->password),
-        ]);
+        $currentTokenId = $user->currentAccessToken()->id;
+
+        $user->tokens()
+            ->where('id', '!=', $currentTokenId)
+            ->delete();
+
+        // Cập nhật mật khẩu
+        $user->password = bcrypt($request->password);
+        $user->save();
 
         return response()->json([
             'status'  => true,
-            'message' => 'Cập nhật mật khẩu thành công!',
+            'message' => 'Đổi mật khẩu thành công! Các thiết bị khác đã được đăng xuất.',
         ]);
     }
 
@@ -527,8 +534,8 @@ class KhachHangController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('ten', 'like', "%{$request->search}%")
-                  ->orWhere('email', 'like', "%{$request->search}%")
-                  ->orWhere('so_dien_thoai', 'like', "%{$request->search}%");
+                    ->orWhere('email', 'like', "%{$request->search}%")
+                    ->orWhere('so_dien_thoai', 'like', "%{$request->search}%");
             });
         }
 
