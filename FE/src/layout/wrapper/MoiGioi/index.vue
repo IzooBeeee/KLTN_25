@@ -13,13 +13,17 @@
     <!-- Footer -->
     <MoiGioiFooter />
   </div>
+
+  <!-- Chat Bot Môi Giới -->
+  <ChatBotMoiGioi />
 </div>
 </template>
 
 <script>
-import MoiGioiMenu from "../../components/MoiGioi/Menu.vue";
+import MoiGioiMenu   from "../../components/MoiGioi/Menu.vue";
 import MoiGioiHeader from "../../components/MoiGioi/Header.vue";
 import MoiGioiFooter from "../../components/MoiGioi/Footer.vue";
+import ChatBotMoiGioi from "../../../components/MoiGioi/ChatBot/index.vue";
 
 export default {
   name: "MoiGioiLayout",
@@ -27,6 +31,7 @@ export default {
     MoiGioiMenu,
     MoiGioiHeader,
     MoiGioiFooter,
+    ChatBotMoiGioi,
   },
 
   mounted() {

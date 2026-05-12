@@ -15,6 +15,10 @@ class ChatBotRequest extends FormRequest
     {
         return [
             'message' => 'required|string|max:1000',
+            'session_id' => 'nullable|string|max:100',
+            'role' => 'nullable|string|in:khach-hang,moi-gioi,guest',
+            'action_type' => 'nullable|string|max:120',
+            'action_payload' => 'nullable|array',
         ];
     }
 
