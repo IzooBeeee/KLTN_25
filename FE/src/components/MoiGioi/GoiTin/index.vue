@@ -113,6 +113,7 @@
         'border-emerald': plan.isPopular,
         'current-plan': plan.id === currentPlanId && !brokerInfo.het_han,
         'expired-plan': plan.id === currentPlanId && brokerInfo.het_han,
+        'plan-locked': plan.id === currentPlanId && !brokerInfo.het_han && brokerInfo.so_tin_con_lai > 0,
       }">
 
         <!-- Badge: Đang dùng -->
@@ -798,47 +799,47 @@ const buyExtraCredits = async (extra) => {
   }
 };
 
-// ✅ Confirm payment & redirect to Sepay
-// ✅ Confirm payment & show QR modal
+// ✅ Confirm payment & open QR modal
 const confirmPayment = async () => {
-  const token = localStorage.getItem("moi_gioi_auth_token");
-  if (!selectedId.value) {
+  if (!selectedId.value || !selectedPlan.value) {
     alert("Vui lòng chọn gói");
     return;
   }
 
+  showModal.value = false;
+
   try {
     paymentLoading.value = true;
 
-    const res = await api.post(
-      "/moi-gioi/payment/create",
-      {
-        goi_tin_id: selectedId.value,
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const res = await api.post("/moi-gioi/payment/create", {
+      goi_tin_id: selectedId.value,
+    });
 
-    if (res.data?.status && res.data?.data?.payment_html) {
-      showModal.value = false;
-      
-      // Tạo một div ẩn chứa form HTML và tự động submit sang Sepay
-      const div = document.createElement("div");
-      div.style.display = "none";
-      div.innerHTML = res.data.data.payment_html;
-      document.body.appendChild(div);
-      
-      const form = div.querySelector("form");
-      if (form) {
-        form.submit();
-      } else {
-        paymentResult.value = "error";
-        paymentErrorMessage.value = "Lỗi render cổng thanh toán";
+    if (res.data?.status && res.data?.data) {
+      paymentData.value = res.data.data;
+      orderCode.value = res.data.data.order_code;
+
+      // Nếu có payment_html (redirect sang cổng Sepay)
+      if (res.data.data.payment_html) {
+        const div = document.createElement("div");
+        div.style.display = "none";
+        div.innerHTML = res.data.data.payment_html;
+        document.body.appendChild(div);
+        const form = div.querySelector("form");
+        if (form) {
+          form.submit();
+          return;
+        }
       }
+
+      // Mặc định: hiện QR modal
+      showPaymentModal.value = true;
+      startCountdown();
+      stopPolling();
+      startPolling();
     } else {
       paymentResult.value = "error";
-      paymentErrorMessage.value = "Không tạo được thanh toán";
+      paymentErrorMessage.value = res.data?.message || "Không tạo được thanh toán";
     }
   } catch (err) {
     console.error("Payment error:", err);
@@ -2106,14 +2107,18 @@ onUnmounted(() => {
 
 /* Nút disabled - mờ đi */
 .pricing-card.current-plan .btn {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Chỉ disable nút khi gói ĐANG DÙNG & CÒN TIN (không cần gia hạn) */
+.pricing-card.current-plan.plan-locked .btn {
   background: #e2e8f0;
   color: #94a3b8;
   border: 2px solid #cbd5e1;
   cursor: not-allowed;
   opacity: 0.6;
   pointer-events: none;
-  position: relative;
-  overflow: hidden;
 }
 
 .pricing-card.current-plan .btn::before {

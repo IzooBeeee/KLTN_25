@@ -302,8 +302,11 @@
             <!-- Thông tin cơ bản -->
             <div class="col-12"><h6 class="fw-bold text-primary border-bottom pb-2">1. Thông tin cơ bản</h6></div>
             <div class="col-12">
-              <label class="form-label text-muted fw-bold small text-uppercase">📌 Tiêu Đề</label>
-              <input v-model="editingProperty.title" type="text" class="form-control form-control-lg bg-light border-0 rounded-3 fs-6" />
+              <label class="form-label text-muted fw-bold small text-uppercase">📌 Tiêu Đề <span class="text-danger">*</span></label>
+              <input v-model="editingProperty.title" type="text"
+                class="form-control form-control-lg bg-light rounded-3 fs-6"
+                :class="editErrors.title ? 'border-danger' : 'border-0'" />
+              <div v-if="editErrors.title" class="text-danger small mt-1">⚠️ {{ editErrors.title }}</div>
             </div>
             <div class="col-md-6">
               <label class="form-label text-muted fw-bold small text-uppercase">Loại Bất Động Sản</label>
@@ -330,37 +333,61 @@
             </div>
 
             <!-- Vị trí -->
-            <div class="col-12 mt-4"><h6 class="fw-bold text-primary border-bottom pb-2">2. Vị trí</h6></div>
+            <div class="col-12 mt-4"><h6 class="fw-bold text-primary border-bottom pb-2">2. Vị trí <span class="text-danger">*</span></h6></div>
             <div class="col-md-4">
-              <label class="form-label text-muted fw-bold small text-uppercase">Tỉnh / Thành</label>
-              <select v-model="editingProperty.tinh_id" @change="onTinhChange" class="form-select form-control-lg bg-light border-0 rounded-3 fs-6">
+              <label class="form-label text-muted fw-bold small text-uppercase">Tỉnh / Thành <span class="text-danger">*</span></label>
+              <select v-model="editingProperty.tinh_id" @change="onTinhChange"
+                class="form-select form-control-lg rounded-3 fs-6"
+                :class="editErrors.address && !editingProperty.tinh_id ? 'border-danger bg-light' : 'border-0 bg-light'">
                 <option value="">Chọn tỉnh</option>
                 <option v-for="tinh in tinhThanhList" :key="tinh.id" :value="tinh.id">{{ tinh.ten }}</option>
               </select>
             </div>
             <div class="col-md-4">
-              <label class="form-label text-muted fw-bold small text-uppercase">Quận / Huyện</label>
-              <select v-model="editingProperty.quan_id" @change="onQuanChange" class="form-select form-control-lg bg-light border-0 rounded-3 fs-6">
+              <label class="form-label text-muted fw-bold small text-uppercase">Quận / Huyện <span class="text-danger">*</span></label>
+              <select v-model="editingProperty.quan_id" @change="onQuanChange"
+                class="form-select form-control-lg rounded-3 fs-6"
+                :class="editErrors.address && !editingProperty.quan_id ? 'border-danger bg-light' : 'border-0 bg-light'">
                 <option value="">Chọn quận</option>
                 <option v-for="quan in quanHuyenList" :key="quan.id" :value="quan.id">{{ quan.ten }}</option>
               </select>
             </div>
             <div class="col-md-4">
-              <label class="form-label text-muted fw-bold small text-uppercase">Phường / Xã</label>
-              <select v-model="editingProperty.phuong_id" class="form-select form-control-lg bg-light border-0 rounded-3 fs-6">
+              <label class="form-label text-muted fw-bold small text-uppercase">Phường / Xã <span class="text-danger">*</span></label>
+              <select v-model="editingProperty.phuong_id"
+                class="form-select form-control-lg rounded-3 fs-6"
+                :class="editErrors.address && !editingProperty.phuong_id ? 'border-danger bg-light' : 'border-0 bg-light'">
                 <option value="">Chọn phường</option>
                 <option v-for="phuong in phuongList" :key="phuong.id" :value="phuong.id">{{ phuong.ten }}</option>
               </select>
             </div>
+            <!-- Inline error address -->
+            <div v-if="editErrors.address" class="col-12">
+              <div class="alert alert-danger py-2 px-3 small mb-0 rounded-3">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ editErrors.address }}
+              </div>
+            </div>
             <div class="col-12">
-              <label class="form-label text-muted fw-bold small text-uppercase">Địa chỉ chi tiết</label>
-              <input v-model="editingProperty.dia_chi_chi_tiet" type="text" class="form-control form-control-lg bg-light border-0 rounded-3 fs-6" />
+              <label class="form-label text-muted fw-bold small text-uppercase">Địa chỉ chi tiết <span class="text-danger">*</span></label>
+              <input v-model="editingProperty.dia_chi_chi_tiet" type="text"
+                class="form-control form-control-lg bg-light rounded-3 fs-6"
+                :class="editErrors.diaChiChiTiet ? 'border-danger' : 'border-0'"
+                placeholder="Ví dụ: Số 12 Đường Hoàng Văn Thái" />
+              <div v-if="editErrors.diaChiChiTiet" class="text-danger small mt-1">⚠️ {{ editErrors.diaChiChiTiet }}</div>
             </div>
 
             <!-- Hình ảnh -->
-            <div class="col-12 mt-4"><h6 class="fw-bold text-primary border-bottom pb-2">3. Hình ảnh</h6></div>
+            <div class="col-12 mt-4">
+              <h6 class="fw-bold border-bottom pb-2" :class="editErrors.images ? 'text-danger' : 'text-primary'">
+                3. Hình ảnh <span class="text-danger">*</span>
+              </h6>
+            </div>
             <div class="col-12">
               <p class="text-muted small mb-2">Click "Đặt bìa" để chọn ảnh đại diện cho tin đăng. Chỉ áp dụng với ảnh đã lưu trên server.</p>
+              <!-- Inline error images -->
+              <div v-if="editErrors.images" class="alert alert-danger py-2 px-3 small mb-3 rounded-3">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ editErrors.images }}
+              </div>
               <div class="d-flex flex-wrap gap-2 mb-3">
                 <div v-for="(img, idx) in oldImages" :key="'old-' + img.id" class="position-relative" style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden;" :style="representativeIdx === idx ? 'border: 2px solid #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,0.25);' : 'border: 1px solid #ddd;'">
                   <img :src="getImageUrl(img.url)" class="w-100 h-100" style="object-fit: cover;" />
@@ -489,6 +516,14 @@ const newImages = ref([]);
 const deletedImages = ref([]);
 const imagePreviewUrls = ref([]);
 const representativeIdx = ref(0); // Index của ảnh đại diện trong danh sách hiện tại (old + new)
+
+// ✅ Inline validation errors
+const editErrors = ref({
+  images: '',
+  address: '',
+  title: '',
+  diaChiChiTiet: '',
+});
 
 
 // CHECK AUTH
@@ -633,6 +668,8 @@ const filteredProperties = computed(() => {
 // ACTIONS
 
 const handleEdit = async (property) => {
+  // ✅ Reset lỗi validation khi mở modal mới
+  editErrors.value = { images: '', address: '', title: '', diaChiChiTiet: '' };
   editingProperty.value = {
     id: property.id,
     title: property.title,
@@ -777,10 +814,36 @@ const setRepresentativeImage = (index) => {
 
 
 const submitEdit = async () => {
+  // ✅ Reset errors
+  editErrors.value = { images: '', address: '', title: '', diaChiChiTiet: '' };
+  let hasError = false;
+
   if (!editingProperty.value.title.trim()) {
-    alert("⚠️ Vui lòng nhập tiêu đề");
-    return;
+    editErrors.value.title = 'Vui lòng nhập tiêu đề bài đăng.';
+    hasError = true;
   }
+
+  // ✅ Validate bắt buộc phải có ảnh
+  const totalImages = oldImages.value.length + newImages.value.length;
+  if (totalImages === 0) {
+    editErrors.value.images = 'Bắt buộc phải có ít nhất 1 hình ảnh. Vui lòng tải ảnh lên.';
+    hasError = true;
+  }
+
+  // ✅ Validate địa chỉ bắt buộc
+  if (!editingProperty.value.tinh_id || !editingProperty.value.quan_id || !editingProperty.value.phuong_id) {
+    editErrors.value.address = 'Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Phường/Xã.';
+    hasError = true;
+  }
+
+  // ✅ Validate địa chỉ chi tiết bắt buộc
+  if (!editingProperty.value.dia_chi_chi_tiet?.trim()) {
+    editErrors.value.diaChiChiTiet = 'Vui lòng nhập địa chỉ chi tiết (số nhà, tên đường...).';
+    hasError = true;
+  }
+
+  if (hasError) return;
+
   isSubmitting.value = true;
   errorMessage.value = "";
 
@@ -797,7 +860,7 @@ const submitEdit = async () => {
     if (editingProperty.value.tinh_id) formData.append("tinh_id", editingProperty.value.tinh_id);
     if (editingProperty.value.quan_id) formData.append("quan_id", editingProperty.value.quan_id);
     if (editingProperty.value.phuong_id) formData.append("phuong_id", editingProperty.value.phuong_id);
-    if (editingProperty.value.dia_chi_chi_tiet) formData.append("dia_chi_chi_tiet", editingProperty.value.dia_chi_chi_tiet);
+    formData.append("dia_chi_chi_tiet", editingProperty.value.dia_chi_chi_tiet || ""); // ✅ Luôn gửi (kể cả khi rỗng)
     if (editingProperty.value.latitude) formData.append("latitude", editingProperty.value.latitude);
     if (editingProperty.value.longitude) formData.append("longitude", editingProperty.value.longitude);
 
@@ -839,6 +902,7 @@ const cancelEdit = () => {
   showEditModal.value = false;
   editingProperty.value = null;
   representativeIdx.value = 0;
+  editErrors.value = { images: '', address: '', title: '', diaChiChiTiet: '' };
 };
 
 const handleDelete = (property) => {

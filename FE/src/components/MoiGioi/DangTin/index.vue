@@ -1139,7 +1139,7 @@ const debouncedReverseGeocode = (lat, lng) => {
   if (geocodeTimer) clearTimeout(geocodeTimer);
   geocodeTimer = setTimeout(() => {
     reverseGeocode(lat, lng);
-  }, 500);
+  }, 1000); // ✅ Tăng lên 1s để tránh spam API
 };
 
 const updateDiaChiChiTiet = () => {
@@ -1169,6 +1169,8 @@ const getFullAddressString = () => {
 };
 
 const forwardGeocode = async () => {
+  // ✅ Không geocode khi đang restore form (tránh spam API)
+  if (isRestoringForm.value) return;
   const addressQuery = getFullAddressString();
   // Chỉ tìm kiếm khi đã chọn ít nhất Tỉnh và Quận
   if (!form.tinh_id || !form.quan_id || !mapInstance.value) return;
@@ -1211,10 +1213,11 @@ const forwardGeocode = async () => {
 
 let forwardGeocodeTimer = null;
 const debouncedForwardGeocode = () => {
+  if (isRestoringForm.value) return; // ✅ Không chạy khi đang restore
   if (forwardGeocodeTimer) clearTimeout(forwardGeocodeTimer);
   forwardGeocodeTimer = setTimeout(() => {
     forwardGeocode();
-  }, 1000);
+  }, 2000); // ✅ Tăng lên 2s để giảm lag
 };
 
 // Watch step changes to init/destroy map
