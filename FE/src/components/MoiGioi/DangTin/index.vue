@@ -1278,6 +1278,18 @@ const validateStep = () => {
       });
     }
   }
+  if (currentStep.value === 2) {
+    if (form.images.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Thiếu hình ảnh",
+        text: "Vui lòng tải lên ít nhất một hình ảnh cho bất động sản của bạn.",
+        confirmButtonText: "Đã hiểu",
+        confirmButtonColor: "#001f7c",
+      });
+      return false;
+    }
+  }
   if (currentStep.value === 3) {
     if (!form.latitude || !form.longitude) {
       Swal.fire({
@@ -1506,6 +1518,22 @@ const submitForm = async () => {
   });
 
   if (!confirm) return;
+
+  // Kiểm tra cuối cùng về hình ảnh trước khi submit
+  if (form.images.length === 0) {
+    Swal.fire({
+      icon: "error",
+      title: "Thiếu hình ảnh",
+      text: "Vui lòng quay lại bước 2 để thêm hình ảnh cho bất động sản.",
+      confirmButtonText: "Quay lại bước 2",
+      confirmButtonColor: "#001f7c",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        currentStep.value = 2;
+      }
+    });
+    return;
+  }
 
   try {
     const formData = new FormData();
