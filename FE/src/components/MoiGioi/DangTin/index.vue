@@ -1139,7 +1139,7 @@ const debouncedReverseGeocode = (lat, lng) => {
   if (geocodeTimer) clearTimeout(geocodeTimer);
   geocodeTimer = setTimeout(() => {
     reverseGeocode(lat, lng);
-  }, 500);
+  }, 1000); // ✅ Tăng lên 1s để tránh spam API
 };
 
 const updateDiaChiChiTiet = () => {
@@ -1169,6 +1169,8 @@ const getFullAddressString = () => {
 };
 
 const forwardGeocode = async () => {
+  // ✅ Không geocode khi đang restore form (tránh spam API)
+  if (isRestoringForm.value) return;
   const addressQuery = getFullAddressString();
   // Chỉ tìm kiếm khi đã chọn ít nhất Tỉnh và Quận
   if (!form.tinh_id || !form.quan_id || !mapInstance.value) return;
@@ -1211,10 +1213,11 @@ const forwardGeocode = async () => {
 
 let forwardGeocodeTimer = null;
 const debouncedForwardGeocode = () => {
+  if (isRestoringForm.value) return; // ✅ Không chạy khi đang restore
   if (forwardGeocodeTimer) clearTimeout(forwardGeocodeTimer);
   forwardGeocodeTimer = setTimeout(() => {
     forwardGeocode();
-  }, 1000);
+  }, 2000); // ✅ Tăng lên 2s để giảm lag
 };
 
 // Watch step changes to init/destroy map
@@ -1273,6 +1276,18 @@ const validateStep = () => {
         text: "Tiêu đề nên có ít nhất 20 ký tự để thu hút người xem",
         confirmButtonText: "Tiếp tục",
       });
+    }
+  }
+  if (currentStep.value === 2) {
+    if (form.images.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Thiếu hình ảnh",
+        text: "Vui lòng tải lên ít nhất một hình ảnh cho bất động sản của bạn.",
+        confirmButtonText: "Đã hiểu",
+        confirmButtonColor: "#001f7c",
+      });
+      return false;
     }
   }
   if (currentStep.value === 3) {
@@ -1503,6 +1518,22 @@ const submitForm = async () => {
   });
 
   if (!confirm) return;
+
+  // Kiểm tra cuối cùng về hình ảnh trước khi submit
+  if (form.images.length === 0) {
+    Swal.fire({
+      icon: "error",
+      title: "Thiếu hình ảnh",
+      text: "Vui lòng quay lại bước 2 để thêm hình ảnh cho bất động sản.",
+      confirmButtonText: "Quay lại bước 2",
+      confirmButtonColor: "#001f7c",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        currentStep.value = 2;
+      }
+    });
+    return;
+  }
 
   try {
     const formData = new FormData();

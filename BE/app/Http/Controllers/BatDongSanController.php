@@ -380,6 +380,11 @@ class BatDongSanController extends Controller
                 if (!$goi) {
                     return response()->json(['status' => false, 'message' => 'Gói không hợp lệ'], 403);
                 }
+
+                // Kiểm tra có hình ảnh khi đăng tin trực tiếp
+                if (!$request->hasFile('hinh_anh') || count($request->file('hinh_anh')) === 0) {
+                    return response()->json(['status' => false, 'message' => 'Vui lòng cung cấp ít nhất một hình ảnh cho bất động sản'], 422);
+                }
             }
 
             // 1. Tạo hoặc lấy địa chỉ
@@ -499,6 +504,14 @@ class BatDongSanController extends Controller
 
             if (!$goi) {
                 return response()->json(['status' => false, 'message' => 'Gói không hợp lệ'], 403);
+            }
+
+            // Kiểm tra có hình ảnh trước khi publish bản nháp
+            if ($bds->hinhAnh()->count() === 0) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Không thể đăng tin vì chưa có hình ảnh. Vui lòng cập nhật hình ảnh trước khi đăng.'
+                ], 422);
             }
 
             // 🔥 UPDATE
@@ -658,6 +671,15 @@ class BatDongSanController extends Controller
                         $repImage->update(['is_anh_dai_dien' => true]);
                     }
                 }
+            }
+
+            // Kiểm tra có hình ảnh khi đăng bài (status != draft)
+            if ($data->status !== 'draft' && $data->hinhAnh()->count() === 0) {
+                DB::rollBack();
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Vui lòng cung cấp ít nhất một hình ảnh cho bất động sản'
+                ], 422);
             }
 
             DB::commit();

@@ -51,7 +51,7 @@ class CreateBatDongSanRequest extends FormRequest
         'mo_ta' => 'nullable|string',
         'so_phong_ngu' => 'nullable|integer|min:0',
         'so_phong_tam' => 'nullable|integer|min:0',
-        'hinh_anh' => 'nullable|array|max:10',
+        'hinh_anh' => ($status === 'published' ? 'required|' : 'nullable|') . 'array|min:1|max:10',
     ];
 }
 
@@ -78,6 +78,8 @@ class CreateBatDongSanRequest extends FormRequest
             'is_noi_bat.boolean' => 'Giá trị is_noi_bat phải là true hoặc false',
             'mo_ta.string' => 'Mô tả phải là chuỗi ký tự',
             'mo_ta.max' => 'Mô tả không được vượt quá 255 ký tự',
+            'hinh_anh.required'     => 'Vui lòng cung cấp ít nhất một hình ảnh cho bất động sản',
+            'hinh_anh.min'          => 'Vui lòng cung cấp ít nhất một hình ảnh cho bất động sản',
             'hinh_anh.array'        => 'Hình ảnh phải là danh sách file',
             'hinh_anh.max'          => 'Chỉ được upload tối đa 10 ảnh',
             // 'hinh_anh.*.image'      => 'File phải là hình ảnh',
