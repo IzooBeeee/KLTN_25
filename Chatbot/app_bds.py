@@ -1,4 +1,4 @@
-﻿import json
+import json
 import logging
 import os
 import random
@@ -246,6 +246,7 @@ class RolePolicy:
         "broker_appointments",
         "broker_leads",
         "broker_profile_help",
+        "broker_help",
         "general_broker_help",
     }
 
@@ -289,13 +290,17 @@ class RolePolicy:
         return {
             "success": True,
             "response": (
-                "Chế độ này dành cho môi giới nên mình ưu tiên hỗ trợ gói tin, đăng bài và lịch khách hẹn. "
+                "Chế độ này dành cho môi giới nên mình ưu tiên hỗ trợ gói tin, đăng bài, quản lý tin và lịch khách hẹn. "
                 "Nếu bạn muốn tìm BĐS như khách hàng, hãy chuyển sang khu khách hàng."
             ),
             "intent": "customer_feature_redirect",
             "context": "broker",
             "suggestions": [],
-            "quick_replies": ["Gói tin đăng BĐS", "Hướng dẫn đăng bài", "Lịch khách hẹn xem nhà"],
+            "quick_replies": [
+                "Gói tin đăng BĐS giá bao nhiêu?",
+                "Hướng dẫn đăng bài",
+                "Lịch khách hẹn xem nhà",
+            ],
         }
 
     @classmethod
@@ -757,6 +762,83 @@ class GeminiPipeline:
             return draft
 
 
+def detect_out_of_domain(message: str) -> bool:
+    t = normalize_text(message)
+    t_ascii = normalize_ascii(message)
+    
+    # Nhận diện intent BĐS rõ ràng (Yêu cầu C)
+    bds_intents = [
+        "tìm nhà", "tim nha", "mua nhà", "mua nha", "bán nhà", "ban nha", "thuê nhà", "thue nha",
+        "nhà phố", "nha pho", "nhà đất", "nha dat", "bất động sản", "bat dong san", "bđs", "bds",
+        "căn hộ", "can ho", "chung cư", "chung cu", "đất nền", "dat nen", "biệt thự", "biet thu",
+        "giá nhà", "gia nha", "nhà gần biển", "nha gan bien",
+    ]
+    has_clear_bds = any(k in t or k in t_ascii for k in bds_intents)
+    
+    for loc in ["sơn trà", "son tra", "hải châu", "hai chau", "ngũ hành sơn", "ngu hanh son", "liên chiểu", "lien chieu", "hòa vang", "hoa vang", "cẩm lệ", "cam le", "thanh khê", "thanh khe"]:
+        if f"nhà ở {loc}" in t or f"nha o {loc}" in t_ascii or f"nhà {loc}" in t or f"nha {loc}" in t_ascii:
+            has_clear_bds = True
+            break
+
+    # Shopping/food literal check:
+    shopping_food = [
+        "mua áo", "mua ao", "mua quần", "mua quan", "mua giày", "mua giay",
+        "áo da", "ao da", "áo sơ mi", "ao so mi",
+        "bán cho tôi", "ban cho toi", "bán cho tui", "ban cho tui",
+        "tô cháo", "to chao", "cháo", "sữa tươi", "sua tuoi",
+        "sữa tươi không đường", "sua tuoi khong duong",
+        "quả táo", "qua tao", "trái táo", "trai tao", "trái cây", "trai cay",
+        "đồ ăn", "do an", "nước uống", "nuoc uong",
+    ]
+    if any(k in t or k in t_ascii for k in shopping_food):
+        if not any(k in t or k in t_ascii for k in ["căn hộ", "can ho", "nhà phố", "nha pho", "đất nền", "dat nen", "biệt thự", "biet thu"]):
+            return True
+            
+    if "bán cho" in t or "ban cho" in t_ascii:
+        if not any(k in t or k in t_ascii for k in ["nhà", "nha", "bđs", "bds", "đất", "dat", "căn", "can"]):
+            return True
+
+    if re.search(r"\b(mua|bán cho|ban cho).*(áo|ao|quần|quan|cháo|chao|sữa|sua|táo|tao)\b", t_ascii):
+        if not any(k in t or k in t_ascii for k in ["căn hộ", "can ho", "nhà phố", "nha pho", "đất nền", "dat nen", "biệt thự", "biet thu"]):
+            return True
+
+    # Social/personal checks:
+    social_personal = [
+        "qua nhà mình chơi", "qua nha minh choi",
+        "qua nhà tui", "qua nha tui",
+        "qua nhà tôi", "qua nha toi",
+        "qua nhà tao", "qua nha tao",
+        "nhà ở đâu vậy mình qua chơi", "nha o dau vay minh qua choi",
+        "bạn muốn qua nhà mình chơi không", "ban muon qua nha minh choi khong",
+        "qua nhà chơi", "qua nha choi",
+        "đi chơi không", "di choi khong",
+        "đi biển không", "di bien khong",
+        "đi tắm biển", "di tam bien",
+        "tắm biển", "tam bien",
+        "bạn ăn gì chưa", "ban an gi chua",
+    ]
+    if any(k in t or k in t_ascii for k in social_personal):
+        return True
+
+    if "thời tiết" in t or "thoi tiet" in t_ascii:
+        if not any(k in t or k in t_ascii for k in ["nhà", "nha", "bđs", "bds", "đất", "dat", "căn", "can"]):
+            return True
+
+    social_regexes = [
+        r"\bqua\s+(nhà|nha)\b",
+        r"\b(nhà|nha)\s+(mình|minh|tui|tôi|toi|tao|bạn|ban)\b",
+        r"\bqua\s+(nhà|nha).*(chơi|choi)\b",
+        r"\b(nhà|nha)\s+ở\s+đâu.*(qua|chơi|choi)\b",
+        r"\bđi\s+(chơi|biển|tam bien|tắm biển)\b",
+    ]
+    for pat in social_regexes:
+        if re.search(pat, t_ascii) or re.search(pat, t):
+            if not has_clear_bds:
+                return True
+                
+    return False
+
+
 class RuleBasedNLU:
     PROPERTY_TYPES = {
         "căn hộ": "căn hộ",
@@ -817,6 +899,16 @@ class RuleBasedNLU:
                 "context": None,
                 "entities": {},
                 "confidence": 1,
+                "raw": t,
+            }
+
+        # 1. OUT_OF_DOMAIN / SOCIAL CHAT EARLY DETECTION
+        if detect_out_of_domain(message):
+            return {
+                "intent": "out_of_domain",
+                "context": None,
+                "entities": {},
+                "confidence": 0.95,
                 "raw": t,
             }
 
@@ -886,6 +978,7 @@ class RuleBasedNLU:
 
         # Package list (view/re-view) — takes priority OVER buy_guide for 'xem lại gói tin'
         package_view_keywords = [
+            "gói tin", "goi tin",
             "xem lại gói tin", "xem lai goi tin",
             "xem gói tin", "xem goi tin",
             "bảng giá gói tin", "bang gia goi tin",
@@ -910,12 +1003,57 @@ class RuleBasedNLU:
         if any(k in t or k in t_ascii for k in posting_keywords):
             intent, context = "posting_guide", "posting"
             
+        broker_help_keywords = [
+            "chat này tôi làm được cái gì", "chat nay toi lam duoc cai gi",
+            "chatbot này làm được gì", "chatbot nay lam duoc gi",
+            "bạn hỗ trợ gì", "ban ho tro gi",
+            "bạn giúp được gì", "ban giup duoc gi",
+            "tôi có thể hỏi gì", "toi co the hoi gi",
+            "chức năng của bạn", "chuc nang cua ban",
+            "chức năng chatbot", "chuc nang chatbot",
+            "hướng dẫn sử dụng chatbot", "huong dan su dung chatbot",
+            "help", "trợ giúp", "tro giup",
+        ]
+        if memory.actor == "broker" and any(k in t or k in t_ascii for k in broker_help_keywords):
+            return {
+                "intent": "broker_help",
+                "context": "broker",
+                "entities": {},
+                "confidence": 1.0,
+                "raw": t,
+            }
+            
         listing_count = self.extract_listing_count(t)
         if listing_count is not None:
             entities["requested_listing_count"] = listing_count
 
         for k, v in self.PROPERTY_TYPES.items():
             if k in t:
+                # Căn cứ Yêu cầu 2 & 3: Kiểm tra từ "nhà" đơn lẻ
+                if k == "nhà":
+                    # Bỏ qua nếu thuộc các cụm giao tiếp cá nhân (Yêu cầu 2)
+                    social_nhas = [
+                        "nhà mình", "nha minh", "nhà tôi", "nha toi",
+                        "nhà tui", "nha tui",
+                        "nhà tao", "nha tao", "nhà bạn", "nha ban",
+                        "qua nhà", "qua nha", "đến nhà", "den nha",
+                        "chơi không", "choi khong",
+                        "nhà ở đâu vậy mình qua chơi",
+                    ]
+                    if any(sn in t or sn in t_ascii for sn in social_nhas):
+                        # Trừ khi có ý định BĐS rõ ràng (Yêu cầu 3)
+                        clear_bds_intents = [
+                            "tìm nhà", "tim nha", "mua nhà", "mua nha",
+                            "bán nhà", "ban nha", "thuê nhà", "thue nha",
+                            "nhà phố", "nha pho", "nhà đất", "nha dat",
+                            "bất động sản", "bat dong san", "căn hộ", "can ho",
+                            "chung cư", "chung cu", "đất nền", "dat nen",
+                            "biệt thự", "biet thu", "giá nhà", "gia nha",
+                            "nhà ở sơn trà", "nha o son tra", "nhà khoảng",
+                            "nha khoang", "nhà gần biển", "nha gan bien",
+                        ]
+                        if not any(cbi in t or cbi in t_ascii for cbi in clear_bds_intents):
+                            continue
                 entities["property_type"] = v
                 if intent == "general_bds":
                     intent = "search_property"
@@ -959,33 +1097,41 @@ class RuleBasedNLU:
         lifestyles = [v for k, v in self.LIFESTYLE.items() if k in t]
         if lifestyles:
             entities["lifestyle"] = list(dict.fromkeys(lifestyles))
-        if any(k in t for k in ["định giá", "giá bao nhiêu"]):
-            intent, context = "valuation", "valuation"
-        elif any(k in t for k in ["đặt lịch", "xem nhà", "hẹn"]):
-            intent, context = "appointment", "appointment"
-        elif any(k in t for k in ["rẻ hơn", "rộng hơn", "gần biển", "gần trung tâm"]):
-            if "gần biển" in t and memory.active_context not in ["search"] and not memory.last_search_filters:
-                # No prior search context → treat as broad beach search
-                intent, context = "search_property", "search"
-                lifestyles = entities.get("lifestyle") or []
-                if "near_beach" not in lifestyles:
-                    lifestyles.append("near_beach")
-                entities["lifestyle"] = lifestyles
-                if not entities.get("locations"):
-                    entities["locations"] = ["sơn trà", "ngũ hành sơn", "mỹ an", "mỹ khê"]
-            else:
-                intent, context = "refine_search", (
-                    "search" if memory.active_context == "search" else "general"
-                )
-                entities["refinement"] = True
-                if "rẻ hơn" in t:
-                    entities["refinement_type"] = "cheaper"
-                elif "rộng hơn" in t:
-                    entities["refinement_type"] = "larger"
-                elif "gần biển" in t:
-                    entities["refinement_type"] = "near_beach"
-                elif "gần trung tâm" in t:
-                    entities["refinement_type"] = "center"
+        if intent not in {
+            "package_info",
+            "package_buy_guide",
+            "become_broker_guide",
+            "posting_guide",
+            "broker_help",
+            "general_broker_help",
+        }:
+            if any(k in t for k in ["định giá", "giá bao nhiêu"]):
+                intent, context = "valuation", "valuation"
+            elif any(k in t for k in ["đặt lịch", "xem nhà", "hẹn"]):
+                intent, context = "appointment", "appointment"
+            elif any(k in t for k in ["rẻ hơn", "rộng hơn", "gần biển", "gần trung tâm"]):
+                if "gần biển" in t and memory.active_context not in ["search"] and not memory.last_search_filters:
+                    # No prior search context → treat as broad beach search
+                    intent, context = "search_property", "search"
+                    lifestyles = entities.get("lifestyle") or []
+                    if "near_beach" not in lifestyles:
+                        lifestyles.append("near_beach")
+                    entities["lifestyle"] = lifestyles
+                    if not entities.get("locations"):
+                        entities["locations"] = ["sơn trà", "ngũ hành sơn", "mỹ an", "mỹ khê"]
+                else:
+                    intent, context = "refine_search", (
+                        "search" if memory.active_context == "search" else "general"
+                    )
+                    entities["refinement"] = True
+                    if "rẻ hơn" in t:
+                        entities["refinement_type"] = "cheaper"
+                    elif "rộng hơn" in t:
+                        entities["refinement_type"] = "larger"
+                    elif "gần biển" in t:
+                        entities["refinement_type"] = "near_beach"
+                    elif "gần trung tâm" in t:
+                        entities["refinement_type"] = "center"
         return {
             "intent": intent,
             "context": context,
@@ -1640,11 +1786,13 @@ class ResponseGenerator:
     def packages(self, packages: List[Dict[str, Any]]) -> Tuple[str, List[str]]:
         print(f"📦 RESPONSE_GENERATOR.packages() called with {len(packages)} packages")
         if not packages:
-            print("⚠️ packages list is EMPTY - returning fallback message")
-            return (
-                'Hiện mình chưa đọc được bảng gói tin. Bạn có thể vào <a href="/moi-gioi/goi-tin" target="_blank">trang gói tin</a> hoặc nhắn mình nhu cầu đăng bao nhiêu tin để tư vấn tiếp.',
-                ["Tôi muốn đăng 10 tin", "Xem gói tin"],
-            )
+            print("⚠️ packages list is EMPTY - returning default static packages")
+            packages = [
+                {"ten_goi": "Gói Cơ Bản", "gia": 50000, "so_ngay": 7, "so_luong_tin": 3},
+                {"ten_goi": "Gói Tiêu Chuẩn", "gia": 100000, "so_ngay": 15, "so_luong_tin": 10},
+                {"ten_goi": "Gói VIP", "gia": 250000, "so_ngay": 30, "so_luong_tin": 30},
+                {"ten_goi": "Gói Cao Cấp", "gia": 500000, "so_ngay": 60, "so_luong_tin": 100},
+            ]
         lines = [
             "Với môi giới, bạn có thể chọn gói theo số lượng tin và nhu cầu hiển thị:"
         ]
@@ -1773,8 +1921,8 @@ class ResponseGenerator:
                 ["Xem bảng giá gói tin", "Tìm BĐS", "Định giá BĐS"],
             ),
             "out_of_domain": (
-                "Mình là trợ lý bất động sản nên chỉ hỗ trợ tìm nhà đất, định giá, gói tin, đặt lịch.",
-                ["Tìm BĐS Đà Nẵng", "Định giá nhà", "Gói tin đăng bài"],
+                "Hiện mình chỉ hỗ trợ các nội dung liên quan đến bất động sản như:<br>• Tìm kiếm BĐS<br>• Định giá BĐS<br>• Đặt lịch xem nhà<br>• Thông tin gói tin/môi giới",
+                ["Tìm BĐS", "Định giá BĐS", "Gói tin"],
             ),
             "ending": (
                 "Rất vui được hỗ trợ bạn. Khi cần tìm nhà, định giá hoặc đặt lịch xem BĐS, cứ nhắn mình nhé.",
@@ -1783,6 +1931,40 @@ class ResponseGenerator:
             "empty": (
                 "Bạn nhập giúp mình nhu cầu cụ thể hơn nhé, ví dụ: 'tìm căn hộ Sơn Trà khoảng 2 tỷ'.",
                 ["Tìm căn hộ Đà Nẵng", "Xem gói tin"],
+            ),
+            "broker_help": (
+                "Mình có thể hỗ trợ bạn:<br>"
+                "• Xem bảng giá gói tin đăng BĐS<br>"
+                "• Hướng dẫn mua gói tin<br>"
+                "• Hướng dẫn đăng bài BĐS<br>"
+                "• Kiểm tra lượt đăng/gói hiện tại nếu hệ thống hỗ trợ<br>"
+                "• Xem lịch khách hẹn xem nhà<br>"
+                "• Hướng dẫn quản lý tin đăng<br><br>"
+                "Bạn muốn mình hỗ trợ phần nào?",
+                [
+                    "Gói tin đăng BĐS giá bao nhiêu?",
+                    "Cách mua gói tin",
+                    "Hướng dẫn đăng bài",
+                    "Lịch khách hẹn xem nhà",
+                    "Tôi còn bao nhiêu lượt đăng?",
+                ],
+            ),
+            "general_broker_help": (
+                "Mình có thể hỗ trợ bạn:<br>"
+                "• Xem bảng giá gói tin đăng BĐS<br>"
+                "• Hướng dẫn mua gói tin<br>"
+                "• Hướng dẫn đăng bài BĐS<br>"
+                "• Kiểm tra lượt đăng/gói hiện tại nếu hệ thống hỗ trợ<br>"
+                "• Xem lịch khách hẹn xem nhà<br>"
+                "• Hướng dẫn quản lý tin đăng<br><br>"
+                "Bạn muốn mình hỗ trợ phần nào?",
+                [
+                    "Gói tin đăng BĐS giá bao nhiêu?",
+                    "Cách mua gói tin",
+                    "Hướng dẫn đăng bài",
+                    "Lịch khách hẹn xem nhà",
+                    "Tôi còn bao nhiêu lượt đăng?",
+                ],
             ),
         }
         return mapping.get(
@@ -2051,7 +2233,7 @@ class BDSChatbot:
             a_b = {"intent": "broker_appointments", "context": "broker", "entities": {}}
             self.memory.update(session_id, message, draft_b, a_b, [])
             return self.wrap(draft_b, a_b, [], [
-                "L\u1ecbch ch\u1edd x\u00e1c nh\u1eadn", "G\u00f3i tin \u0111\u0103ng B\u0110S", "H\u01b0\u1edbng d\u1eabn \u0111\u0103ng b\u00e0i"
+                "Lịch chờ xác nhận", "Gói tin đăng BĐS giá bao nhiêu?", "Hướng dẫn đăng bài"
             ], start)
 
         # 3. Check cancel booking
@@ -2062,6 +2244,36 @@ class BDSChatbot:
             draft = "Mình đã hủy thao tác đặt lịch. Bạn cần hỗ trợ gì khác không?"
             self.memory.update(session_id, message, draft, analysis, [])
             return self.wrap(draft, analysis, [], ["Tìm BĐS", "Định giá"], start)
+            
+        # 3b. OUT_OF_DOMAIN priority check for customer/guest
+        if actor in {"customer", "guest"}:
+            is_booking_ref_or_dt = False
+            if mem.active_context == "booking":
+                if resolve_property_reference(message, mem):
+                    is_booking_ref_or_dt = True
+                elif parse_booking_date(message).get("date"):
+                    is_booking_ref_or_dt = True
+                elif parse_booking_time(message, mem.booking_state or {}):
+                    is_booking_ref_or_dt = True
+                    
+            if not is_booking_ref_or_dt and detect_out_of_domain(message):
+                mem.pending_followup = None
+                mem.no_result_context = {}
+                mem.last_no_result_filters = {}
+                is_booking_dt = mem.active_context == "booking" and mem.booking_state and mem.booking_state.get("step") in ["need_date", "need_time"]
+                if not is_booking_dt:
+                    mem.active_context = None
+                    
+                out_msg = (
+                    "Hiện mình chỉ hỗ trợ các nội dung liên quan đến bất động sản như:<br>"
+                    "• Tìm kiếm BĐS<br>"
+                    "• Định giá BĐS<br>"
+                    "• Đặt lịch xem nhà<br>"
+                    "• Thông tin gói tin/môi giới"
+                )
+                out_a = {"intent": "out_of_domain", "context": None, "entities": {}}
+                self.memory.update(session_id, message, out_msg, out_a, [])
+                return self.wrap(out_msg, out_a, [], ["Tìm BĐS", "Định giá BĐS", "Gói tin"], start)
             
         # 4. Handle Active Booking Flow BEFORE anything else — ONLY for customers
         is_active_booking = (
@@ -2093,7 +2305,7 @@ class BDSChatbot:
             a_br = {"intent": "broker_appointments", "context": "broker", "entities": {}}
             self.memory.update(session_id, message, draft_br, a_br, [])
             return self.wrap(draft_br, a_br, [], [
-                "Lịch chờ xác nhận", "Gói tin đăng BĐS", "Hướng dẫn đăng bài"
+                "Lịch chờ xác nhận", "Gói tin đăng BĐS giá bao nhiêu?", "Hướng dẫn đăng bài"
             ], start)
         
         # 5b. Early return for guide intents (before LLM/router, to prevent falling into search)
@@ -2136,6 +2348,14 @@ class BDSChatbot:
         is_nearby_loc     = any(k in msg_ascii_lower for k in ["tim khu vuc gan do", "khu vuc gan do", "quan lan can", "khu lan can"])
         is_similar_type   = any(k in msg_ascii_lower for k in ["doi loai bds tuong tu", "loai tuong tu", "bds tuong tu", "doi loai bds"])
         is_similar_prop   = any(k in msg_ascii_lower for k in ["tim can tuong tu", "can tuong tu", "tuong tu can nay", "tuong tu can do"])
+
+        if actor == "broker" and any([
+            is_escape_best, is_escape_all_b, is_escape_th_b, is_all_prop,
+            is_same_loc, is_relax_budget, is_nearby_loc, is_similar_type, is_similar_prop
+        ]):
+            pol_b = RolePolicy._broker_redirect("search_property")
+            pol_b["processing_time"] = round(time.time() - start, 3)
+            return pol_b
 
         if is_escape_best:
             mem.no_result_context = {"base_filters": {}, "reason": None, "tried_actions": [], "retry_count": 0}
@@ -2359,9 +2579,9 @@ class BDSChatbot:
         pending = getattr(mem, 'pending_followup', None) or ""
         STUDIO_KEYWORDS = ["studio", "can studio", "can ho studio", "studio apartment"]
         is_studio = any(k in msg_ascii_lower for k in STUDIO_KEYWORDS)
-        if is_studio or (pending.startswith("similar_type:") and any(k in msg_ascii_lower for k in [
+        if actor in {"customer", "guest"} and (is_studio or (pending.startswith("similar_type:") and any(k in msg_ascii_lower for k in [
                 t.strip().lower().replace(" ", "") for t in pending.replace("similar_type:", "").split(",")
-            ])):
+            ]))):
             base_s = deepcopy(mem.last_no_result_filters or mem.last_search_filters or mem.entities or {})
             base_s["property_type"] = "căn hộ"
             base_s["title_keyword"] = "studio"  # used by fetch_properties if supported
@@ -2550,8 +2770,19 @@ class BDSChatbot:
             "general_bds",
             "posting_guide",
             "package_buy_guide",
+            "broker_help",
+            "general_broker_help",
         ]:
-            if actor == "customer" and analysis.get("intent") in ["empty", "out_of_domain", "general_bds"]:
+            if actor == "broker" and analysis.get("intent") in ["empty", "out_of_domain", "general_bds"]:
+                draft = "Mình đang ở chế độ môi giới. Bạn có thể hỏi mình về gói tin, cách mua gói, cách đăng bài, quản lý tin đăng hoặc lịch khách hẹn xem nhà."
+                quick = [
+                    "Gói tin đăng BĐS giá bao nhiêu?",
+                    "Cách mua gói tin",
+                    "Hướng dẫn đăng bài",
+                    "Lịch khách hẹn xem nhà",
+                    "Tôi còn bao nhiêu lượt đăng?",
+                ]
+            elif actor in {"customer", "guest"} and analysis.get("intent") in ["empty", "out_of_domain", "general_bds"]:
                 draft = "Mình có thể giúp bạn tìm BĐS, lọc theo ngân sách/khu vực, xem chi tiết, định giá hoặc đặt lịch xem nhà. Bạn muốn tìm căn theo khu vực/ngân sách nào?"
                 quick = ["Tìm căn hộ 4 tỷ", "Định giá BĐS", "Đặt lịch xem nhà"]
             else:
@@ -2667,6 +2898,8 @@ class BDSChatbot:
             "search_property",
             "posting_guide",
             "package_buy_guide",
+            "broker_help",
+            "general_broker_help",
         }
 
         if gem and isinstance(gem, dict):

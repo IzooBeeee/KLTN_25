@@ -16,7 +16,7 @@ class KhachHangSeeder extends Seeder
         DB::table('khach_hangs')->insertOrIgnore([
             [
                 'ten' => 'Hoàng Văn A',
-                'email' => 'vannhan130504@gmail.com',
+                'email' => 'hva@gmail.com',
                 'so_dien_thoai' => '0987654321',
                 'password' => bcrypt('123456'),
                 'is_active' => true,
@@ -26,7 +26,7 @@ class KhachHangSeeder extends Seeder
             ],
             [
                 'ten' => 'Vũ Thị B',
-                'email' => 'vtb@example.com',
+                'email' => 'vtb@gmail.com',
                 'so_dien_thoai' => '0976543210',
                 'password' => bcrypt('123456789'),
                 'is_active' => true,
@@ -36,7 +36,7 @@ class KhachHangSeeder extends Seeder
             ],
             [
                 'ten' => 'Phan Minh C',
-                'email' => 'pmc@example.com',
+                'email' => 'pmc@gmail.com',
                 'so_dien_thoai' => '0965432109',
                 'password' => bcrypt('123456789'),
                 'is_active' => true,
@@ -46,7 +46,7 @@ class KhachHangSeeder extends Seeder
             ],
             [
                 'ten' => 'Đặng Hải D',
-                'email' => 'dhd@example.com',
+                'email' => 'dhd@gmail.com',
                 'so_dien_thoai' => '0954321098',
                 'password' => bcrypt('123456789'),
                 'is_active' => true,
@@ -56,7 +56,7 @@ class KhachHangSeeder extends Seeder
             ],
             [
                 'ten' => 'Bùi Kim E',
-                'email' => 'bke@example.com',
+                'email' => 'bke@gmail.com',
                 'so_dien_thoai' => '0943210987',
                 'password' => bcrypt('123456789'),
                 'is_active' => false,

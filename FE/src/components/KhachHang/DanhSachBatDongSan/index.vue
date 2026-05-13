@@ -189,30 +189,30 @@
 
           <!-- Grid/List Content -->
           <transition-group name="list-fade" tag="div"
-            :class="viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8' : 'space-y-4'">
+            :class="viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-9' : 'space-y-5'">
             <div v-for="bds in properties" :key="bds.id" @click="viewProperty(bds.id)"
-              class="group bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(10,14,39,0.1)] transition-all duration-500 cursor-pointer border border-gray-100 hover:-translate-y-2">
+              class="property-list-card group bg-white rounded-[28px] overflow-hidden cursor-pointer border border-gray-100">
               <!-- Image -->
-              <div class="relative h-[240px] overflow-hidden">
+              <div class="property-list-media relative h-[240px] overflow-hidden">
                 <img :src="bds.image"
-                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  class="property-list-img w-full h-full object-cover"
                   :alt="bds.tieu_de" @error="handleImageError" loading="lazy" />
 
                 <!-- Badge Loại BĐS -->
                 <div
-                  class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md text-[#0a0e27] text-[10px] font-bold uppercase tracking-wider rounded-full">
+                  class="property-chip absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md text-[#0a0e27] text-[10px] font-bold uppercase tracking-wider">
                   {{ bds.loai?.ten_loai || 'BĐS' }}
                 </div>
 
                 <!-- Badge Nổi bật -->
                 <div v-if="bds.is_noi_bat"
-                  class="absolute top-4 right-16 px-3 py-1 bg-yellow-400 text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
+                  class="property-chip property-chip--featured absolute top-4 right-20 px-3 py-1 text-white text-[10px] font-bold uppercase tracking-wider">
                   Nổi bật
                 </div>
 
                 <!-- ❤️ Icon Trái Tim - SYNC WITH API -->
                 <button @click.stop="toggleFavorite(bds.id, $event)"
-                  class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/95 backdrop-blur-md shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group/btn"
+                  class="favorite-float-btn absolute top-4 right-4 w-11 h-11 rounded-full bg-white/95 backdrop-blur-md flex items-center justify-center active:scale-95 group/btn"
                   :class="bds.isFavorite ? 'bg-gradient-to-br from-pink-500 to-rose-500' : ''"
                   :aria-label="bds.isFavorite ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'" title="Yêu thích">
                   <span class="material-symbols-outlined text-lg transition-all duration-300"
@@ -256,7 +256,7 @@
                     {{ formatPriceFull(bds.gia) }}
                   </p>
                   <span @click.stop="viewProperty(bds.id)"
-                    class="text-blue-600 font-semibold text-sm flex items-center gap-1 group/btn cursor-pointer relative">
+                    class="detail-pill-button text-blue-600 font-semibold text-sm flex items-center gap-1 group/btn cursor-pointer relative">
                     Chi tiết
                     <span
                       class="material-symbols-outlined text-[16px] group-hover/btn:translate-x-1 transition-transform">
@@ -351,28 +351,25 @@
       </div>
     </div>
 
-    <!-- 🍞 Enhanced Toast Notification - FIX: Position below sticky header -->
+    <!-- Toast Notification -->
     <transition name="toast-slide">
-      <div v-if="toast.visible" class="fixed top-20 right-5 z-[9999] pointer-events-auto"
+      <div v-if="toast.visible" class="property-toast-shell fixed top-6 right-6 z-[10000] pointer-events-auto"
         style="will-change: transform, opacity;">
         <div
-          class="flex items-center gap-3 px-5 py-3.5 text-white rounded-2xl shadow-2xl backdrop-blur-md border border-white/20 min-w-[280px] max-w-sm"
+          class="property-toast flex items-center gap-3 text-white shadow-2xl backdrop-blur-md border border-white/20"
           :class="getToastClass(toast.type)">
-          <!-- Icon với animation pulse khi add favorite -->
-          <span class="material-symbols-outlined text-xl flex-shrink-0"
+          <span class="property-toast__icon material-symbols-outlined flex-shrink-0"
             :class="{ 'animate-heart-pulse': toast.type === 'favorite-add' }">
             {{ toast.icon || getToastIcon(toast.type) }}
           </span>
 
-          <!-- Message -->
-          <span class="font-medium text-sm flex-1 leading-tight">
+          <span class="property-toast__message font-semibold flex-1 leading-tight">
             {{ toast.message }}
           </span>
 
-          <!-- Close button -->
-          <button @click="hideToast" class="ml-2 hover:opacity-80 transition-opacity p-1 rounded-full hover:bg-white/20"
+          <button @click="hideToast" class="property-toast__close"
             aria-label="Đóng thông báo">
-            <span class="material-symbols-outlined text-lg">close</span>
+            <span class="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
       </div>
@@ -706,6 +703,137 @@ export default {
   overflow: hidden;
 }
 
+.property-list-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.07);
+  transition:
+    transform 0.68s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.68s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.68s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.property-list-card:hover {
+  transform: translate3d(0, -10px, 0);
+  border-color: rgba(147, 197, 253, 0.72);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.14);
+}
+
+.property-list-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 35%, rgba(2, 6, 23, 0.38) 100%);
+  opacity: 0.4;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.property-list-card:hover .property-list-media::after {
+  opacity: 0.78;
+}
+
+.property-list-img {
+  transition:
+    transform 1.05s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.8s ease;
+}
+
+.property-list-card:hover .property-list-img {
+  transform: scale(1.08);
+  filter: saturate(1.1) contrast(1.04);
+}
+
+.property-chip {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
+}
+
+.property-chip--featured {
+  background: linear-gradient(135deg, #f59e0b 0%, #f43f5e 100%);
+  box-shadow: 0 12px 30px rgba(244, 63, 94, 0.25);
+}
+
+.favorite-float-btn {
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.13);
+  transition:
+    transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.42s ease;
+}
+
+.favorite-float-btn:hover {
+  transform: translateY(-2px) scale(1.08);
+  background: #ffffff;
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.18);
+}
+
+.detail-pill-button {
+  padding: 0.62rem 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%);
+  border: 1px solid #dbeafe;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+  transition:
+    transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.38s ease,
+    color 0.38s ease;
+}
+
+.detail-pill-button:hover {
+  color: #ffffff;
+  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.26);
+  transform: translateX(2px);
+}
+
+.property-toast-shell {
+  max-width: calc(100vw - 2rem);
+}
+
+.property-toast {
+  width: min(340px, calc(100vw - 2rem));
+  min-height: 64px;
+  padding: 0.9rem 1rem;
+  border-radius: 22px;
+  box-shadow: 0 22px 56px rgba(15, 23, 42, 0.22);
+}
+
+.property-toast__icon {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 20px;
+}
+
+.property-toast__message {
+  min-width: 0;
+  font-size: 0.9rem;
+}
+
+.property-toast__close {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.property-toast__close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+}
+
 /* ✅ Fast fade for loading overlay */
 .fade-fast-enter-active,
 .fade-fast-leave-active {
@@ -736,21 +864,25 @@ export default {
 
 /* 🍞 Enhanced Toast Animation - FIX: Position below sticky header */
 .toast-slide-enter-active {
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .toast-slide-leave-active {
-  transition: all 0.2s ease-in;
+  transition:
+    opacity 0.22s ease-in,
+    transform 0.22s ease-in;
 }
 
 .toast-slide-enter-from {
   opacity: 0;
-  transform: translateX(120%) scale(0.9);
+  transform: translateX(22px) scale(0.96);
 }
 
 .toast-slide-leave-to {
   opacity: 0;
-  transform: translateX(120%) scale(0.95);
+  transform: translateX(22px) scale(0.96);
 }
 
 /* 💖 Heart pulse animation */

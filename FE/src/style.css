@@ -20,6 +20,10 @@ body,
   min-height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: "Be Vietnam Pro", sans-serif;
@@ -39,6 +43,23 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+button,
+.btn,
+[role="button"],
+a {
+  transition:
+    color 0.28s ease,
+    background-color 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.32s ease,
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button:not(:disabled),
+[role="button"] {
+  cursor: pointer;
 }
 
 @layer base {

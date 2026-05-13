@@ -126,27 +126,27 @@
           <div
             v-for="(item, index) in properties"
             :key="item.id"
-            class="reveal-item group bg-white border border-slate-100/60 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-400 cursor-pointer"
+            class="property-showcase-card reveal-item group bg-white border border-slate-100/70 rounded-[28px] overflow-hidden cursor-pointer"
             :style="`transition-delay: ${index * 100}ms`"
             @click.prevent="viewProperty(item.id)"
           >
             <!-- Image Area -->
-            <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
+            <div class="property-showcase-media relative aspect-[4/3] overflow-hidden bg-slate-100">
               <img
                 :src="item.image"
-                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                class="property-showcase-img w-full h-full object-cover"
                 :alt="item.name"
                 @error="handleImageError"
                 loading="lazy"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+              <div class="property-showcase-overlay absolute inset-0"></div>
 
               <!-- Badges -->
-              <div class="absolute top-4 left-4 flex gap-2">
-                <span class="px-3 py-1 bg-white/95 backdrop-blur text-slate-800 text-[11px] font-bold uppercase tracking-wider rounded-md shadow-sm">
+              <div class="property-badge-row absolute top-4 left-4 flex gap-3">
+                <span class="property-badge property-badge--type px-3 py-1 backdrop-blur text-slate-800 text-[11px] font-bold uppercase tracking-wider">
                   {{ item.loai }}
                 </span>
-                <span v-if="item.isExclusive" class="px-3 py-1 bg-rose-500 text-white text-[11px] font-bold uppercase tracking-wider rounded-md shadow-sm">
+                <span v-if="item.isExclusive" class="property-badge property-badge--hot px-3 py-1 text-white text-[11px] font-bold uppercase tracking-wider">
                   Hot
                 </span>
               </div>
@@ -154,7 +154,7 @@
               <!-- Heart Button -->
               <button
                 @click.stop="toggleFavorite(item.id, $event)"
-                class="absolute top-4 right-4 w-10 h-10 bg-white/95 backdrop-blur-md rounded-full shadow-sm flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300"
+                class="favorite-float-btn group/btn absolute top-4 right-4 w-11 h-11 bg-white/95 backdrop-blur-md rounded-full flex items-center justify-center active:scale-95"
               >
                 <span
                   class="material-symbols-outlined text-[20px] transition-colors duration-300"
@@ -174,12 +174,12 @@
             </div>
 
             <!-- Content Area -->
-            <div class="p-6">
-              <div class="flex items-center gap-1.5 text-slate-400 mb-2">
+            <div class="property-showcase-body p-6">
+              <div class="property-location-line flex items-center gap-1.5 text-slate-400 mb-2">
                 <span class="material-symbols-outlined text-[16px]">location_on</span>
                 <span class="text-sm font-medium">{{ item.location }}</span>
               </div>
-              <h3 class="text-lg font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors min-h-[56px] mb-2">
+              <h3 class="property-showcase-title text-lg font-bold text-slate-800 line-clamp-2 leading-snug min-h-[56px] mb-2">
                 {{ item.name }}
               </h3>
             </div>
@@ -325,12 +325,15 @@
 
     <!-- 6. TOAST NOTIFICATION -->
     <transition name="fade-toast">
-      <div v-if="toast.visible" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[9999]">
-        <div class="flex items-center gap-3 px-6 py-4 bg-slate-900/95 backdrop-blur text-white rounded-xl shadow-2xl">
-          <span class="material-symbols-outlined text-xl" :class="toast.type === 'favorite-add' ? 'text-rose-500 font-variation-settings:\'FILL\' 1' : 'text-blue-400'">
+      <div v-if="toast.visible" class="home-toast-shell fixed top-6 right-6 z-[10000] pointer-events-auto">
+        <div class="home-toast flex items-center gap-3 bg-slate-900/95 backdrop-blur text-white shadow-2xl">
+          <span class="home-toast__icon material-symbols-outlined" :class="toast.type === 'favorite-add' ? 'text-rose-400 font-variation-settings:\'FILL\' 1' : 'text-blue-300'">
             {{ toast.icon || 'info' }}
           </span>
-          <span class="font-medium">{{ toast.message }}</span>
+          <span class="home-toast__message font-semibold">{{ toast.message }}</span>
+          <button @click="hideToast" class="home-toast__close" aria-label="Đóng thông báo">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
         </div>
       </div>
     </transition>
@@ -653,6 +656,175 @@ export default {
   transform: translateY(0);
 }
 
+.property-showcase-card {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.07);
+  transition:
+    transform 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.72s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.property-showcase-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(20, 184, 166, 0.08));
+  opacity: 0;
+  transition: opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.property-showcase-card:hover {
+  transform: translate3d(0, -10px, 0);
+  border-color: rgba(147, 197, 253, 0.72);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.13);
+}
+
+.property-showcase-card:hover::after {
+  opacity: 1;
+}
+
+.property-showcase-media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.2) 45%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.property-showcase-card:hover .property-showcase-media::before {
+  transform: translateX(120%);
+}
+
+.property-showcase-img {
+  transition:
+    transform 1.05s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.8s ease;
+}
+
+.property-showcase-card:hover .property-showcase-img {
+  transform: scale(1.08);
+  filter: saturate(1.1) contrast(1.04);
+}
+
+.property-showcase-overlay {
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.02) 0%, rgba(2, 6, 23, 0.08) 36%, rgba(2, 6, 23, 0.72) 100%);
+  opacity: 0.84;
+  transition: opacity 0.72s ease;
+}
+
+.property-showcase-card:hover .property-showcase-overlay {
+  opacity: 0.96;
+}
+
+.property-badge-row {
+  max-width: calc(100% - 76px);
+  flex-wrap: wrap;
+}
+
+.property-badge {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
+}
+
+.property-badge--type {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.property-badge--hot {
+  background: linear-gradient(135deg, #ff4d7d 0%, #e11d48 100%);
+  box-shadow: 0 12px 28px rgba(225, 29, 72, 0.28);
+}
+
+.favorite-float-btn {
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.13);
+  transition:
+    transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.42s ease;
+}
+
+.favorite-float-btn:hover {
+  transform: translateY(-2px) scale(1.08);
+  background: #ffffff;
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.18);
+}
+
+.property-showcase-body {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.property-location-line {
+  transition: color 0.4s ease;
+}
+
+.property-showcase-title {
+  transition: color 0.42s ease;
+}
+
+.property-showcase-card:hover .property-location-line,
+.property-showcase-card:hover .property-showcase-title {
+  color: #1d4ed8;
+}
+
+.home-toast-shell {
+  max-width: calc(100vw - 2rem);
+}
+
+.home-toast {
+  width: min(340px, calc(100vw - 2rem));
+  min-height: 64px;
+  padding: 0.9rem 1rem;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 22px 56px rgba(15, 23, 42, 0.22);
+}
+
+.home-toast__icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 20px;
+}
+
+.home-toast__message {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.home-toast__close {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.home-toast__close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
 /* 2. Hero subtle zoom */
 .animate-hero-scale {
   animation: heroScale 25s ease-in-out infinite alternate;
@@ -665,11 +837,13 @@ export default {
 /* 3. Toast Fade Up */
 .fade-toast-enter-active,
 .fade-toast-leave-active {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .fade-toast-enter-from,
 .fade-toast-leave-to {
   opacity: 0;
-  transform: translate(-50%, 20px);
+  transform: translateX(22px) scale(0.96);
 }
 </style>

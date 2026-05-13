@@ -11,6 +11,7 @@
             </h4>
             <button
               class="btn btn-primary rounded-pill px-4 shadow-sm"
+              @click="resetFormThem"
               data-bs-toggle="modal"
               data-bs-target="#createModal"
             >
@@ -256,6 +257,7 @@
               <input
                 v-model="chuc_vu.email"
                 type="email"
+                autocomplete="off"
                 class="form-control form-control-lg border-2 shadow-none bg-light"
                 placeholder="admin@email.com"
                 style="font-size: 1rem; border-radius: 12px"
@@ -269,6 +271,7 @@
               <input
                 v-model="chuc_vu.password"
                 type="password"
+                autocomplete="new-password"
                 class="form-control form-control-lg border-2 shadow-none bg-light"
                 placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
                 style="font-size: 1rem; border-radius: 12px"
@@ -353,6 +356,7 @@
               <input
                 v-model="edit.email"
                 type="email"
+                autocomplete="off"
                 class="form-control form-control-lg border-2 shadow-none bg-light"
                 placeholder="admin@email.com"
                 style="font-size: 1rem; border-radius: 12px"
@@ -366,6 +370,7 @@
               <input
                 v-model="edit.password"
                 type="password"
+                autocomplete="new-password"
                 class="form-control form-control-lg border-2 shadow-none bg-light"
                 placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
                 style="font-size: 1rem; border-radius: 12px"
@@ -605,8 +610,16 @@ export default {
     },
   },
   methods: {
+    // Reset form tạo chức vụ mới
+    resetFormThem() {
+      this.chuc_vu = {
+        ten_chuc_vu: "",
+        tinh_trang: 1,
+        email: "",
+        password: "",
+      };
+    },
 
-    
     selectChucVu(v) {
       this.quyen_dang_chon = v;
       this.id_chuc_vu = v.id;

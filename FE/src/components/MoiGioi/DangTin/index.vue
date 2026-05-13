@@ -1784,9 +1784,6 @@ select.form-select {
   overflow: visible !important;
 }
 
-/* ===== LEAFLET MAP ===== */
-@import "leaflet/dist/leaflet.css";
-
 /* ✅ Fix lỗi CSS làm vỡ / lệch marker Leaflet do thuộc tính CSS global (Tailwind / Bootstrap) */
 .leaflet-container img.leaflet-marker-icon,
 .leaflet-container img.leaflet-marker-shadow {

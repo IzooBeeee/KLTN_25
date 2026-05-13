@@ -16,7 +16,7 @@ class MoiGioiSeeder extends Seeder
         DB::table('moi_giois')->insertOrIgnore([
             [
                 'ten' => 'Nguyễn Văn An',
-                'email' => 'vannhan130504@gmail.com',
+                'email' => 'nva@gmail.com',
                 'so_dien_thoai' => '0901234567',
                 'password' => bcrypt('123456'),
                 'avatar' => null,
@@ -29,7 +29,7 @@ class MoiGioiSeeder extends Seeder
             ],
             [
                 'ten' => 'Trần Thị Bình',
-                'email' => 'ttb@bds.com',
+                'email' => 'ttb@gmail.com',
                 'so_dien_thoai' => '0912345678',
                 'password' => bcrypt('123456789'),
                 'avatar' => null,
@@ -42,7 +42,7 @@ class MoiGioiSeeder extends Seeder
             ],
             [
                 'ten' => 'Lê Minh Khánh',
-                'email' => 'lmk@bds.com',
+                'email' => 'lmk@gmail.com',
                 'so_dien_thoai' => '0923456789',
                 'password' => bcrypt('123456789'),
                 'avatar' => null,
@@ -55,7 +55,7 @@ class MoiGioiSeeder extends Seeder
             ],
             [
                 'ten' => 'Phạm Hương Giang',
-                'email' => 'phg@bds.com',
+                'email' => 'phg@gmail.com',
                 'so_dien_thoai' => '0934567890',
                 'password' => bcrypt('123456789'),
                 'avatar' => null,
@@ -68,7 +68,7 @@ class MoiGioiSeeder extends Seeder
             ],
             [
                 'ten' => 'Đỗ Quang Huy',
-                'email' => 'dqh@bds.com',
+                'email' => 'dqh@gmail.com',
                 'so_dien_thoai' => '0945678901',
                 'password' => bcrypt('123456789'),
                 'avatar' => null,

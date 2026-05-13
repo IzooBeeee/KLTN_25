@@ -3,7 +3,7 @@
     <div class="dl-overlay" @click.self="$emit('close')">
       <div class="dl-modal">
         <div class="dl-header">
-          <div class="dl-header__icon">📅</div>
+          <div class="dl-header__icon"><i class="fa-regular fa-calendar-check"></i></div>
           <div>
             <h3 class="dl-header__title">Đặt lịch hẹn xem nhà</h3>
             <p class="dl-header__subtitle">{{ propertyTitle }}</p>
@@ -101,8 +101,10 @@ async function submit() {
 .dl-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background:
+    radial-gradient(circle at 50% 10%, rgba(37, 99, 235, 0.16), transparent 30%),
+    rgba(2, 6, 23, 0.58);
+  backdrop-filter: blur(10px);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -111,32 +113,36 @@ async function submit() {
 }
 
 .dl-modal {
-  background: #fff;
-  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.74);
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 34px 90px rgba(15, 23, 42, 0.28);
+  animation: dlModalIn 0.42s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dl-header {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1.25rem;
+  padding: 1.5rem;
   border-bottom: 1px solid #f1f5f9;
 }
 
 .dl-header__icon {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  border-radius: 12px;
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #2563eb, #06b6d4);
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  color: #fff;
+  font-size: 1.35rem;
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.28);
 }
 
 .dl-header__title {
@@ -154,17 +160,23 @@ async function submit() {
 
 .dl-close {
   margin-left: auto;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: none;
-  background: #f1f5f9;
+  background: #eef4ff;
   color: #64748b;
   cursor: pointer;
+  transition:
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.32s ease,
+    color 0.32s ease;
 }
 
 .dl-close:hover {
-  background: #e2e8f0;
+  transform: rotate(90deg) scale(1.04);
+  background: #dbeafe;
+  color: #1d4ed8;
 }
 
 .dl-body {
@@ -189,13 +201,19 @@ async function submit() {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 18px;
   font-size: 0.95rem;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
 }
 
 .dl-input:focus {
   border-color: #3b82f6;
   outline: none;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+  background: #ffffff;
 }
 
 .dl-time-grid {
@@ -205,13 +223,18 @@ async function submit() {
 }
 
 .dl-time-btn {
-  padding: 0.5rem;
+  padding: 0.58rem 0.5rem;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 999px;
   background: #fff;
   font-size: 0.8rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition:
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.28s ease,
+    border-color 0.28s ease,
+    background 0.28s ease,
+    color 0.28s ease;
 }
 
 .dl-time-btn.disabled {
@@ -224,23 +247,37 @@ async function submit() {
 }
 
 .dl-time-btn:hover {
+  transform: translateY(-2px);
   border-color: #3b82f6;
   color: #3b82f6;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.14);
 }
 
 .dl-time-btn.active {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, #2563eb, #06b6d4);
   color: #fff;
   border-color: transparent;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.28);
 }
 
 .dl-textarea {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 18px;
   font-size: 0.95rem;
   resize: vertical;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
+}
+
+.dl-textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+  background: #ffffff;
 }
 
 .dl-error {
@@ -260,10 +297,15 @@ async function submit() {
 .dl-btn {
   flex: 1;
   padding: 0.875rem 1rem;
-  border-radius: 12px;
+  border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
   border: none;
+  transition:
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.32s ease,
+    background 0.32s ease,
+    color 0.32s ease;
 }
 
 .dl-btn--secondary {
@@ -273,16 +315,18 @@ async function submit() {
 
 .dl-btn--secondary:hover {
   background: #e2e8f0;
+  transform: translateY(-2px);
 }
 
 .dl-btn--primary {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, #2563eb, #06b6d4);
   color: #fff;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.24);
 }
 
 .dl-btn--primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 38px rgba(37, 99, 235, 0.34);
 }
 
 .dl-btn--primary:disabled {
@@ -303,6 +347,17 @@ async function submit() {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes dlModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 </style>
