@@ -11,8 +11,6 @@ class ChucVu extends Model
         'ten_chuc_vu',
         'slug_chuc_vu',
         'mo_ta',
-        'email',
-        'password',
         'tinh_trang',
     ];
 
@@ -20,7 +18,8 @@ class ChucVu extends Model
         'tinh_trang' => 'integer',
     ];
 
-    protected $hidden = [
-        'password',
-    ];
+    public function admins()
+    {
+        return $this->hasMany(Admin::class, 'id_chuc_vu');
+    }
 }

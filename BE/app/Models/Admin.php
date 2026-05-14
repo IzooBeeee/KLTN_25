@@ -21,7 +21,9 @@ class Admin extends Authenticatable
         'password',
         'mo_ta',
         'so_dien_thoai',
+        'id_chuc_vu',
         'is_super',
+        'is_active',
         'hash_reset',
         'hash_reset_expires_at',
     ];
@@ -34,7 +36,14 @@ class Admin extends Authenticatable
 
     protected $casts = [
         'is_super' => 'boolean',
+        'is_active' => 'boolean',
+        'hash_reset_expires_at' => 'datetime',
     ];
+
+    public function chucVu()
+    {
+        return $this->belongsTo(ChucVu::class, 'id_chuc_vu');
+    }
 
     /**
      * ✅ Route broadcast notifications → channel: private-admin.{id}

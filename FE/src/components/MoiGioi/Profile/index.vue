@@ -14,15 +14,15 @@
         <div class="relative -mt-12 sm:-mt-16 flex-shrink-0">
           <img :src="avatarPreview || profile.avatar || defaultAvatar" alt="Avatar"
             class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-4 border-white shadow-lg object-cover" />
-          <label
-            class="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 border-2 border-white rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 transition shadow-lg"
-            title="Đổi ảnh đại diện">
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+          <label class="avatar-camera-btn" title="Đổi ảnh đại diện">
+            <svg class="avatar-camera-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
+
             <input type="file" accept="image/*" class="hidden" @change="onAvatarChange" />
           </label>
         </div>
@@ -41,7 +41,7 @@
           </div>
         </div>
         <button @click="saveProfile" :disabled="loading"
-          class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-200 hover:-translate-y-0.5 transition-all disabled:opacity-60">
+          class="flex items-center gap-2 px-6 py-2.5 bg-[#059669]  text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-200 hover:-translate-y-0.5 transition-all disabled:opacity-60">
           <svg v-if="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
@@ -325,8 +325,6 @@ export default {
         soGoiDaMua: 0, // Số gói đã mua
       },
 
-      defaultAvatar:
-        "https://ui-avatars.com/api/?name=Moi+Gioi&background=0a0a4d&color=fff&rounded=true&size=200",
       avatarPreview: null,
       avatarFile: null,
       token: getToken("moi-gioi"),
@@ -345,6 +343,16 @@ export default {
       const total = (this.stats.tinDaDang || 0) + (this.stats.tinConLai || 0);
       if (total === 0) return 0;
       return Math.round((this.stats.tinDaDang / total) * 100);
+    },
+    usagePercent() {
+      const total = (this.stats.tinDaDang || 0) + (this.stats.tinConLai || 0);
+      if (total === 0) return 0;
+      return Math.round((this.stats.tinDaDang / total) * 100);
+    },
+
+    defaultAvatar() {
+      const name = this.profile.ten || "Môi Giới";
+      return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=059669&color=fff`;
     },
   },
 
@@ -600,7 +608,7 @@ export default {
 .profile-banner {
   position: relative;
   height: 160px;
-  background: linear-gradient(to right, #0a0e27, #1e3a8a, #1d4ed8);
+  background: linear-gradient(135deg, #059669, #10b981);
   overflow: hidden;
   margin: 0 -16px 0;
 }
@@ -614,13 +622,27 @@ export default {
   background-position: center;
 }
 
-.banner-curve {
+.avatar-camera-btn {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 56px;
-  background: #f0f4f8;
-  clip-path: ellipse(55% 100% at 50% 100%);
+  right: -8px;
+  bottom: -8px;
+  width: 42px;
+  height: 42px;
+  border-radius: 9999px;
+  background: #059669;
+  border: 3px solid #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.22);
+  line-height: 1;
+}
+
+.avatar-camera-svg {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+  display: block;
+  transform: translateY(0.5px);
 }
 </style>

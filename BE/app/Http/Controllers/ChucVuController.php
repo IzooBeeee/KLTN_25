@@ -9,13 +9,23 @@ use App\Models\ChucVu;
 use App\Models\PhanQuyen;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Models\Admin;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class ChucVuController extends Controller
 {
-    public function getData()
+    private function checkPermission($id_chuc_nang)
     {
-        $id_chuc_nang = 52;
         $user = Auth::guard('sanctum')->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bạn chưa đăng nhập!'
+            ], 401);
+        }
+
         $id_chuc_vu = $user->id_chuc_vu;
 
         $check_quyen = PhanQuyen::where('id_chuc_vu', $id_chuc_vu)
@@ -24,131 +34,117 @@ class ChucVuController extends Controller
 
         if (!$user->is_super && !$check_quyen) {
             return response()->json([
-                'data' => false,
-                'message' => "bạn không có quyền thực hiện chức năng này!"
-            ]);
+                'status' => false,
+                'message' => 'Bạn không có quyền thực hiện chức năng này!'
+            ], 403);
         }
 
-        $data = ChucVu::all();
+        return null;
+    }
+
+    public function getData()
+    {
+        $permission = $this->checkPermission(52);
+        if ($permission) return $permission;
+
+        $data = ChucVu::orderBy('id', 'desc')->get();
 
         return response()->json([
+            'status' => true,
             'data' => $data
         ]);
     }
 
     public function store(ChucVucreateRequest $request)
     {
-        $id_chuc_nang = 51;
-        $user = Auth::guard('sanctum')->user();
-        $id_chuc_vu = $user->id_chuc_vu;
+        $permission = $this->checkPermission(51);
+        if ($permission) return $permission;
 
-        $check_quyen = PhanQuyen::where('id_chuc_vu', $id_chuc_vu)
-            ->where('id_chuc_nang', $id_chuc_nang)
-            ->first();
+        DB::beginTransaction();
 
-        if (!$user->is_super && !$check_quyen) {
-            return response()->json([
-                'data' => false,
-                'message' => "bạn không có quyền thực hiện chức năng này!"
+        try {
+            $chucVu = ChucVu::create([
+                'slug_chuc_vu' => Str::slug($request->ten_chuc_vu),
+                'ten_chuc_vu' => $request->ten_chuc_vu,
+                'mo_ta'       => $request->mo_ta,
+                'tinh_trang'  => $request->tinh_trang ?? 1,
             ]);
+
+            Admin::create([
+                'ten'         => $request->ten,
+                'email'       => $request->email,
+                'password'    => Hash::make($request->password),
+                'id_chuc_vu'  => $chucVu->id,
+                'is_super'    => 0,
+                'is_active'   => $request->tinh_trang ?? 1,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Tạo chức vụ và tài khoản quản lý thành công',
+                'data' => $chucVu,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi xảy ra khi tạo chức vụ',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        if ($request->filled('email')) {
-            $existing = ChucVu::where('email', $request->email)->first();
-
-            if ($existing) {
-                return response()->json([
-                    'data' => false,
-                    'message' => 'Email đã được sử dụng bởi chức vụ khác!'
-                ]);
-            }
-        }
-
-        $data = ChucVu::create([
-            'slug_chuc_vu' => Str::slug($request->ten_chuc_vu),
-            'ten_chuc_vu' => $request->ten_chuc_vu,
-            'tinh_trang' => $request->tinh_trang ?? 1,
-            'email' => $request->email ?? null,
-            'password' => $request->filled('password') ? bcrypt($request->password) : null,
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Thêm chức vụ ' . $data->ten_chuc_vu . ' thành công',
-        ]);
     }
 
     public function update(ChucVuUpdateRequest $request)
     {
-        $id_chuc_nang = 53;
-        $user = Auth::guard('sanctum')->user();
-        $id_chuc_vu = $user->id_chuc_vu;
+        $permission = $this->checkPermission(53);
+        if ($permission) return $permission;
 
-        $check_quyen = PhanQuyen::where('id_chuc_vu', $id_chuc_vu)
-            ->where('id_chuc_nang', $id_chuc_nang)
-            ->first();
+        $chucVu = ChucVu::find($request->id);
 
-        if (!$user->is_super && !$check_quyen) {
+        if (!$chucVu) {
             return response()->json([
-                'data' => false,
-                'message' => "bạn không có quyền thực hiện chức năng này!"
-            ]);
+                'status' => false,
+                'message' => 'Chức vụ không tồn tại!'
+            ], 404);
         }
 
-        if ($request->filled('email')) {
-            $existing = ChucVu::where('email', $request->email)
-                ->where('id', '!=', $request->id)
-                ->first();
-
-            if ($existing) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Email đã được sử dụng bởi chức vụ khác!'
-                ]);
-            }
-        }
-
-        $updateData = [
+        $chucVu->update([
             'slug_chuc_vu' => Str::slug($request->ten_chuc_vu),
             'ten_chuc_vu' => $request->ten_chuc_vu,
-            'tinh_trang' => $request->tinh_trang,
-            'email' => $request->email ?? null,
-        ];
-
-        if ($request->filled('password')) {
-            $updateData['password'] = bcrypt($request->password);
-        }
-
-        ChucVu::where('id', $request->id)->update($updateData);
+            'mo_ta'       => $request->mo_ta,
+            'tinh_trang'  => $request->tinh_trang,
+        ]);
 
         return response()->json([
             'status' => true,
-            'message' => 'Cập nhật chức vụ ' . $request->ten_chuc_vu . ' thành công',
+            'message' => 'Cập nhật chức vụ ' . $chucVu->ten_chuc_vu . ' thành công',
+            'data' => $chucVu
         ]);
     }
 
     public function destroy(ChucVuDeleteRequest $request)
     {
-        $id_chuc_nang = 54;
-        $user = Auth::guard('sanctum')->user();
-        $id_chuc_vu = $user->id_chuc_vu;
+        $permission = $this->checkPermission(54);
+        if ($permission) return $permission;
 
-        $check_quyen = PhanQuyen::where('id_chuc_vu', $id_chuc_vu)
-            ->where('id_chuc_nang', $id_chuc_nang)
-            ->first();
+        $chucVu = ChucVu::find($request->id);
 
-        if (!$user->is_super && !$check_quyen) {
+        if (!$chucVu) {
             return response()->json([
-                'data' => false,
-                'message' => "bạn không có quyền thực hiện chức năng này!"
-            ]);
+                'status' => false,
+                'message' => 'Chức vụ không tồn tại!'
+            ], 404);
         }
 
-        ChucVu::where('id', $request->id)->delete();
+        $tenChucVu = $chucVu->ten_chuc_vu;
+        $chucVu->delete();
 
         return response()->json([
             'status' => true,
-            'message' => 'Xóa chức vụ ' . $request->ten_chuc_vu . ' thành công',
+            'message' => 'Xóa chức vụ ' . $tenChucVu . ' thành công',
         ]);
     }
 }

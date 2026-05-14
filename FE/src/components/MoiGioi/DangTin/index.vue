@@ -402,7 +402,7 @@
             <div v-if="hetTin" class="alert-box danger">
               <i class="fas fa-exclamation-triangle"></i>
               <p>Bạn đã hết số lượng tin đăng. Vui lòng mua thêm gói để tiếp tục.</p>
-              <button class="btn btn-primary btn-sm" @click="$router.push('/moi-gioi/goi-tin')">Mua gói ngay</button>
+              <button class="btn btn-success btn-sm" @click="$router.push('/moi-gioi/goi-tin')">Mua gói ngay</button>
             </div>
             <div v-else class="alert-box success">
               <i class="fas fa-info-circle"></i>
@@ -412,25 +412,27 @@
 
           <!-- Review Summary -->
           <div class="review-summary mt-8 d-flex gap-4">
-            <div class="summary-image" style="width: 150px; height: 100px; border-radius: 12px; overflow: hidden; flex-shrink: 0;">
-                <img :src="imagePreviewUrls[0] || 'https://via.placeholder.com/400x300?text=No+Image'" class="w-100 h-100 object-cover" />
+            <div class="summary-image"
+              style="width: 150px; height: 100px; border-radius: 12px; overflow: hidden; flex-shrink: 0;">
+              <img :src="imagePreviewUrls[0] || 'https://via.placeholder.com/400x300?text=No+Image'"
+                class="w-100 h-100 object-cover" />
             </div>
             <div class="flex-grow-1">
-                <h4 class="summary-title">Tóm tắt tin đăng</h4>
-                <div class="summary-list">
-                  <div class="summary-item">
-                    <span>Tiêu đề:</span>
-                    <strong>{{ form.tieu_de }}</strong>
-                  </div>
-                  <div class="summary-item">
-                    <span>Giá:</span>
-                    <strong>{{ formatPrice(form.gia) }}</strong>
-                  </div>
-                  <div class="summary-item">
-                    <span>Vị trí:</span>
-                    <strong>{{ form.dia_chi_chi_tiet }}</strong>
-                  </div>
+              <h4 class="summary-title">Tóm tắt tin đăng</h4>
+              <div class="summary-list">
+                <div class="summary-item">
+                  <span>Tiêu đề:</span>
+                  <strong>{{ form.tieu_de }}</strong>
                 </div>
+                <div class="summary-item">
+                  <span>Giá:</span>
+                  <strong>{{ formatPrice(form.gia) }}</strong>
+                </div>
+                <div class="summary-item">
+                  <span>Vị trí:</span>
+                  <strong>{{ form.dia_chi_chi_tiet }}</strong>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -442,7 +444,7 @@
             Quay lại
           </button>
 
-          <button v-if="currentStep < 4" class="btn btn-primary btn-lg" @click="nextStep">
+          <button v-if="currentStep < 4" class="btn btn-success btn-lg" @click="nextStep">
             Tiếp tục
             <i class="fas fa-arrow-right"></i>
           </button>
@@ -692,11 +694,11 @@ const formatDate = (dateStr) => {
 const getImageUrl = (url) => {
   if (!url) return "https://via.placeholder.com/400x300?text=No+Image";
   if (url.startsWith("http") || url.startsWith("data:")) return url;
-  
-  const base = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:8000';
+
+  const base = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000';
   const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
   const finalUrl = cleanUrl.startsWith('storage/') ? cleanUrl : `storage/${cleanUrl}`;
-  
+
   return `${base}/${finalUrl}`;
 };
 
@@ -1158,13 +1160,13 @@ const getFullAddressString = () => {
   const tinh = tinhThanhList.value.find(t => t.id === form.tinh_id)?.ten || "";
   const quan = quanHuyenList.value.find(q => q.id === form.quan_id)?.ten || "";
   const phuong = phuongList.value.find(p => p.id === form.phuong_id)?.ten || "";
-  
+
   let parts = [];
   if (soNha.value) parts.push(soNha.value);
   if (phuong) parts.push(phuong);
   if (quan) parts.push(quan);
   if (tinh) parts.push(tinh);
-  
+
   return parts.join(", ");
 };
 
@@ -1181,16 +1183,16 @@ const forwardGeocode = async () => {
     if (data && data.length > 0) {
       const lat = parseFloat(data[0].lat);
       const lon = parseFloat(data[0].lon);
-      
+
       form.latitude = lat;
       form.longitude = lon;
-      
+
       if (!markerInstance.value) {
         markerInstance.value = L.marker([lat, lon], {
           icon: customLeafletIcon,
           draggable: true,
         }).addTo(mapInstance.value);
-        
+
         markerInstance.value.on("dragend", (e) => {
           const pos = e.target.getLatLng();
           form.latitude = pos.lat;
@@ -1201,9 +1203,9 @@ const forwardGeocode = async () => {
         markerInstance.value.setLatLng([lat, lon]);
       }
       mapInstance.value.setView([lat, lon], 16);
-      
+
       if (!addressFromMap.value) {
-         form.dia_chi_chi_tiet = addressQuery;
+        form.dia_chi_chi_tiet = addressQuery;
       }
     }
   } catch (error) {
@@ -1439,7 +1441,7 @@ const saveDraft = async (isManual = false) => {
 
     if (isManual) {
       clearDraftLocal();
-      
+
       Swal.fire({
         icon: "success",
         title: "Đã lưu nháp",
@@ -1552,7 +1554,7 @@ const submitForm = async () => {
 
       if (["gia", "dien_tich", "so_phong_ngu", "so_phong_tam", "loai_id", "tinh_id", "quan_id", "phuong_id", "trang_thai_id"].includes(key)) {
         if (value === null || value === "" || value === undefined) return;
-        
+
         // Bỏ qua phòng ngủ/phòng tắm nếu là dạng BĐS không phải nhà ở
         if ((key === "so_phong_ngu" || key === "so_phong_tam") && !isResidential.value) {
           return;
@@ -1892,7 +1894,7 @@ select.form-select {
 }
 
 .progress-item.active .step-indicator {
-  background: #001f7c;
+  background: #059669;
   color: white;
   box-shadow: 0 0 0 4px rgba(0, 31, 124, 0.2);
 }
@@ -1909,7 +1911,7 @@ select.form-select {
 }
 
 .progress-item.active .step-name {
-  color: #001f7c;
+  color: #059669;
   font-weight: 600;
 }
 
@@ -1963,11 +1965,11 @@ select.form-select {
 
 .nav-item:hover {
   background: #f9fafb;
-  color: #001f7c;
+  color: #059669
 }
 
 .nav-item.active {
-  background: #001f7c;
+  background: #059669;
   color: white;
 }
 
@@ -1977,7 +1979,7 @@ select.form-select {
 }
 
 .upgrade-box {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #059669, #10b981);
   color: white;
   text-align: center;
   padding: 2rem 1.5rem;
@@ -2098,7 +2100,7 @@ select.form-select {
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #001f7c;
+  border-color: #059669;
   box-shadow: 0 0 0 3px rgba(0, 31, 124, 0.1);
 }
 
@@ -2177,14 +2179,14 @@ select.form-select {
 }
 
 .btn-chip:hover {
-  border-color: #001f7c;
-  color: #001f7c;
+  border-color: #059669;
+  color: #059669
 }
 
 .btn-chip.active {
-  background: #001f7c;
+  background: #059669;
   color: white;
-  border-color: #001f7c;
+  border-color: #059669
 }
 
 .textarea-toolbar {
@@ -2206,7 +2208,7 @@ select.form-select {
 
 .toolbar-btn:hover {
   background: #e5e7eb;
-  color: #001f7c;
+  color: #059669
 }
 
 .quick-upload-section {
@@ -2226,7 +2228,7 @@ select.form-select {
 }
 
 .upload-card:hover {
-  border-color: #001f7c;
+  border-color: #059669;
   background: rgba(0, 31, 124, 0.05);
 }
 
@@ -2244,7 +2246,7 @@ select.form-select {
 
 .upload-icon-wrapper i {
   font-size: 2.5rem;
-  color: #001f7c;
+  color: #059669
 }
 
 .btn {
@@ -2302,8 +2304,8 @@ select.form-select {
 
 .btn-outline {
   background: white;
-  color: #001f7c;
-  border: 2px solid #001f7c;
+  color: #059669;
+  border: 2px solid #059669
 }
 
 .btn-outline:hover {
@@ -2465,7 +2467,7 @@ select.form-select {
 .package-icon {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #059669, #10b981);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -2482,7 +2484,7 @@ select.form-select {
 }
 
 .package-name {
-  color: #6366f1;
+  color: #059669;
   font-weight: 600;
   font-size: 0.9rem;
   margin: 0;
@@ -2589,9 +2591,17 @@ select.form-select {
   color: #1e293b;
 }
 
-.mt-8 { margin-top: 2rem; }
-.text-danger { color: #ef4444; }
-.text-success { color: #10b981; }
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.text-danger {
+  color: #ef4444;
+}
+
+.text-success {
+  color: #10b981;
+}
 
 /* ===== SIDEBAR ENHANCEMENTS ===== */
 .credit-card {
@@ -2611,7 +2621,7 @@ select.form-select {
 .credit-value {
   font-size: 2rem;
   font-weight: 800;
-  color: #001f7c;
+  color: #059669;
   margin: 0.5rem 0;
 }
 
@@ -2625,7 +2635,7 @@ select.form-select {
 
 .progress-bar-mini {
   height: 100%;
-  background: #001f7c;
+  background: #059669;
   border-radius: 10px;
   transition: width 0.5s ease;
 }
@@ -2675,7 +2685,7 @@ select.form-select {
 }
 
 .upgrade-box {
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #059669, #10b981);
   color: white;
 }
 
@@ -2691,7 +2701,7 @@ select.form-select {
 
 .btn-upgrade {
   background: white;
-  color: #1e40af;
+  color: #000000;
   border: none;
   padding: 0.6rem;
   border-radius: 6px;
@@ -2706,7 +2716,7 @@ select.form-select {
 }
 
 .auto-save-indicator.saving {
-  color: #001f7c;
+  color: #059669
 }
 
 .sidebar-right {
@@ -2735,7 +2745,7 @@ select.form-select {
 
 .card-header i {
   font-size: 1.25rem;
-  color: #001f7c;
+  color: #059669
 }
 
 .card-header.warning i {
@@ -2776,7 +2786,7 @@ select.form-select {
 }
 
 .stats-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #059669, #10b981);
   color: white;
 }
 

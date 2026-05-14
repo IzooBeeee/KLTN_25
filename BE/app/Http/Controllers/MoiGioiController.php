@@ -149,28 +149,7 @@ class MoiGioiController extends Controller
         ]);
     }
 
-    // public function profile()
-    // {
-    //     /** @var MoiGioi|null $user */
-    //     $user = Auth::guard('sanctum')->user();
 
-    //     if ($user) {
-    //         return response()->json([
-    //             'status' => true,
-    //             'data' => $user,
-    //         ]);
-    //     } else {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => "Có lỗi xảy ra"
-    //         ]);
-    //     }
-
-    //     return response()->json([
-    //         'status' => false,
-    //         'message' => 'Có lỗi xảy ra',
-    //     ]);
-    // }
 
     public function profile()
     {
@@ -239,6 +218,17 @@ class MoiGioiController extends Controller
     // Admin lấy danh sách môi giới
     public function getData(Request $request)
     {
+        $id_chuc_nang = 67; // ID tìm kiếm BDS cho admin
+        $user = Auth::guard('sanctum')->user();
+        $check = PhanQuyen::where('id_chuc_vu', $user->id_chuc_vu)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$user->is_super &&  !$check) {
+            return response()->json([
+                'status' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này"
+            ]);
+        }
         $user = Auth::guard('sanctum')->user();
         if (!$user) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
 

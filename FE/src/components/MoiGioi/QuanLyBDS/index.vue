@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid py-4 dashboard-bg min-vh-100" style="
-      background-color: #f4f6f9;
-      font-family: &quot;Inter&quot;, sans-serif;
+      /* background-color: #f4f6f9; */
+      /* font-family: &quot; Inter&quot; , sans-serif; */
     ">
     <header class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
       <div>
@@ -11,7 +11,7 @@
         </p>
       </div>
       <button @click="$router.push('/moi-gioi/dang-tin')"
-        class="btn btn-primary px-4 py-2 fw-semibold d-flex align-items-center gap-2 shadow-sm rounded-pill">
+        class="btn btn-success px-4 py-2 fw-semibold d-flex align-items-center gap-2 shadow-sm rounded-pill">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" width="20" height="20" fill="none" viewBox="0 0 24 24"
           stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -220,8 +220,7 @@
             </button>
             <button @click="handleEdit(item)"
               class="btn btn-light border rounded-3 btn-sm d-flex align-items-center justify-content-center text-primary"
-              style="width: 40px; height: 40px"
-              title="Chỉnh sửa">
+              style="width: 40px; height: 40px" title="Chỉnh sửa">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -292,7 +291,7 @@
           <button type="button" class="btn-close" @click="cancelEdit"></button>
         </div>
 
-        
+
         <div class="modal-body px-4 py-4">
           <div v-if="isLoadingDetail" class="text-center py-5 text-muted">
             <div class="spinner-border text-primary mb-3" role="status"></div>
@@ -300,9 +299,12 @@
           </div>
           <div v-else class="row g-4">
             <!-- Thông tin cơ bản -->
-            <div class="col-12"><h6 class="fw-bold text-primary border-bottom pb-2">1. Thông tin cơ bản</h6></div>
             <div class="col-12">
-              <label class="form-label text-muted fw-bold small text-uppercase">📌 Tiêu Đề <span class="text-danger">*</span></label>
+              <h6 class="fw-bold text-primary border-bottom pb-2">1. Thông tin cơ bản</h6>
+            </div>
+            <div class="col-12">
+              <label class="form-label text-muted fw-bold small text-uppercase">📌 Tiêu Đề <span
+                  class="text-danger">*</span></label>
               <input v-model="editingProperty.title" type="text"
                 class="form-control form-control-lg bg-light rounded-3 fs-6"
                 :class="editErrors.title ? 'border-danger' : 'border-0'" />
@@ -310,32 +312,40 @@
             </div>
             <div class="col-md-6">
               <label class="form-label text-muted fw-bold small text-uppercase">Loại Bất Động Sản</label>
-              <select v-model="editingProperty.loai_id" class="form-select form-control-lg bg-light border-0 rounded-3 fs-6">
+              <select v-model="editingProperty.loai_id"
+                class="form-select form-control-lg bg-light border-0 rounded-3 fs-6">
                 <option value="">Chọn loại</option>
                 <option v-for="loai in loaiBDSList" :key="loai.id" :value="loai.id">{{ loai.ten_loai }}</option>
               </select>
             </div>
             <div class="col-md-6">
               <label class="form-label text-muted fw-bold small text-uppercase">💰 Giá (VNĐ)</label>
-              <input v-model="editingProperty.gia" type="number" class="form-control form-control-lg bg-light border-0 rounded-3 fs-6 fw-bold text-primary" />
+              <input v-model="editingProperty.gia" type="number"
+                class="form-control form-control-lg bg-light border-0 rounded-3 fs-6 fw-bold text-primary" />
             </div>
             <div class="col-md-4">
               <label class="form-label text-muted fw-bold small text-uppercase">📐 Diện Tích (m²)</label>
-              <input v-model="editingProperty.dien_tich" type="number" class="form-control form-control-lg bg-light border-0 rounded-3 fs-6" />
+              <input v-model="editingProperty.dien_tich" type="number"
+                class="form-control form-control-lg bg-light border-0 rounded-3 fs-6" />
             </div>
             <div class="col-md-4">
               <label class="form-label text-muted fw-bold small text-uppercase">🛏️ Phòng Ngủ</label>
-              <input v-model.number="editingProperty.so_phong_ngu" type="number" class="form-control form-control-lg bg-light border-0 rounded-3 fs-6" />
+              <input v-model.number="editingProperty.so_phong_ngu" type="number"
+                class="form-control form-control-lg bg-light border-0 rounded-3 fs-6" />
             </div>
             <div class="col-md-4">
               <label class="form-label text-muted fw-bold small text-uppercase">🚿 Phòng Tắm</label>
-              <input v-model.number="editingProperty.so_phong_tam" type="number" class="form-control form-control-lg bg-light border-0 rounded-3 fs-6" />
+              <input v-model.number="editingProperty.so_phong_tam" type="number"
+                class="form-control form-control-lg bg-light border-0 rounded-3 fs-6" />
             </div>
 
             <!-- Vị trí -->
-            <div class="col-12 mt-4"><h6 class="fw-bold text-primary border-bottom pb-2">2. Vị trí <span class="text-danger">*</span></h6></div>
+            <div class="col-12 mt-4">
+              <h6 class="fw-bold text-primary border-bottom pb-2">2. Vị trí <span class="text-danger">*</span></h6>
+            </div>
             <div class="col-md-4">
-              <label class="form-label text-muted fw-bold small text-uppercase">Tỉnh / Thành <span class="text-danger">*</span></label>
+              <label class="form-label text-muted fw-bold small text-uppercase">Tỉnh / Thành <span
+                  class="text-danger">*</span></label>
               <select v-model="editingProperty.tinh_id" @change="onTinhChange"
                 class="form-select form-control-lg rounded-3 fs-6"
                 :class="editErrors.address && !editingProperty.tinh_id ? 'border-danger bg-light' : 'border-0 bg-light'">
@@ -344,7 +354,8 @@
               </select>
             </div>
             <div class="col-md-4">
-              <label class="form-label text-muted fw-bold small text-uppercase">Quận / Huyện <span class="text-danger">*</span></label>
+              <label class="form-label text-muted fw-bold small text-uppercase">Quận / Huyện <span
+                  class="text-danger">*</span></label>
               <select v-model="editingProperty.quan_id" @change="onQuanChange"
                 class="form-select form-control-lg rounded-3 fs-6"
                 :class="editErrors.address && !editingProperty.quan_id ? 'border-danger bg-light' : 'border-0 bg-light'">
@@ -353,9 +364,9 @@
               </select>
             </div>
             <div class="col-md-4">
-              <label class="form-label text-muted fw-bold small text-uppercase">Phường / Xã <span class="text-danger">*</span></label>
-              <select v-model="editingProperty.phuong_id"
-                class="form-select form-control-lg rounded-3 fs-6"
+              <label class="form-label text-muted fw-bold small text-uppercase">Phường / Xã <span
+                  class="text-danger">*</span></label>
+              <select v-model="editingProperty.phuong_id" class="form-select form-control-lg rounded-3 fs-6"
                 :class="editErrors.address && !editingProperty.phuong_id ? 'border-danger bg-light' : 'border-0 bg-light'">
                 <option value="">Chọn phường</option>
                 <option v-for="phuong in phuongList" :key="phuong.id" :value="phuong.id">{{ phuong.ten }}</option>
@@ -368,12 +379,14 @@
               </div>
             </div>
             <div class="col-12">
-              <label class="form-label text-muted fw-bold small text-uppercase">Địa chỉ chi tiết <span class="text-danger">*</span></label>
+              <label class="form-label text-muted fw-bold small text-uppercase">Địa chỉ chi tiết <span
+                  class="text-danger">*</span></label>
               <input v-model="editingProperty.dia_chi_chi_tiet" type="text"
                 class="form-control form-control-lg bg-light rounded-3 fs-6"
                 :class="editErrors.diaChiChiTiet ? 'border-danger' : 'border-0'"
                 placeholder="Ví dụ: Số 12 Đường Hoàng Văn Thái" />
-              <div v-if="editErrors.diaChiChiTiet" class="text-danger small mt-1">⚠️ {{ editErrors.diaChiChiTiet }}</div>
+              <div v-if="editErrors.diaChiChiTiet" class="text-danger small mt-1">⚠️ {{ editErrors.diaChiChiTiet }}
+              </div>
             </div>
 
             <!-- Hình ảnh -->
@@ -383,34 +396,55 @@
               </h6>
             </div>
             <div class="col-12">
-              <p class="text-muted small mb-2">Click "Đặt bìa" để chọn ảnh đại diện cho tin đăng. Chỉ áp dụng với ảnh đã lưu trên server.</p>
+              <p class="text-muted small mb-2">Click "Đặt bìa" để chọn ảnh đại diện cho tin đăng. Chỉ áp dụng với ảnh đã
+                lưu trên server.</p>
               <!-- Inline error images -->
               <div v-if="editErrors.images" class="alert alert-danger py-2 px-3 small mb-3 rounded-3">
                 <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ editErrors.images }}
               </div>
               <div class="d-flex flex-wrap gap-2 mb-3">
-                <div v-for="(img, idx) in oldImages" :key="'old-' + img.id" class="position-relative" style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden;" :style="representativeIdx === idx ? 'border: 2px solid #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,0.25);' : 'border: 1px solid #ddd;'">
+                <div v-for="(img, idx) in oldImages" :key="'old-' + img.id" class="position-relative"
+                  style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden;"
+                  :style="representativeIdx === idx ? 'border: 2px solid #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,0.25);' : 'border: 1px solid #ddd;'">
                   <img :src="getImageUrl(img.url)" class="w-100 h-100" style="object-fit: cover;" />
-                  <button @click="removeImage(idx)" class="btn btn-sm btn-danger position-absolute d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; top: 2px; right: 2px; border-radius: 50%; font-size: 12px; line-height: 1;">&times;</button>
-                  <span v-if="representativeIdx === idx" class="badge bg-primary position-absolute bottom-0 start-0 w-100 text-center" style="font-size: 0.6rem; padding: 2px 4px; border-radius: 0 0 6px 6px; opacity: 0.9;">Ảnh bìa</span>
-                  <span v-else class="badge bg-secondary position-absolute bottom-0 start-0 w-100 text-center" style="font-size: 0.6rem; padding: 2px 4px; border-radius: 0 0 6px 6px; opacity: 0.8; cursor: pointer;" @click="representativeIdx = idx">Đặt bìa</span>
+                  <button @click="removeImage(idx)"
+                    class="btn btn-sm btn-danger position-absolute d-flex align-items-center justify-content-center"
+                    style="width: 22px; height: 22px; top: 2px; right: 2px; border-radius: 50%; font-size: 12px; line-height: 1;">&times;</button>
+                  <span v-if="representativeIdx === idx"
+                    class="badge bg-primary position-absolute bottom-0 start-0 w-100 text-center"
+                    style="font-size: 0.6rem; padding: 2px 4px; border-radius: 0 0 6px 6px; opacity: 0.9;">Ảnh
+                    bìa</span>
+                  <span v-else class="badge bg-secondary position-absolute bottom-0 start-0 w-100 text-center"
+                    style="font-size: 0.6rem; padding: 2px 4px; border-radius: 0 0 6px 6px; opacity: 0.8; cursor: pointer;"
+                    @click="representativeIdx = idx">Đặt bìa</span>
                 </div>
-                <div v-for="(url, idx) in imagePreviewUrls.slice(oldImages.length)" :key="'new-' + idx" class="position-relative" style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid #28a745;">
+                <div v-for="(url, idx) in imagePreviewUrls.slice(oldImages.length)" :key="'new-' + idx"
+                  class="position-relative"
+                  style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid #28a745;">
                   <img :src="url" class="w-100 h-100" style="object-fit: cover;" />
-                  <button @click="removeImage(oldImages.length + idx)" class="btn btn-sm btn-danger position-absolute d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; top: 2px; right: 2px; border-radius: 50%; font-size: 12px; line-height: 1;">&times;</button>
-                  <span class="badge bg-success position-absolute bottom-0 start-0 w-100 text-center" style="font-size: 0.6rem; padding: 2px 4px; border-radius: 0 0 6px 6px; opacity: 0.9;">Mới</span>
+                  <button @click="removeImage(oldImages.length + idx)"
+                    class="btn btn-sm btn-danger position-absolute d-flex align-items-center justify-content-center"
+                    style="width: 22px; height: 22px; top: 2px; right: 2px; border-radius: 50%; font-size: 12px; line-height: 1;">&times;</button>
+                  <span class="badge bg-success position-absolute bottom-0 start-0 w-100 text-center"
+                    style="font-size: 0.6rem; padding: 2px 4px; border-radius: 0 0 6px 6px; opacity: 0.9;">Mới</span>
                 </div>
-                <div class="position-relative d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; border-radius: 8px; border: 2px dashed #0d6efd; cursor: pointer;" @click="$refs.fileInput.click()">
+                <div class="position-relative d-flex align-items-center justify-content-center"
+                  style="width: 100px; height: 100px; border-radius: 8px; border: 2px dashed #0d6efd; cursor: pointer;"
+                  @click="$refs.fileInput.click()">
                   <span class="fs-4 text-primary fw-bold">+</span>
                 </div>
-                <input ref="fileInput" type="file" multiple accept="image/*" class="d-none" @change="handleFileSelect" />
+                <input ref="fileInput" type="file" multiple accept="image/*" class="d-none"
+                  @change="handleFileSelect" />
               </div>
             </div>
 
             <!-- Mô tả -->
-            <div class="col-12 mt-4"><h6 class="fw-bold text-primary border-bottom pb-2">4. Mô tả chi tiết</h6></div>
+            <div class="col-12 mt-4">
+              <h6 class="fw-bold text-primary border-bottom pb-2">4. Mô tả chi tiết</h6>
+            </div>
             <div class="col-12">
-              <textarea v-model="editingProperty.mo_ta" rows="6" class="form-control bg-light border-0 rounded-3 fs-6"></textarea>
+              <textarea v-model="editingProperty.mo_ta" rows="6"
+                class="form-control bg-light border-0 rounded-3 fs-6"></textarea>
             </div>
           </div>
         </div>
@@ -422,7 +456,7 @@
           <button type="button" class="btn btn-light border px-4 py-2 rounded-3 fw-semibold" @click="cancelEdit">
             Hủy bỏ
           </button>
-          <button type="button" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold shadow-sm" @click="submitEdit"
+          <button type="button" class="btn btn-success px-4 py-2 rounded-3 fw-semibold shadow-sm" @click="submitEdit"
             :disabled="isSubmitting">
             <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"
               aria-hidden="true"></span>
@@ -581,14 +615,14 @@ const loadBatDongSan = async (page = 1) => {
         total: result.total,
       };
 
-  if (res.data.stats) {
-    stats.value = res.data.stats;
-  }
+      if (res.data.stats) {
+        stats.value = res.data.stats;
+      }
 
-  // Tính thêm stat "Nháp" từ phản hồi API
-  if (res.data.draft_count !== undefined) {
-    stats.value.draft = res.data.draft_count;
-  }
+      // Tính thêm stat "Nháp" từ phản hồi API
+      if (res.data.draft_count !== undefined) {
+        stats.value.draft = res.data.draft_count;
+      }
     }
   } catch (error) {
     errorMessage.value = "Lỗi tải dữ liệu";
@@ -687,10 +721,10 @@ const handleEdit = async (property) => {
     latitude: null,
     longitude: null,
   };
-  
+
   showEditModal.value = true;
   isLoadingDetail.value = true;
-  
+
   // Reset images
   oldImages.value = [];
   newImages.value = [];
@@ -703,7 +737,7 @@ const handleEdit = async (property) => {
     if (res.data?.status) {
       const detail = res.data.data;
       editingProperty.value.mo_ta = detail.mo_ta || "";
-      
+
       if (detail.dia_chi) {
         const t_id = detail.dia_chi.tinh_id ? String(detail.dia_chi.tinh_id) : "";
         const q_id = detail.dia_chi.quan_id ? String(detail.dia_chi.quan_id) : "";
@@ -713,19 +747,19 @@ const handleEdit = async (property) => {
         editingProperty.value.tinh_id = t_id;
         if (t_id) {
           await onTinhChange(false);
-          
+
           // 2. Sau khi có danh sách Quận, gán Quận và load Phường
           if (q_id) {
             editingProperty.value.quan_id = q_id;
             await onQuanChange(false);
-            
+
             // 3. Sau khi có danh sách Phường, gán Phường
             if (p_id) {
               editingProperty.value.phuong_id = p_id;
             }
           }
         }
-        
+
         editingProperty.value.dia_chi_chi_tiet = detail.dia_chi.dia_chi_chi_tiet || "";
         editingProperty.value.latitude = detail.dia_chi.latitude;
         editingProperty.value.longitude = detail.dia_chi.longitude;
@@ -757,8 +791,8 @@ const onTinhChange = async (shouldReset = true) => {
   if (!editingProperty.value.tinh_id) return;
   try {
     const res = await api.get(`/quan-huyen-by-tinh`, { params: { tinh_id: editingProperty.value.tinh_id } });
-    if (res.data?.status) quanHuyenList.value = res.data.data.map(x => ({...x, id: String(x.id)}));
-  } catch (error) {}
+    if (res.data?.status) quanHuyenList.value = res.data.data.map(x => ({ ...x, id: String(x.id) }));
+  } catch (error) { }
 };
 
 const onQuanChange = async (shouldReset = true) => {
@@ -768,11 +802,11 @@ const onQuanChange = async (shouldReset = true) => {
   }
   if (!editingProperty.value.quan_id) return;
   try {
-    const res = await api.get(`/phuong-xa-by-quan-huyen`, { 
-      params: { quan_huyen_id: editingProperty.value.quan_id } 
+    const res = await api.get(`/phuong-xa-by-quan-huyen`, {
+      params: { quan_huyen_id: editingProperty.value.quan_id }
     });
     if (res.data?.status === 'success' || res.data?.status === true) {
-      phuongList.value = res.data.data.map(x => ({...x, id: String(x.id)}));
+      phuongList.value = res.data.data.map(x => ({ ...x, id: String(x.id) }));
     }
   } catch (error) {
     console.error("Lỗi lấy danh sách phường xã:", error);
@@ -1046,8 +1080,8 @@ const loadInitialData = async () => {
       api.get("/client/loai-bat-dong-san"),
       api.get("/tinh-thanh")
     ]);
-    if (loaiRes.data?.status) loaiBDSList.value = loaiRes.data.data.map(x => ({...x, id: String(x.id)}));
-    if (tinhRes.data?.status) tinhThanhList.value = tinhRes.data.data.map(x => ({...x, id: String(x.id)}));
+    if (loaiRes.data?.status) loaiBDSList.value = loaiRes.data.data.map(x => ({ ...x, id: String(x.id) }));
+    if (tinhRes.data?.status) tinhThanhList.value = tinhRes.data.data.map(x => ({ ...x, id: String(x.id) }));
   } catch (e) {
     console.error("Lỗi load data:", e);
   }
@@ -1097,7 +1131,7 @@ onMounted(() => {
 }
 
 .nav-pills .nav-link.active {
-  background-color: #0d6efd;
+  background-color: #059669;
   color: #fff !important;
 }
 

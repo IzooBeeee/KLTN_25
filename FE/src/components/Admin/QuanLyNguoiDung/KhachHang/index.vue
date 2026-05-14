@@ -40,11 +40,11 @@
                 <div v-if="showExportMenu"
                   class="dropdown-menu show position-absolute end-0 mt-2 shadow-sm border-0 rounded-3 p-2 z-3"
                   style="min-width: 200px">
-                  <a href="#" @click.prevent="exportData('csv')"
+                  <!-- <a href="#" @click.prevent="exportData('csv')"
                     class="dropdown-item rounded py-2 d-flex align-items-center">
                     <i class="bi bi-filetype-csv text-success fs-5 me-2"></i>
                     Xuất file CSV
-                  </a>
+                  </a> -->
                   <a href="#" @click.prevent="exportData('excel')"
                     class="dropdown-item rounded py-2 d-flex align-items-center">
                     <i class="bi bi-file-earmark-excel text-primary fs-5 me-2"></i>
@@ -192,9 +192,9 @@
                   </button>
                 </td>
                 <td class="text-end pe-5 text-nowrap">
-                  <button @click="openEdit(v)" class="btn btn-icon btn-light-primary me-2" title="Cập nhật">
+                  <!-- <button @click="openEdit(v)" class="btn btn-icon btn-light-primary me-2" title="Cập nhật">
                     <i class="bi bi-pencil-square"></i>
-                  </button>
+                  </button> -->
                   <button @click="openDelete(v)" class="btn btn-icon btn-light-danger" title="Xóa khách hàng">
                     <i class="bi bi-trash"></i>
                   </button>
@@ -231,8 +231,8 @@
             <!-- Page Numbers -->
             <button v-for="page in visiblePages" :key="page" @click="goToPage(page)" class="btn btn-sm btn-primary"
               :class="page === currentPage
-                  ? 'btn-primary'
-                  : 'btn-light border text-muted'
+                ? 'btn-primary'
+                : 'btn-light border text-muted'
                 ">
               {{ page }}
             </button>
@@ -249,7 +249,7 @@
 
     <div v-if="showEdit || showDelete" class="modal-backdrop fade show" style="z-index: 1040"></div>
 
-    <div v-if="showEdit" class="modal fade show d-block" tabindex="-1" style="z-index: 1050">
+    <!-- <div v-if="showEdit" class="modal fade show d-block" tabindex="-1" style="z-index: 1050">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
           <div class="modal-header border-0 pt-4 px-4 pb-0">
@@ -284,7 +284,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <div v-if="showDelete" class="modal fade show d-block" tabindex="-1" style="z-index: 1050">
       <div class="modal-dialog modal-dialog-centered modal-sm">

@@ -75,7 +75,7 @@ const primaryItems = ref([
     id: "dashboard",
     label: "Trang chủ",
     icon: "dashboard",
-    route: "/moi-gioi/trang-chu",
+    route: "/moi-gioi/dashboard",
   },
   {
     id: "listings",

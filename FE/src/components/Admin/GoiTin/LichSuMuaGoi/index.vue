@@ -10,7 +10,11 @@
       <div class="flex items-center gap-3">
         <!-- Search -->
         <div class="relative">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
           <input v-model="searchKeyword" @input="debouncedSearch" type="text" placeholder="Tìm kiếm môi giới..."
             class="pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all w-64" />
         </div>
@@ -19,29 +23,47 @@
           <button @click="showExportMenu = !showExportMenu"
             class="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-100 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all active:scale-95">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Xuất dữ liệu
-            <svg class="w-4 h-4 transition-transform" :class="{'rotate-180': showExportMenu}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': showExportMenu }" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          <div v-if="showExportMenu" class="absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-30 w-48">
-            <button @click="exportData('csv')" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all group">
-              <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <div v-if="showExportMenu"
+            class="absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-30 w-48">
+            <!-- <button @click="exportData('csv')"
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-all group">
+              <div
+                class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
               </div>
               Xuất file CSV
-            </button>
-            <button @click="exportData('excel')" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-all group">
-              <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </button> -->
+            <button @click="exportData('excel')"
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-all group">
+              <div
+                class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
               </div>
               Xuất file Excel
             </button>
-            <button @click="exportData('pdf')" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-xl transition-all group">
-              <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <button @click="exportData('pdf')"
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-xl transition-all group">
+              <div
+                class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
               </div>
               Xuất file PDF
             </button>
@@ -52,11 +74,14 @@
     </div>
 
     <!-- Tab Navigation -->
-    <div class="flex items-center gap-1 bg-white rounded-2xl p-1.5 shadow-sm border border-gray-100 mb-6 w-fit">
+    <!-- <div class="flex items-center gap-1 bg-white rounded-2xl p-1.5 shadow-sm border border-gray-100 mb-6 w-fit">
       <button @click="activeTab = 'history'"
         class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl transition-all"
         :class="activeTab === 'history' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
         Lịch sử mua gói
       </button>
       <button @click="activeTab = 'unmatched'"
@@ -68,18 +93,22 @@
           {{ unmatchedCount }}
         </span>
       </button>
-    </div>
+    </div> -->
 
     <!-- Summary Stats -->
     <div v-if="summaryStats" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-      <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 text-white flex items-center justify-between shadow-sm">
+      <div
+        class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 text-white flex items-center justify-between shadow-sm">
         <div>
           <p class="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Tổng doanh thu</p>
           <div class="text-2xl font-black leading-tight">{{ formatCurrency(summaryStats.tong_doanh_thu) }}</div>
           <p class="text-xs text-blue-200 mt-1">{{ summaryStats.tong_moi_gioi }} môi giới đã mua</p>
         </div>
         <div class="w-12 h-12 bg-white/15 rounded-2xl flex items-center justify-center flex-shrink-0">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
         </div>
       </div>
       <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
@@ -89,7 +118,10 @@
           <p class="text-xs text-gray-400 mt-1">{{ summaryStats.goi_dang_hoat_dong }} gói đang active</p>
         </div>
         <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
         </div>
       </div>
       <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm flex items-center justify-between">
@@ -99,7 +131,10 @@
           <p class="text-xs text-gray-400 mt-1">Trong tháng này</p>
         </div>
         <div class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-          <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
         </div>
       </div>
     </div>
@@ -112,9 +147,11 @@
             <tr class="bg-gray-50 border-b border-gray-100">
               <th class="text-left text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Môi giới</th>
               <th class="text-left text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Số lần mua</th>
-              <th class="text-center text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Gói đang active</th>
+              <th class="text-center text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Gói đang
+                active</th>
               <th class="text-center text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Tổng tiền</th>
-              <th class="text-center text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Lần mua gần nhất</th>
+              <th class="text-center text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Lần mua gần
+                nhất</th>
               <th class="text-right text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Thao tác</th>
             </tr>
           </thead>
@@ -132,16 +169,22 @@
             <tr v-else-if="danhSachGrouped.length === 0">
               <td colspan="6" class="text-center py-16">
                 <div class="flex flex-col items-center gap-2">
-                  <svg class="w-12 h-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                  <p class="text-sm text-gray-400">{{ searchKeyword ? 'Không tìm thấy kết quả' : 'Chưa có lịch sử mua nào' }}</p>
+                  <svg class="w-12 h-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  <p class="text-sm text-gray-400">{{ searchKeyword ? 'Không tìm thấy kết quả' :
+                    'Chưa có lịch sử mua nào' }}</p>
                 </div>
               </td>
             </tr>
             <!-- Data -->
-            <tr v-else v-for="item in danhSachGrouped" :key="item.moi_gioi.id" class="hover:bg-gray-50 transition-colors">
+            <tr v-else v-for="item in danhSachGrouped" :key="item.moi_gioi.id"
+              class="hover:bg-gray-50 transition-colors">
               <td class="px-5 py-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 font-black text-sm flex items-center justify-center flex-shrink-0">
+                  <div
+                    class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 font-black text-sm flex items-center justify-center flex-shrink-0">
                     {{ getInitials(item.moi_gioi.ten) }}
                   </div>
                   <div>
@@ -152,7 +195,9 @@
                 </div>
               </td>
               <td class="px-5 py-4">
-                <span class="inline-flex items-center px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full">{{ item.thong_ke.tong_so_lan_mua }} lần</span>
+                <span
+                  class="inline-flex items-center px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full">{{
+                    item.thong_ke.tong_so_lan_mua }} lần</span>
               </td>
               <td class="px-5 py-4 text-center">
                 <span class="inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-full"
@@ -165,12 +210,22 @@
               <td class="px-5 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
                   <button @click="viewChiTiet(item.moi_gioi.id)"
-                    class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-100 transition-all active:scale-90" title="Xem chi tiết">
-                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-100 transition-all active:scale-90"
+                    title="Xem chi tiết">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
                   </button>
                   <button @click="copyInfo(item.moi_gioi)"
-                    class="w-9 h-9 bg-gray-50 text-gray-500 rounded-xl flex items-center justify-center hover:bg-gray-600 hover:text-white hover:shadow-lg hover:shadow-gray-100 transition-all active:scale-90" title="Copy thông tin">
-                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    class="w-9 h-9 bg-gray-50 text-gray-500 rounded-xl flex items-center justify-center hover:bg-gray-600 hover:text-white hover:shadow-lg hover:shadow-gray-100 transition-all active:scale-90"
+                    title="Copy thông tin">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
                   </button>
                 </div>
               </td>
@@ -179,22 +234,27 @@
         </table>
       </div>
       <!-- Pagination -->
-      <div v-if="pagination.total > 0" class="px-5 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p class="text-xs text-gray-400">Hiển thị {{ pagination.from }}-{{ pagination.to }} của {{ pagination.total }} môi giới</p>
+      <div v-if="pagination.total > 0"
+        class="px-5 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-xs text-gray-400">Hiển thị {{ pagination.from }}-{{ pagination.to }} của {{ pagination.total }}
+          môi giới</p>
         <div class="flex items-center gap-1">
           <button @click="changePage(pagination.current_page - 1)" :disabled="pagination.current_page === 1"
             class="w-8 h-8 rounded-lg border border-gray-200 text-gray-500 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm">&laquo;</button>
           <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
             class="w-8 h-8 rounded-lg text-sm font-bold transition"
-            :class="page === pagination.current_page ? 'bg-blue-600 text-white shadow-sm' : 'border border-gray-200 text-gray-500 hover:bg-gray-50'">{{ page }}</button>
-          <button @click="changePage(pagination.current_page + 1)" :disabled="pagination.current_page === pagination.last_page"
+            :class="page === pagination.current_page ? 'bg-blue-600 text-white shadow-sm' : 'border border-gray-200 text-gray-500 hover:bg-gray-50'">{{
+              page }}</button>
+          <button @click="changePage(pagination.current_page + 1)"
+            :disabled="pagination.current_page === pagination.last_page"
             class="w-8 h-8 rounded-lg border border-gray-200 text-gray-500 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm">&raquo;</button>
         </div>
       </div>
     </div>
 
     <!-- Unmatched Payments Section -->
-    <div v-if="activeTab === 'unmatched'" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+    <div v-if="activeTab === 'unmatched'"
+      class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
@@ -203,7 +263,8 @@
               <th class="text-left text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Số tiền</th>
               <th class="text-left text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Mã Sepay</th>
               <th class="text-left text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Reference</th>
-              <th class="text-center text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Trạng thái</th>
+              <th class="text-center text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Trạng thái
+              </th>
               <th class="text-right text-xs font-bold text-gray-400 uppercase tracking-widest px-5 py-4">Hành động</th>
             </tr>
           </thead>
@@ -211,7 +272,10 @@
             <tr v-if="!unmatchedPayments.length">
               <td colspan="6" class="text-center py-16">
                 <div class="flex flex-col items-center gap-2">
-                  <svg class="w-12 h-12 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <svg class="w-12 h-12 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   <p class="text-sm text-gray-400">Không có giao dịch chưa khớp</p>
                 </div>
               </td>
@@ -219,15 +283,17 @@
             <tr v-else v-for="item in unmatchedPayments" :key="item.id" class="hover:bg-gray-50 transition-colors">
               <td class="px-5 py-4 text-gray-600 text-xs">{{ formatDateTime(item.created_at) }}</td>
               <td class="px-5 py-4 font-black text-green-600">{{ formatCurrency(item.so_tien) }}</td>
-              <td class="px-5 py-4"><code class="text-xs bg-gray-100 px-2 py-1 rounded">{{ item.order_code_from_sepay || 'N/A' }}</code></td>
-              <td class="px-5 py-4"><code class="text-xs bg-gray-100 px-2 py-1 rounded">{{ item.sepayer_reference }}</code></td>
+              <td class="px-5 py-4"><code
+                  class="text-xs bg-gray-100 px-2 py-1 rounded">{{ item.order_code_from_sepay || 'N/A' }}</code></td>
+              <td class="px-5 py-4"><code
+                  class="text-xs bg-gray-100 px-2 py-1 rounded">{{ item.sepayer_reference }}</code></td>
               <td class="px-5 py-4 text-center">
-                <span class="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">{{ item.status }}</span>
+                <span class="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">{{ item.status
+                }}</span>
               </td>
               <td class="px-5 py-4 text-right">
                 <div class="flex items-center justify-end gap-2 flex-wrap">
-                  <button v-for="tx in pendingTransactions" :key="tx.id"
-                    @click="matchPayment(item.id, tx.id)"
+                  <button v-for="tx in pendingTransactions" :key="tx.id" @click="matchPayment(item.id, tx.id)"
                     class="px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-bold rounded-lg hover:bg-blue-100 transition">
                     {{ tx.ma_giao_dich }}
                   </button>
@@ -245,16 +311,21 @@
 
     <!-- Modal: Chi tiết lịch sử mua của 1 môi giới -->
     <Teleport to="body">
-      <div v-if="showDetailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div v-if="showDetailModal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
           <!-- Modal Header -->
           <div class="flex items-start justify-between p-6 border-b border-gray-100 flex-shrink-0">
             <div>
               <h3 class="font-black text-gray-900 text-lg">Lịch sử mua của {{ chiTietData.moi_gioi?.ten }}</h3>
-              <p class="text-sm text-gray-400 mt-0.5">{{ chiTietData.moi_gioi?.so_dien_thoai }} • {{ chiTietData.moi_gioi?.email }}</p>
+              <p class="text-sm text-gray-400 mt-0.5">{{ chiTietData.moi_gioi?.so_dien_thoai }} • {{
+                chiTietData.moi_gioi?.email }}</p>
             </div>
-            <button @click="closeModal" class="w-8 h-8 rounded-lg bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center transition flex-shrink-0">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <button @click="closeModal"
+              class="w-8 h-8 rounded-lg bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center transition flex-shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
           <!-- Modal Body -->
@@ -273,7 +344,8 @@
                 </div>
                 <div class="bg-gray-50 rounded-2xl p-4 text-center">
                   <p class="text-xs text-gray-400 mb-1">Đang active</p>
-                  <div class="text-2xl font-black text-green-600">{{ chiTietData.thong_ke?.so_goi_dang_hoat_dong ?? 0 }} gói</div>
+                  <div class="text-2xl font-black text-green-600">{{ chiTietData.thong_ke?.so_goi_dang_hoat_dong ?? 0 }}
+                    gói</div>
                 </div>
                 <div class="bg-gray-50 rounded-2xl p-4 text-center">
                   <p class="text-xs text-gray-400 mb-1">Tổng tiền</p>
@@ -289,14 +361,16 @@
                     <div class="flex items-start justify-between gap-3">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-2">
-                          <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">#{{ don.ma_don_hang }}</span>
+                          <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">#{{ don.ma_don_hang
+                          }}</span>
                           <span class="text-xs font-bold px-2 py-0.5 rounded-full"
                             :class="don.trang_thai_label?.class === 'success' ? 'bg-green-100 text-green-700' : don.trang_thai_label?.class === 'danger' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-500'">
                             {{ don.trang_thai_label?.text }}
                           </span>
                         </div>
                         <p class="font-bold text-gray-900 text-sm mb-1">{{ don.goi_tin?.ten_goi }}</p>
-                        <p class="text-xs text-gray-400">{{ don.ngay_bat_dau }} → {{ don.ngay_ket_thuc }} • {{ don.goi_tin?.so_luong_tin }} tin / {{ don.goi_tin?.so_ngay }} ngày</p>
+                        <p class="text-xs text-gray-400">{{ don.ngay_bat_dau }} → {{ don.ngay_ket_thuc }} • {{
+                          don.goi_tin?.so_luong_tin }} tin / {{ don.goi_tin?.so_ngay }} ngày</p>
                       </div>
                       <div class="text-right flex-shrink-0">
                         <div class="font-black text-blue-600">{{ don.so_tien_formatted }}</div>
@@ -308,17 +382,21 @@
                 </div>
               </div>
               <div v-else class="text-center py-10">
-                <svg class="w-10 h-10 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                <svg class="w-10 h-10 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
                 <p class="text-sm text-gray-400">Chưa có lịch sử mua nào</p>
               </div>
             </template>
           </div>
           <!-- Modal Footer -->
           <div class="flex items-center justify-between p-6 border-t border-gray-100 flex-shrink-0">
-            <button @click="closeModal" class="px-5 py-2.5 border-2 border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition text-sm">Đóng</button>
+            <button @click="closeModal"
+              class="px-5 py-2.5 border-2 border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition text-sm">Đóng</button>
             <div class="flex items-center gap-2">
-              <button @click="exportChiTiet('csv')" :disabled="!moiGioiId"
-                class="px-4 py-2 bg-green-50 text-green-700 text-xs font-bold rounded-xl hover:bg-green-100 transition disabled:opacity-40">CSV</button>
+              <!-- <button @click="exportChiTiet('csv')" :disabled="!moiGioiId"
+                class="px-4 py-2 bg-green-50 text-green-700 text-xs font-bold rounded-xl hover:bg-green-100 transition disabled:opacity-40">CSV</button> -->
               <button @click="exportChiTiet('excel')" :disabled="!moiGioiId"
                 class="px-4 py-2 bg-blue-50 text-blue-700 text-xs font-bold rounded-xl hover:bg-blue-100 transition disabled:opacity-40">Excel</button>
               <button @click="exportChiTiet('pdf')" :disabled="!moiGioiId"
@@ -350,9 +428,9 @@ export default {
       },
 
       // Tab control
-      activeTab: "history", // 'history' hoặc 'unmatched'
-      unmatchedPayments: [],
-      unmatchedCount: 0,
+      // activeTab: "history", // 'history' hoặc 'unmatched'
+      // unmatchedPayments: [],
+      // unmatchedCount: 0,
       pendingTransactions: [],
 
       // Pagination
@@ -719,5 +797,4 @@ export default {
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-
 </style>

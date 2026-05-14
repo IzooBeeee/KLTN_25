@@ -32,8 +32,23 @@ class BatDongSanController extends Controller
     //Lấy danh sách BDS cho admin
     public function getData(Request $request)
     {
+        $id_chuc_nang = 1;
+        $user = Auth::guard('sanctum')->user();
+        $check = PhanQuyen::where('id_chuc_vu', $user->id_chuc_vu)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$user->is_super &&  !$check) {
+            return response()->json([
+                'status' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này"
+            ]);
+        }
         $query = BatDongSan::with([
-            'loai', 'moiGioi', 'diaChi.tinh', 'diaChi.quan', 'hinhAnh'
+            'loai',
+            'moiGioi',
+            'diaChi.tinh',
+            'diaChi.quan',
+            'hinhAnh'
         ])
             ->where('status', '!=', 'draft'); // Ẩn bài nháp với admin
 
@@ -99,8 +114,8 @@ class BatDongSanController extends Controller
         $data = BatDongSan::with(['loai', 'moiGioi', 'diaChi.tinh', 'diaChi.quan', 'hinhAnh'])
             ->where(function ($q) use ($noi_dung) {
                 $q->where('tieu_de', 'like', $noi_dung)
-                  ->orWhere('mo_ta', 'like', $noi_dung)
-                  ->orWhereHas('moiGioi', fn($mq) => $mq->where('ten', 'like', $noi_dung));
+                    ->orWhere('mo_ta', 'like', $noi_dung)
+                    ->orWhereHas('moiGioi', fn($mq) => $mq->where('ten', 'like', $noi_dung));
             })
             ->paginate(10);
 

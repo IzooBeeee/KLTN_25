@@ -6,15 +6,28 @@ use App\Models\GiaoDich;
 use App\Models\GoiTin;
 use App\Models\LichSuGoiTin;
 use App\Models\MoiGioi;
+use App\Models\PhanQuyen;
 use App\Models\UnmatchedPayment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class LichSuGoiTinController extends Controller
 {
     public function lichSuMua(Request $request)
     {
+        $id_chuc_nang = 66; // ID tìm kiếm BDS cho admin
+        $user = Auth::guard('sanctum')->user();
+        $check = PhanQuyen::where('id_chuc_vu', $user->id_chuc_vu)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$user->is_super &&  !$check) {
+            return response()->json([
+                'status' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này"
+            ]);
+        }
         $perPage = $request->get('per_page', 10);
         $search = $request->get('search', '');
 

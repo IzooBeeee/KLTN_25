@@ -4,24 +4,18 @@
       <div class="col-12">
         <div class="card border-0 shadow-sm custom-header-card">
           <div
-            class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3 gap-3"
-          >
+            class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3 gap-3">
             <div class="p-2">
               <h4 class="mb-0 fw-bold text-primary">
                 <i class="bi bi-person-vcard me-2"></i>Quản lý môi giới
               </h4>
-              <small class="text-muted"
-                >Theo dõi hiệu suất, phê duyệt danh tính và quản lý quyền lợi
-                đội ngũ.</small
-              >
+              <small class="text-muted">Theo dõi hiệu suất, phê duyệt danh tính và quản lý quyền lợi
+                đội ngũ.</small>
             </div>
 
             <div class="d-flex justify-content-center align-items-center gap-2">
               <div class="input-group" style="max-width: 180px">
-                <select
-                  v-model="statusFilter"
-                  class="form-select custom-input text-muted rounded-pill"
-                >
+                <select v-model="statusFilter" class="form-select custom-input text-muted rounded-pill">
                   <option value="">Tất cả trạng thái</option>
                   <option :value="true">Đang hoạt động</option>
                   <option :value="false">Bị khóa</option>
@@ -29,84 +23,49 @@
               </div>
 
               <div class="input-group" style="max-width: 180px">
-                <select
-                  v-model="packageFilter"
-                  class="form-select custom-input text-muted rounded-pill"
-                >
-                <option value="">Tất cả các gói</option>
-                <option
-                  v-for="pkg in availablePackages"
-                  :key="pkg.ten_goi"
-                  :value="pkg.ten_goi"
-                >
-                  {{ pkg.ten_goi }} - {{ formatCurrency(pkg.gia) }}
-                </option>
+                <select v-model="packageFilter" class="form-select custom-input text-muted rounded-pill">
+                  <option value="">Tất cả các gói</option>
+                  <option v-for="pkg in availablePackages" :key="pkg.ten_goi" :value="pkg.ten_goi">
+                    {{ pkg.ten_goi }} - {{ formatCurrency(pkg.gia) }}
+                  </option>
                 </select>
               </div>
 
               <div class="input-group" style="max-width: 250px">
-                <input
-                  v-model="search"
-                  type="text"
-                  class="form-control custom-input rounded-start-pill"
-                  placeholder="Tìm tên, email, SĐT..."
-                />
-                <button
-                  class="btn btn-outline-secondary shadow-none rounded-end-circle"
-                  type="button"
-                >
+                <input v-model="search" type="text" class="form-control custom-input rounded-start-pill"
+                  placeholder="Tìm tên, email, SĐT..." />
+                <button class="btn btn-outline-secondary shadow-none rounded-end-circle" type="button">
                   <i class="bi bi-search"></i>
                 </button>
               </div>
 
               <div class="position-relative">
-                <button
-                  @click="showExportMenu = !showExportMenu"
-                  class="btn btn-success btn-lg text-nowrap px-4 shadow-sm fw-bold rounded-pill"
-                >
+                <button @click="showExportMenu = !showExportMenu"
+                  class="btn btn-success btn-lg text-nowrap px-4 shadow-sm fw-bold rounded-pill">
                   <i class="bi bi-download me-1"></i> Export
-                  <i
-                    class="bi bi-chevron-down ms-1"
-                    style="font-size: 12px"
-                  ></i>
+                  <i class="bi bi-chevron-down ms-1" style="font-size: 12px"></i>
                 </button>
-                <div
-                  v-if="showExportMenu"
+                <div v-if="showExportMenu"
                   class="dropdown-menu show position-absolute end-0 mt-2 shadow-sm border-0 rounded-3 p-2 z-3"
-                  style="min-width: 200px"
-                >
-                  <a
-                    href="#"
-                    @click.prevent="exportData('csv')"
-                    class="dropdown-item rounded py-2 d-flex align-items-center"
-                  >
+                  style="min-width: 200px">
+                  <!-- <a href="#" @click.prevent="exportData('csv')"
+                    class="dropdown-item rounded py-2 d-flex align-items-center">
                     <i class="bi bi-filetype-csv text-success fs-5 me-2"></i>
                     Xuất file CSV
-                  </a>
-                  <a
-                    href="#"
-                    @click.prevent="exportData('excel')"
-                    class="dropdown-item rounded py-2 d-flex align-items-center"
-                  >
-                    <i
-                      class="bi bi-file-earmark-excel text-primary fs-5 me-2"
-                    ></i>
+                  </a> -->
+                  <a href="#" @click.prevent="exportData('excel')"
+                    class="dropdown-item rounded py-2 d-flex align-items-center">
+                    <i class="bi bi-file-earmark-excel text-primary fs-5 me-2"></i>
                     Xuất file Excel
                   </a>
-                  <a
-                    href="#"
-                    @click.prevent="exportData('pdf')"
-                    class="dropdown-item rounded py-2 d-flex align-items-center"
-                  >
+                  <a href="#" @click.prevent="exportData('pdf')"
+                    class="dropdown-item rounded py-2 d-flex align-items-center">
                     <i class="bi bi-filetype-pdf text-danger fs-5 me-2"></i>
                     Xuất file PDF
                   </a>
                 </div>
-                <div
-                  v-if="showExportMenu"
-                  @click="showExportMenu = false"
-                  class="position-fixed top-0 start-0 w-100 h-100 z-2"
-                ></div>
+                <div v-if="showExportMenu" @click="showExportMenu = false"
+                  class="position-fixed top-0 start-0 w-100 h-100 z-2"></div>
               </div>
               <!-- <button
                 @click="openAdd"
@@ -124,9 +83,7 @@
       <!-- TỔNG MÔI GIỚI -->
       <div class="col-md-3">
         <div class="card border-0 shadow-sm">
-          <div
-            class="card-body d-flex justify-content-between align-items-center"
-          >
+          <div class="card-body d-flex justify-content-between align-items-center">
             <div>
               <small class="text-muted fw-bold">TỔNG MÔI GIỚI</small>
               <h3 class="fw-bold text-primary mb-0">
@@ -141,9 +98,7 @@
       <!-- ĐÃ XÁC MINH -->
       <div class="col-md-3">
         <div class="card border-0 shadow-sm bg-primary text-white">
-          <div
-            class="card-body d-flex justify-content-between align-items-center"
-          >
+          <div class="card-body d-flex justify-content-between align-items-center">
             <div>
               <small class="opacity-75 fw-bold">ĐANG HOẠT ĐỘNG</small>
               <h3 class="fw-bold mb-0">
@@ -158,9 +113,7 @@
       <!-- CHỜ XÁC MINH-->
       <div class="col-md-3">
         <div class="card border-0 shadow-sm bg-danger bg-opacity-10">
-          <div
-            class="card-body d-flex justify-content-between align-items-center"
-          >
+          <div class="card-body d-flex justify-content-between align-items-center">
             <div>
               <small class="text-danger fw-bold">BỊ KHÓA</small>
               <div class="d-flex align-items-end">
@@ -177,18 +130,14 @@
       <!-- MÔI GIỚI VIP-->
       <div class="col-md-3">
         <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
-          <div
-            class="card-body d-flex justify-content-between align-items-center"
-          >
+          <div class="card-body d-flex justify-content-between align-items-center">
             <div>
               <small class="text-primary fw-bold">MÔI GIỚI VIP</small>
               <div class="d-flex align-items-end">
                 <h3 class="fw-bold text-primary mb-0">
                   {{ soGoiVIP.toLocaleString() }}
                 </h3>
-                <small class="text-muted ms-3 fw-bold"
-                  >Đang sử dụng gói cao cấp</small
-                >
+                <small class="text-muted ms-3 fw-bold">Đang sử dụng gói cao cấp</small>
               </div>
             </div>
             <i class="bi bi-star-fill fs-1 text-primary opacity-50"></i>
@@ -229,27 +178,17 @@
                 </td>
               </tr>
 
-              <tr
-                v-for="(v, k) in paginatedList"
-                :key="v.id"
-                class="transition-all"
-              >
+              <tr v-for="(v, k) in paginatedList" :key="v.id" class="transition-all">
                 <td>
                   <div class="d-flex align-items-center">
-                    <img
-                      :src="v.avatar || defaultAvatar(v.ten)"
+                    <img :src="v.avatar || defaultAvatar(v.ten)"
                       class="avatar-sm me-3 rounded-circle object-cover shadow-sm border border-2 border-white"
-                      alt="Avatar"
-                    />
+                      alt="Avatar" />
                     <div>
                       <div class="fw-bold text-dark">{{ v.ten }}</div>
-                      <div
-                        class="text-muted small mt-1 d-flex align-items-center gap-2"
-                      >
-                        <span
-                          class="badge bg-light text-dark border px-2 py-1 mt-1 small"
-                          >ID: BRO-{{ String(k + 1).padStart(2, "0") }}</span
-                        >
+                      <div class="text-muted small mt-1 d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-dark border px-2 py-1 mt-1 small">ID: BRO-{{ String(k +
+                          1).padStart(2, "0") }}</span>
                       </div>
                     </div>
                   </div>
@@ -261,42 +200,33 @@
                   </small>
                 </td>
                 <td class="text-center">
-                  <span
-                    :class="[
-                      !v.ten_goi || v.ten_goi === 'Chưa mua' 
-                        ? 'bg-secondary text-white border-secondary'
-                        : ((v.ten_goi || '').includes('VIP') || (v.ten_goi || '').includes('Kim') || (v.ten_goi || '').includes('Cao Cấp'))
-                          ? 'bg-warning text-dark border-warning'
-                          : 'bg-primary text-white border-primary'
-                    ]"
-                    class="badge border px-3 py-2 rounded-pill small fw-bold mb-1"
-                  >
+                  <span :class="[
+                    !v.ten_goi || v.ten_goi === 'Chưa mua'
+                      ? 'bg-secondary text-white border-secondary'
+                      : ((v.ten_goi || '').includes('VIP') || (v.ten_goi || '').includes('Kim') || (v.ten_goi || '').includes('Cao Cấp'))
+                        ? 'bg-warning text-dark border-warning'
+                        : 'bg-primary text-white border-primary'
+                  ]" class="badge border px-3 py-2 rounded-pill small fw-bold mb-1">
                     {{ v.ten_goi || "Chưa mua" }}
                   </span>
                 </td>
                 <td class="text-center">
                   <span
-                    class="badge bg-light text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill"
-                  >
+                    class="badge bg-light text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill">
                     {{ v.so_tin || 0 }}
                   </span>
                 </td>
                 <td class="text-center">
                   <!--  Fix: Truyền đúng boolean cho changeStatus -->
-                  <button
-                    @click="
-                      changeStatus(
-                        v,
-                        !(v.is_active === true || v.is_active === 1)
-                      )
-                    "
-                    :class="
-                      v.is_active === true || v.is_active === 1
-                        ? 'badge-active'
-                        : 'badge-inactive'
-                    "
-                    class="badge px-3 py-2 rounded-pill small fw-bold border-0 cursor-pointer"
-                  >
+                  <button @click="
+                    changeStatus(
+                      v,
+                      !(v.is_active === true || v.is_active === 1)
+                    )
+                    " :class="v.is_active === true || v.is_active === 1
+                      ? 'badge-active'
+                      : 'badge-inactive'
+                      " class="badge px-3 py-2 rounded-pill small fw-bold border-0 cursor-pointer">
                     {{
                       v.is_active === true || v.is_active === 1
                         ? "Đang hoạt động"
@@ -305,18 +235,14 @@
                   </button>
                 </td>
                 <td class="text-end pe-4 text-nowrap">
-                  <button
+                  <!-- <button
                     @click="openEdit(v)"
                     class="btn btn-icon btn-light-primary me-2"
                     title="Cập nhật"
                   >
                     <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button
-                    @click="openDelete(v)"
-                    class="btn btn-icon btn-light-danger"
-                    title="Xóa"
-                  >
+                  </button> -->
+                  <button @click="openDelete(v)" class="btn btn-icon btn-light-danger" title="Xóa">
                     <i class="bi bi-trash"></i>
                   </button>
                 </td>
@@ -327,9 +253,7 @@
       </div>
       <!-- Pagination Footer -->
       <div class="card-footer bg-white border-0 py-3 px-4">
-        <div
-          class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3"
-        >
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
           <!-- Info -->
           <small class="text-muted fw-medium">
             {{ paginationInfo }}
@@ -338,37 +262,23 @@
           <!-- Pagination Buttons -->
           <div class="d-flex align-items-center gap-1" v-if="totalPages > 1">
             <!-- Previous -->
-            <button
-              @click="prevPage"
-              :disabled="currentPage === 1"
-              class="btn btn-sm btn-light border"
-              :class="{ disabled: currentPage === 1 }"
-            >
+            <button @click="prevPage" :disabled="currentPage === 1" class="btn btn-sm btn-light border"
+              :class="{ disabled: currentPage === 1 }">
               &laquo;
             </button>
 
             <!-- Page Numbers -->
-            <button
-              v-for="page in visiblePages"
-              :key="page"
-              @click="goToPage(page)"
-              class="btn btn-sm btn-primary"
-              :class="
-                page === currentPage
-                  ? 'btn-primary'
-                  : 'btn-light border text-muted'
-              "
-            >
+            <button v-for="page in visiblePages" :key="page" @click="goToPage(page)" class="btn btn-sm btn-primary"
+              :class="page === currentPage
+                ? 'btn-primary'
+                : 'btn-light border text-muted'
+                ">
               {{ page }}
             </button>
 
             <!-- Next -->
-            <button
-              @click="nextPage"
-              :disabled="currentPage === totalPages"
-              class="btn btn-sm btn-light border"
-              :class="{ disabled: currentPage === totalPages }"
-            >
+            <button @click="nextPage" :disabled="currentPage === totalPages" class="btn btn-sm btn-light border"
+              :class="{ disabled: currentPage === totalPages }">
               &raquo;
             </button>
           </div>
@@ -376,10 +286,7 @@
       </div>
     </div>
 
-    <div
-      class="alert alert-warning border-0 shadow-sm d-flex align-items-center rounded-3 p-3 mb-0"
-      role="alert"
-    >
+    <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center rounded-3 p-3 mb-0" role="alert">
       <i class="bi bi-shield-exclamation fs-3 text-warning me-3"></i>
       <div>
         <h6 class="alert-heading fw-bold mb-1 text-dark">
@@ -392,93 +299,46 @@
       </div>
     </div>
 
-    <div
-      v-if="showAdd || showEdit || showDelete"
-      class="modal-backdrop fade show"
-      style="z-index: 1040"
-    ></div>
+    <div v-if="showAdd || showEdit || showDelete" class="modal-backdrop fade show" style="z-index: 1040"></div>
 
-    <div
-      v-if="showAdd"
-      class="modal fade show d-block"
-      tabindex="-1"
-      style="z-index: 1050"
-    >
+    <div v-if="showAdd" class="modal fade show d-block" tabindex="-1" style="z-index: 1050">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
           <div class="modal-header border-0 pt-4 px-4 pb-0">
             <h5 class="fw-bold text-primary mb-0">
               <i class="bi bi-person-plus-fill me-2"></i>Thêm môi giới mới
             </h5>
-            <button
-              @click="closeModals"
-              type="button"
-              class="btn-close shadow-none"
-            ></button>
+            <button @click="closeModals" type="button" class="btn-close shadow-none"></button>
           </div>
           <div class="modal-body px-4 py-4">
             <div class="row g-3">
               <div class="col-12">
-                <label
-                  class="form-label small fw-bold text-muted text-uppercase tracking-widest"
-                  >Họ và tên</label
-                >
-                <input
-                  v-model="moi_gioi.ten"
-                  type="text"
-                  placeholder="Nhập tên môi giới..."
-                  class="form-control custom-input fw-bold"
-                />
+                <label class="form-label small fw-bold text-muted text-uppercase tracking-widest">Họ và tên</label>
+                <input v-model="moi_gioi.ten" type="text" placeholder="Nhập tên môi giới..."
+                  class="form-control custom-input fw-bold" />
               </div>
               <div class="col-md-6">
-                <label
-                  class="form-label small fw-bold text-muted text-uppercase tracking-widest"
-                  >Email</label
-                >
-                <input
-                  v-model="moi_gioi.email"
-                  type="email"
-                  placeholder="example@email.com"
-                  class="form-control custom-input fw-bold"
-                />
+                <label class="form-label small fw-bold text-muted text-uppercase tracking-widest">Email</label>
+                <input v-model="moi_gioi.email" type="email" placeholder="example@email.com"
+                  class="form-control custom-input fw-bold" />
               </div>
               <div class="col-md-6">
-                <label
-                  class="form-label small fw-bold text-muted text-uppercase tracking-widest"
-                  >Số điện thoại</label
-                >
-                <input
-                  v-model="moi_gioi.so_dien_thoai"
-                  type="text"
-                  placeholder="09xx xxx xxx"
-                  class="form-control custom-input fw-bold"
-                />
+                <label class="form-label small fw-bold text-muted text-uppercase tracking-widest">Số điện thoại</label>
+                <input v-model="moi_gioi.so_dien_thoai" type="text" placeholder="09xx xxx xxx"
+                  class="form-control custom-input fw-bold" />
               </div>
               <div class="col-12">
-                <label
-                  class="form-label small fw-bold text-muted text-uppercase tracking-widest"
-                  >Mật khẩu</label
-                >
-                <input
-                  v-model="moi_gioi.password"
-                  type="password"
-                  placeholder="••••••••"
-                  class="form-control custom-input fw-bold"
-                />
+                <label class="form-label small fw-bold text-muted text-uppercase tracking-widest">Mật khẩu</label>
+                <input v-model="moi_gioi.password" type="password" placeholder="••••••••"
+                  class="form-control custom-input fw-bold" />
               </div>
             </div>
           </div>
           <div class="modal-footer border-0 pb-4 px-4 pt-0">
-            <button
-              @click="closeModals"
-              class="btn btn-light rounded-pill px-4"
-            >
+            <button @click="closeModals" class="btn btn-light rounded-pill px-4">
               Hủy thao tác
             </button>
-            <button
-              @click="taoMoiGioi"
-              class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm"
-            >
+            <button @click="taoMoiGioi" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
               Lưu thông tin
             </button>
           </div>
@@ -486,7 +346,7 @@
       </div>
     </div>
 
-    <div
+    <!-- <div
       v-if="showEdit"
       class="modal fade show d-block"
       tabindex="-1"
@@ -557,21 +417,15 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <div
-      v-if="showDelete"
-      class="modal fade show d-block"
-      tabindex="-1"
-      style="z-index: 1050"
-    >
+    <div v-if="showDelete" class="modal fade show d-block" tabindex="-1" style="z-index: 1050">
       <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow-lg rounded-4 text-center p-4">
           <div class="mb-3">
             <div
               class="avatar-sm bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center mx-auto"
-              style="width: 60px; height: 60px"
-            >
+              style="width: 60px; height: 60px">
               <i class="bi bi-exclamation-triangle fs-1"></i>
             </div>
           </div>
@@ -585,16 +439,10 @@
             Hành động này không thể hoàn tác.
           </p>
           <div class="d-flex justify-content-center gap-2">
-            <button
-              @click="closeModals"
-              class="btn btn-light rounded-pill px-4"
-            >
+            <button @click="closeModals" class="btn btn-light rounded-pill px-4">
               Hủy
             </button>
-            <button
-              @click="xoaMoiGioiConfirm"
-              class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm"
-            >
+            <button @click="xoaMoiGioiConfirm" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
               Xóa ngay
             </button>
           </div>
@@ -972,6 +820,7 @@ export default {
 .card {
   border-radius: 16px;
 }
+
 .custom-header-card {
   background: white;
 }
@@ -987,6 +836,7 @@ export default {
   padding: 15px;
   border: none;
 }
+
 .table tbody td {
   padding: 18px 15px;
   border-bottom: 1px solid #f1f1f1;
@@ -1008,6 +858,7 @@ export default {
   font-size: 0.75rem;
   font-weight: 600;
 }
+
 .badge-inactive {
   background-color: #fff5f5;
   color: #e67700;
@@ -1027,21 +878,25 @@ export default {
   border-radius: 10px;
   transition: all 0.2s;
 }
+
 .btn-light-primary {
   background: #e7f1ff;
   color: #0d6efd;
   border: none;
 }
+
 .btn-light-danger {
   background: #fff5f5;
   color: #dc3545;
   border: none;
 }
+
 .btn-light-primary:hover {
   background: #0d6efd;
   color: white;
   transform: translateY(-1px);
 }
+
 .btn-light-danger:hover {
   background: #dc3545;
   color: white;
@@ -1056,6 +911,7 @@ export default {
   background-color: #fcfcfc;
   transition: all 0.2s;
 }
+
 .custom-input:focus {
   border-color: #0d6efd;
   background-color: white;
@@ -1066,6 +922,7 @@ export default {
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #dee2e6;
   border-radius: 10px;

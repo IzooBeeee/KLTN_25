@@ -129,7 +129,7 @@
                 </div>
 
                 <!-- Stats -->
-                <div class="dropdown-stats-new">
+                <!-- <div class="dropdown-stats-new">
                   <div class="stat-item-new">
                     <span class="stat-value-new">{{ totalListings }}</span>
                     <span class="stat-label-new">Tin đăng</span>
@@ -138,7 +138,7 @@
                     <span class="stat-value-new">{{ totalCustomers }}</span>
                     <span class="stat-label-new">Khách hàng</span>
                   </div>
-                </div>
+                </div> -->
 
                 <!-- Menu Items -->
                 <div class="dropdown-items-new">
@@ -181,20 +181,20 @@
                     <span class="item-badge-new">MỚI</span>
                   </router-link>
 
-                  <!-- 🔥 Chat với khách hàng -->
+                  <!-- 🔥 Chat với khách hàng
                   <div class="dropdown-item-new chat-customer-item" @click="handleChatWithCustomer" role="menuitem">
                     <span class="item-icon-new">💬</span>
                     <span class="item-label-new">Chat với khách hàng</span>
                     <span class="item-badge-new new">Mới</span>
-                  </div>
+                  </div> -->
 
                   <!-- Thống kê -->
-                  <router-link to="/moi-gioi/trang-chu" class="dropdown-item-new" role="menuitem"
+                  <!-- <router-link to="/moi-gioi/trang-chu" class="dropdown-item-new" role="menuitem"
                     @click="showMenu = false">
                     <span class="item-icon-new">📊</span>
                     <span class="item-label-new">Thống kê hiệu suất</span>
                     <span class="item-arrow-new">→</span>
-                  </router-link>
+                  </router-link> -->
                 </div>
 
                 <!-- Divider -->
@@ -324,8 +324,8 @@ export default {
       loadingPosts: false,
       hasNewNotifications: false, // ✅ Theo dõi thông báo mới
       previousUnreadCount: 0, // ✅ Theo dõi số thông báo chưa đọc trước đó
-      statsListings: 0,
-      statsCustomers: 0,
+      // statsListings: 0,
+      // statsCustomers: 0,
       selectedBdsId: null,
     };
   },
@@ -356,12 +356,12 @@ export default {
       if (!this.user?.id) return '---';
       return this.user?.ma_moi_gioi || this.user?.code || `MG-${String(this.user.id).padStart(4, '0')}`;
     },
-    totalListings() {
-      return this.statsListings;
-    },
-    totalCustomers() {
-      return this.statsCustomers;
-    },
+    // totalListings() {
+    //   return this.statsListings;
+    // },
+    // totalCustomers() {
+    //   return this.statsCustomers;
+    // },
     // ✅ Hiển thị số tin: "5 tin", "Hết", hoặc "∞"
     postsDisplay() {
       if (this.remainingPosts === null) return "...";
@@ -421,7 +421,7 @@ export default {
 
       subscribeUser(userId, (data) => {
         console.log('[Echo] Broker received notification:', data);
-        
+
         // ✅ Nếu là tin nhắn của chính mình gửi (từ tab khác) thì bỏ qua
         if (data.sender_type === 'moi_gioi') {
           return;
@@ -446,8 +446,8 @@ export default {
         const toastMsg = this._buildToastMessage(data);
         if (this.$toast) {
           const toastType = data.loai === 'tu_choi' ? 'error' : (data.loai === 'approved' ? 'success' : 'info');
-          this.$toast[toastType](toastMsg, { 
-            position: 'top-right', 
+          this.$toast[toastType](toastMsg, {
+            position: 'top-right',
             duration: 7000,
             onClick: () => {
               if (data.loai === 'tin_nhan') {
@@ -461,7 +461,7 @@ export default {
             }
           });
         }
-        
+
         // Cập nhật lại stats ở dropdown nếu đang mở
         this.fetchDropdownStats();
         if (this.showNotifications) {
@@ -517,18 +517,18 @@ export default {
     },
     async startChatWithCustomer() {
       if (!this.selectedCustomer) return;
-      
+
       this.triggerToast("Đang khởi tạo cuộc trò chuyện...");
-      
+
       try {
         const payload = {
           khach_hang_id: this.selectedCustomer.id,
           // Nếu có thông tin BĐS từ notification thì đính kèm vào room chat luôn
           bat_dong_san_id: this.selectedBdsId || null
         };
-        
+
         const res = await api.post('/moi-gioi/chat/start', payload);
-        
+
         if (res.data?.status) {
           this.closeModal();
           // Chuyển hướng sang trang quản lý khách hàng (trang chat) và truyền ID cuộc hội thoại
@@ -574,7 +574,7 @@ export default {
           this.token = token;
           this.user = userStr ? JSON.parse(userStr) : (this.user || { ten: "Môi giới" });
           this.userType = "moi-gioi";
-          
+
           // ✅ Cập nhật token cho Echo
           updateEchoToken(token);
 
@@ -634,11 +634,11 @@ export default {
             khach_hang_id: item.khach_hang_id || null,
             bat_dong_san_id: item.bat_dong_san_id || null,
           }));
-          
+
           // 🔔 Detect new notifications and show toast
           const newUnreadCount = newNotifications.filter((n) => !n.da_doc).length;
           console.log(`[Polling] Unread: ${newUnreadCount}, Previous: ${this.previousUnreadCount}`);
-          
+
           // Show toast for new notifications (not on initial load when previousUnreadCount is 0)
           if (this.previousUnreadCount > 0 && newUnreadCount > this.previousUnreadCount) {
             // Find new unread notifications
@@ -650,7 +650,7 @@ export default {
               this.triggerToast(this._buildToastMessage(item), 5000);
             });
           }
-          
+
           this.notifications = newNotifications;
           this.unreadCount = this.notifications.filter((n) => !n.da_doc).length;
           this.previousUnreadCount = this.unreadCount;
@@ -711,14 +711,14 @@ export default {
     },
     handleNotificationClick(item) {
       if (this.isDragging) return;
-      
+
       // Đánh dấu đã đọc
       if (!item.da_doc) {
         item.da_doc = true;
         this.unreadCount = Math.max(0, this.unreadCount - 1);
         this.markAsRead(item.id);
       }
-      
+
       // 📅 Navigate based on notification type
       if (item.loai === 'lich_hen' || item.tieu_de?.includes('Lịch hẹn')) {
         this.showNotifications = false;
@@ -790,18 +790,18 @@ export default {
 
 
     // ✅ MỚI: Xử lý Chat với khách hàng
-    handleChatWithCustomer() {
-      this.showMenu = false;
-      // Option 1: Router push (nếu có trang chat)
-      // this.$router.push('/moi-gioi/chat-voi-khach-hang');
-      // Option 2: Emit event để parent mở modal
-      // this.$emit('open-chat-modal');
-      // Option 3: Mở Zalo (thay số thật)
-      // window.open('https://zalo.me/0123456789', '_blank');
-      // Option 4: Chỉ toast + log (để dev test)
-      this.triggerToast("Đang kết nối với khách hàng...", 2000);
-      console.log("🔗 Mở chat với khách hàng cho broker:", this.user?.id);
-    },
+    // handleChatWithCustomer() {
+    //   this.showMenu = false;
+    //   // Option 1: Router push (nếu có trang chat)
+    //   // this.$router.push('/moi-gioi/chat-voi-khach-hang');
+    //   // Option 2: Emit event để parent mở modal
+    //   // this.$emit('open-chat-modal');
+    //   // Option 3: Mở Zalo (thay số thật)
+    //   // window.open('https://zalo.me/0123456789', '_blank');
+    //   // Option 4: Chỉ toast + log (để dev test)
+    //   this.triggerToast("Đang kết nối với khách hàng...", 2000);
+    //   console.log("🔗 Mở chat với khách hàng cho broker:", this.user?.id);
+    // },
     // ✅ Method gọi API lấy số tin còn lại (giống Dashboard)
     async fetchRemainingPosts() {
       if (!this.isLoggedIn) return;

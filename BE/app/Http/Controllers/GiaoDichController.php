@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\UnmatchedPayment;
 use App\Events\ThanhToanThanhCong;
+use App\Models\PhanQuyen;
 
 class GiaoDichController extends Controller
 {
@@ -26,6 +27,17 @@ class GiaoDichController extends Controller
     // ✅ Lấy danh sách giao dịch cho Admin
     public function getData(Request $request)
     {
+        $id_chuc_nang = 7;
+        $user = Auth::guard('sanctum')->user();
+        $check = PhanQuyen::where('id_chuc_vu', $user->id_chuc_vu)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$user->is_super &&  !$check) {
+            return response()->json([
+                'status' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này"
+            ]);
+        }
         $query = GiaoDich::with(['moiGioi:id,ten,so_dien_thoai', 'goiTin:id,ten_goi']);
 
         if ($request->filled('search')) {
@@ -33,7 +45,7 @@ class GiaoDichController extends Controller
             $query->where('ma_giao_dich', 'like', "%{$search}%")
                 ->orWhereHas('moiGioi', function ($q) use ($search) {
                     $q->where('ten', 'like', "%{$search}%")
-                      ->orWhere('so_dien_thoai', 'like', "%{$search}%");
+                        ->orWhere('so_dien_thoai', 'like', "%{$search}%");
                 });
         }
 

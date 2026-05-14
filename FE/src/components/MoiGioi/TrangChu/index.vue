@@ -11,48 +11,65 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
 
       <!-- 1. Tổng tin đăng -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
+      <div
+        class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
         <div class="flex items-start justify-between mb-4">
           <div>
             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Tổng tin đăng</p>
             <div class="text-4xl font-black text-blue-600">{{ stats.totalPosted }}</div>
           </div>
           <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
           </div>
         </div>
-        <span class="inline-flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-semibold">
-          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+        <span
+          class="inline-flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-semibold">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
           +2 tháng này
         </span>
         <div class="absolute -bottom-3 -right-3 w-20 h-20 bg-blue-50 rounded-full opacity-50"></div>
       </div>
 
       <!-- 2. Tin còn lại -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
+      <div
+        class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
         <div class="flex items-start justify-between mb-4">
           <div>
             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Tin còn lại</p>
             <div class="text-4xl font-black text-green-600">{{ stats.remainingPosts }}</div>
           </div>
           <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
           </div>
         </div>
         <p class="text-xs text-gray-400">Sẵn sàng đăng tin</p>
-        <p v-if="stats.ngayHetHanGoi" class="text-xs text-red-500 font-semibold mt-1">Hết hạn: {{ stats.ngayHetHanGoi }}</p>
+        <p v-if="stats.ngayHetHanGoi" class="text-xs text-red-500 font-semibold mt-1">Hết hạn: {{ stats.ngayHetHanGoi }}
+        </p>
         <div class="absolute -bottom-3 -right-3 w-20 h-20 bg-green-50 rounded-full opacity-50"></div>
       </div>
 
       <!-- 3. Lượt yêu thích -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
+      <div
+        class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
         <div class="flex items-start justify-between mb-4">
           <div>
             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Lượt yêu thích</p>
             <div class="text-4xl font-black text-rose-500">{{ stats.totalFavorites }}</div>
           </div>
           <div class="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-rose-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+            <svg class="w-6 h-6 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                clip-rule="evenodd" />
+            </svg>
           </div>
         </div>
         <p class="text-xs text-gray-400">Từ khách hàng tiềm năng</p>
@@ -60,14 +77,17 @@
       </div>
 
       <!-- 4. Tổng tiền gói -->
-      <div class="bg-gradient-to-br from-[#0a0e27] to-[#1d4ed8] rounded-2xl p-5 shadow-sm relative overflow-hidden text-white">
+      <div class="bg-[#059669] rounded-2xl p-5 shadow-sm relative overflow-hidden text-white">
         <div class="flex items-start justify-between mb-4">
           <div>
             <p class="text-xs font-bold text-blue-300 uppercase tracking-widest mb-1">Tổng tiền gói</p>
             <div class="text-3xl font-black">{{ Number(stats.totalPaid).toLocaleString("vi-VN") }}</div>
           </div>
           <div class="w-12 h-12 bg-white/15 rounded-2xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
         </div>
         <p class="text-xs text-blue-300">VNĐ đã đầu tư</p>
@@ -84,13 +104,11 @@
         <div class="flex items-center justify-between mb-5">
           <h2 class="font-bold text-gray-800">Hiệu suất tin đăng</h2>
           <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
-            <button @click="changeChartPeriod('week')"
-              class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+            <button @click="changeChartPeriod('week')" class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
               :class="chartPeriod === 'week' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'">
               Tuần này
             </button>
-            <button @click="changeChartPeriod('month')"
-              class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+            <button @click="changeChartPeriod('month')" class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
               :class="chartPeriod === 'month' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'">
               Tháng qua
             </button>
@@ -103,7 +121,10 @@
       <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex flex-col">
         <div class="flex items-center gap-3 mb-5">
           <div class="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center">
-            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
           </div>
           <h2 class="font-bold text-gray-800">Khách hàng liên hệ</h2>
         </div>
@@ -114,26 +135,26 @@
         </div>
 
         <!-- Empty -->
-        <div v-else-if="customers.length === 0" class="flex-1 flex flex-col items-center justify-center py-8 text-center">
+        <div v-else-if="customers.length === 0"
+          class="flex-1 flex flex-col items-center justify-center py-8 text-center">
           <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-            <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
           </div>
           <p class="text-sm text-gray-400">Chưa có khách hàng liên hệ</p>
         </div>
 
         <!-- List -->
         <div v-else class="space-y-3 flex-1 overflow-y-auto max-h-72 pr-1">
-          <router-link 
-            v-for="(customer, index) in customers" 
-            :key="index"
+          <router-link v-for="(customer, index) in customers" :key="index"
             :to="{ path: '/moi-gioi/quan-ly-khach-hang', query: { customer_id: customer.khach_hang?.id } }"
-            class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-blue-50 transition-colors cursor-pointer group no-underline"
-          >
+            class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-blue-50 transition-colors cursor-pointer group no-underline">
             <img
               :src="customer.khach_hang?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(customer.khach_hang?.ten || 'KH') + '&background=dbeafe&color=3b82f6'"
               class="w-10 h-10 rounded-full object-cover flex-shrink-0 border-2 border-white shadow-sm"
-              alt="Customer"
-            />
+              alt="Customer" />
             <div class="flex-1 min-w-0 text-left">
               <p class="text-sm font-semibold text-gray-800 truncate mb-0">{{ customer.khach_hang?.ten }}</p>
               <p class="text-xs text-blue-500 truncate mb-1">{{ customer.bat_dong_san?.tieu_de || 'Quan tâm BĐS' }}</p>
@@ -148,19 +169,26 @@
         <router-link to="/moi-gioi/quan-ly-khach-hang"
           class="mt-4 flex items-center justify-center gap-2 py-2.5 border-2 border-blue-200 text-blue-600 text-xs font-bold rounded-xl hover:bg-blue-50 transition">
           Xem tất cả khách hàng
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
         </router-link>
       </div>
     </div>
 
     <!-- Alert Banner -->
-    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div
+      class="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
       <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
       </div>
       <div class="flex-1">
         <h3 class="font-bold text-gray-800 text-sm mb-0.5">Tin đăng sắp hết hạn</h3>
-        <p class="text-sm text-gray-500">Một số tin đăng sẽ hết hiệu lực sớm. Hãy gia hạn để không bỏ lỡ khách hàng tiềm năng.</p>
+        <p class="text-sm text-gray-500">Một số tin đăng sẽ hết hiệu lực sớm. Hãy gia hạn để không bỏ lỡ khách hàng tiềm
+          năng.</p>
       </div>
       <router-link to="/moi-gioi/quan-ly-bat-dong-san"
         class="flex-shrink-0 px-5 py-2.5 bg-amber-500 text-white text-sm font-bold rounded-xl hover:bg-amber-600 transition shadow-sm shadow-amber-200">
@@ -391,14 +419,14 @@ export default {
       const userStr = localStorage.getItem("moi_gioi_user_info");
       if (!userStr) return;
       const user = JSON.parse(userStr);
-      
+
       import("@/js/services/echo").then(({ subscribeUser }) => {
         subscribeUser(user.id, (data) => {
           console.log("[Dashboard] New notification received:", data);
-          
+
           // 1. Tăng số lượt yêu thích trên card
           this.stats.totalFavorites += 1;
-          
+
           // 2. Thêm vào danh sách "Khách hàng liên hệ" (unshift)
           if (data.khach_hang) {
             this.customers.unshift({

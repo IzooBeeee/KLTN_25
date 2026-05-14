@@ -22,7 +22,7 @@ class GoiTinController extends Controller
     // Admin xem danh sách gói tin
     public function getData()
     {
-        $id_chuc_nang = 19; // ID chức năng xem gói tin
+        $id_chuc_nang = 19;
         $user = Auth::guard('sanctum')->user();
         $check = PhanQuyen::where('id_chuc_vu', $user->id_chuc_vu)
             ->where('id_chuc_nang', $id_chuc_nang)
@@ -31,7 +31,7 @@ class GoiTinController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => "Bạn không có quyền thực hiện chức năng này"
-            ], 403);
+            ]);
         }
         return response()->json([
             'status' => true,
