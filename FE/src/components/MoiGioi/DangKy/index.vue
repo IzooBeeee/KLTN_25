@@ -25,9 +25,6 @@
         </div>
 
         <div class="relative z-10">
-          <div class="flex -space-x-2 mb-3">
-            <div v-for="i in 3" :key="i" class="w-8 h-8 rounded-full border-2 border-emerald-900 bg-gray-400"></div>
-          </div>
           <p class="text-[11px] text-emerald-300 uppercase tracking-widest font-bold">
             Hơn 2.000 môi giới đang phát triển cùng chúng tôi
           </p>
@@ -129,7 +126,7 @@
               </div>
             </div>
 
-            <!-- Terms & Conditions -->
+            <!-- Terms & Conditions
             <div class="flex items-start pt-1">
               <input v-model="agreeTerms" type="checkbox" id="agree"
                 class="w-4 h-4 mt-0.5 text-emerald-600 border-gray-300 !rounded focus:ring-emerald-500" />
@@ -137,7 +134,7 @@
                 Tôi đồng ý với <a href="#" class="text-emerald-600 font-bold hover:underline">Điều khoản dịch vụ</a>
                 và <a href="#" class="text-emerald-600 font-bold hover:underline">Chính sách bảo mật</a>
               </label>
-            </div>
+            </div> -->
 
             <!-- Submit Button -->
             <div class="pt-3">
@@ -150,7 +147,7 @@
           </form>
 
           <!-- Login Link -->
-          <p class="text-center text-[11px] text-gray-400 mt-6 font-medium uppercase tracking-wider">
+          <p class="text-center text-[11px] text-gray-400 mt-4 font-medium uppercase tracking-wider">
             Đã có tài khoản môi giới?
             <router-link to="/moi-gioi/dang-nhap" class="text-emerald-900 font-black hover:underline ml-1">Đăng nhập
               ngay</router-link>
@@ -212,14 +209,14 @@ export default {
 
       try {
         const response = await api.post('/moi-gioi/dang-ky', {
-            ten: this.ten,
-            email: this.email,
-            so_dien_thoai: this.so_dien_thoai,
-            zalo_link: this.zalo_link || '',
-            mo_ta: this.mo_ta || '',
-            password: this.password,
-            password_confirmation: this.password_confirmation
-          }
+          ten: this.ten,
+          email: this.email,
+          so_dien_thoai: this.so_dien_thoai,
+          zalo_link: this.zalo_link || '',
+          mo_ta: this.mo_ta || '',
+          password: this.password,
+          password_confirmation: this.password_confirmation
+        }
         );
 
         console.log('✅ Register response:', response.data);

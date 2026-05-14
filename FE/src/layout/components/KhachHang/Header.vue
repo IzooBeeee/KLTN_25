@@ -36,21 +36,16 @@
           </router-link>
 
           <router-link to="/khach-hang/tinh-vay" class="nav-link">
-            <span class="nav-label"><i class="fa-solid fa-calculator" style="color:#10b981;margin-right:4px"></i> Tính Vay</span>
+            <span class="nav-label"><i class="fa-solid fa-calculator" style="color:#10b981;margin-right:4px"></i> Tính
+              Vay</span>
           </router-link>
         </nav>
 
         <!-- Actions -->
         <div class="actions">
-          <!-- 🌙 Dark Mode Toggle -->
-          <button @click="toggleDarkMode" class="btn-darkmode" :title="isDarkMode ? 'Chuyển sáng' : 'Chuyển tối'" :aria-label="isDarkMode ? 'Light mode' : 'Dark mode'">
-            <i v-if="isDarkMode" class="fa-solid fa-sun"></i>
-            <i v-else class="fa-solid fa-moon"></i>
-          </button>
-
           <!-- Nút Đăng tin -->
           <button @click="handlePostListing" class="btn-post">
-            <span class="label">Đăng tin</span>
+            <span class="label text-nowrap">Đăng tin</span>
           </button>
 
           <!-- 🔔 Nút Thông báo lịch hẹn -->
@@ -62,7 +57,7 @@
 
             <!-- 🔔 APPOINTMENT NOTIFICATION PANEL -->
             <transition name="notif-slide">
-              <div v-if="showAppointmentNotifPanel" class="notif-panel appointment-panel" @click.stop>
+              <div v-if="showAppointmentNotifPanel" class="header-popup notif-panel appointment-panel" @click.stop>
                 <div class="notif-header">
                   <h3 class="notif-title flex items-center gap-2">
                     <span class="material-symbols-outlined text-emerald-500">calendar_month</span>
@@ -71,12 +66,13 @@
                   <span class="notif-count">{{ appointmentNotifs.length }} thông báo</span>
                 </div>
 
-                <div class="notif-list">
+                <div class="header-popup-list notif-list">
                   <div v-for="item in appointmentNotifs.slice(0, 5)" :key="item.id" class="notif-item-wrapper"
                     :class="{ unread: !item.da_doc }">
                     <div class="notif-item" @click="handleAppointmentNotifClick(item)">
                       <div class="notif-content">
-                        <p class="notif-text font-semibold" :class="item.loai === 'lich_hen' ? 'text-emerald-600' : ''">{{ item.tieu_de || 'Thông báo lịch hẹn' }}</p>
+                        <p class="notif-text font-semibold" :class="item.loai === 'lich_hen' ? 'text-emerald-600' : ''">
+                          {{ item.tieu_de || 'Thông báo lịch hẹn' }}</p>
                         <p class="notif-detail text-sm text-gray-500">{{ item.noi_dung || 'Xem chi tiết lịch hẹn' }}</p>
                         <span class="notif-time">{{ item.thoi_gian ? formatTime(item.thoi_gian) : 'Vừa xong' }}</span>
                       </div>
@@ -89,8 +85,9 @@
                   </div>
                 </div>
 
-                <div class="notif-footer">
-                  <router-link to="/khach-hang/lich-hen" class="notif-btn-primary" @click="showAppointmentNotifPanel = false">
+                <div class="header-popup-footer notif-footer">
+                  <router-link to="/khach-hang/lich-hen" class="notif-btn-primary"
+                    @click="showAppointmentNotifPanel = false">
                     Xem tất cả lịch hẹn
                   </router-link>
                 </div>
@@ -106,7 +103,7 @@
 
             <!-- 🔔 NOTIFICATION PANEL -->
             <transition name="notif-slide">
-              <div v-if="showNotifPanel" class="notif-panel" @click.stop>
+              <div v-if="showNotifPanel" class="header-popup notif-panel" @click.stop>
                 <div class="notif-header">
                   <h3 class="notif-title flex items-center gap-2">
                     <span class="material-symbols-outlined text-rose-500">favorite</span>
@@ -115,7 +112,7 @@
                   <span class="notif-count">{{ notifications.length }} tin</span>
                 </div>
 
-                <div class="notif-list">
+                <div class="header-popup-list notif-list">
                   <div v-for="item in notifications" :key="item.id" class="notif-item-wrapper"
                     :class="{ deleting: item.isDeleting }">
                     <div class="notif-item-swipeable" :style="{
@@ -130,8 +127,7 @@
                         @mousemove="handleMouseMove($event, item)" @mouseup="handleMouseUp(item)"
                         @mouseleave="handleMouseUp(item)" :class="{ dragging: draggedItem === item }">
                         <div class="notif-image-wrapper">
-                          <img :src="item.avatar" :alt="item.text" @error="handleImageError"
-                            class="notif-image" />
+                          <img :src="item.avatar" :alt="item.text" @error="handleImageError" class="notif-image" />
                         </div>
                         <div class="notif-content">
                           <p class="notif-text">{{ item.text }}</p>
@@ -146,7 +142,8 @@
                     <div class="notif-empty-icon">📭</div>
                     <p class="notif-empty-title">Chưa có tin nào được lưu</p>
                     <p class="notif-empty-hint">
-                      Bấm <span class="material-symbols-outlined text-xs align-middle">favorite</span> để lưu tin bạn quan tâm
+                      Bấm <span class="material-symbols-outlined text-xs align-middle">favorite</span> để lưu tin bạn
+                      quan tâm
                     </p>
                   </div>
 
@@ -156,7 +153,7 @@
                   </div>
                 </div>
 
-                <div class="notif-footer">
+                <div class="header-popup-footer notif-footer">
                   <button class="notif-btn-primary" @click="goToSavedPage">
                     Xem tất cả tin đã lưu
                   </button>
@@ -176,7 +173,7 @@
 
             <!-- CHAT DROPDOWN PANEL -->
             <transition name="dropdown-fade">
-              <div v-if="showChatPanel" class="chat-panel" @click.stop>
+              <div v-if="showChatPanel" class="header-popup chat-panel" @click.stop>
                 <div class="chat-header">
                   <span class="chat-title">💬 Đoạn chat</span>
                   <button @click.stop="toggleChatPanel" class="chat-close" aria-label="Đóng">
@@ -184,7 +181,7 @@
                   </button>
                 </div>
 
-                <div class="chat-list">
+                <div class="header-popup-list chat-list">
                   <!-- Loading -->
                   <div v-if="loadingChat" class="chat-loading">
                     <div class="chat-loading-spinner"></div>
@@ -224,7 +221,7 @@
                   </template>
                 </div>
 
-                <div class="chat-footer">
+                <div class="header-popup-footer chat-footer">
                   <router-link to="/khach-hang/tin-nhan" class="chat-view-all" @click="showChatPanel = false">
                     Xem tất cả tin nhắn
                   </router-link>
@@ -285,9 +282,23 @@
                   <!-- Chat với môi giới -->
                   <div class="dropdown-item-new chat-broker-item" @click="handleChatWithBroker">
                     <span class="item-icon-new">💬</span>
-                    <span class="item-label-new">Chat với môi giới</span>
+                    <span class="item-label-new text-start">Chat với môi giới</span>
                     <span class="item-badge-new">Mới</span>
                   </div>
+
+                  <!-- Giao diện sáng/tối -->
+                  <button type="button" class="dropdown-item-new theme-toggle-item" @click.stop="toggleDarkMode">
+                    <span class="item-icon-new theme-icon-new">
+                      <i v-if="isDarkMode" class="fa-solid fa-sun"></i>
+                      <i v-else class="fa-solid fa-moon"></i>
+                    </span>
+                    <span class="item-label-new text-start">
+                      {{ isDarkMode ? 'Giao diện sáng' : 'Giao diện tối' }}
+                    </span>
+                    <span class="theme-switch-new" :class="{ active: isDarkMode }">
+                      <span class="theme-switch-dot-new"></span>
+                    </span>
+                  </button>
 
                   <!-- Nâng cấp -->
                   <router-link to="/khach-hang/nang-cap-moi-gioi" class="dropdown-item-new" @click="showMenu = false">
@@ -302,7 +313,8 @@
 
                 <!-- Footer: Settings + Logout -->
                 <div class="dropdown-footer-new">
-                  <router-link to="/khach-hang/profile" class="dropdown-item-new settings-item" @click="showMenu = false">
+                  <router-link to="/khach-hang/profile" class="dropdown-item-new settings-item"
+                    @click="showMenu = false">
                     <span class="item-icon-new">⚙️</span>
                     <span class="item-label-new">Cài đặt tài khoản</span>
                   </router-link>
@@ -393,7 +405,7 @@ export default {
       conversations: [],
       unreadCount: 0,
       loadingChat: false,
-      
+
       // 📅 Appointment Notifications
       appointmentNotifs: [],
       previousAppointmentNotifCount: 0,
@@ -492,7 +504,7 @@ export default {
       clearTimeout(this.menuTimer);
       this.menuTimer = null;
     }
-    
+
     // 📅 Cleanup appointment polling
     if (this.appointmentPollInterval) {
       clearInterval(this.appointmentPollInterval);
@@ -518,7 +530,7 @@ export default {
           this.token = token;
           this.user = JSON.parse(userStr);
           this.userType = "khach-hang";
-          
+
           import("@/js/services/echo").then((module) => {
             const { updateEchoToken, subscribeCustomer } = module;
             if (updateEchoToken) updateEchoToken(this.token);
@@ -526,7 +538,7 @@ export default {
               this.subscribeEchoCustomer(subscribeCustomer);
             }
           }).catch(err => console.log('Echo service not available:', err));
-          
+
           return true;
         } catch (e) {
           console.error("Parse user error:", e);
@@ -537,7 +549,7 @@ export default {
         this.token = token;
         this.userType = "khach-hang";
         this.user = this.user || { ten: "Khách hàng" };
-        
+
         import("@/js/services/echo").then((module) => {
           const { updateEchoToken, subscribeCustomer } = module;
           if (updateEchoToken) updateEchoToken(this.token);
@@ -545,14 +557,14 @@ export default {
             this.subscribeEchoCustomer(subscribeCustomer);
           }
         }).catch(err => console.log('Echo service not available:', err));
-        
+
         return true;
       } else {
         this.clearData();
       }
       return false;
     },
-    
+
     subscribeEchoCustomer(subscribeCustomer) {
       const userId = this.user?.id;
       if (!userId) return;
@@ -561,21 +573,21 @@ export default {
       // 🔥 Truyền true để dùng channel 'khach-hang.{id}'
       subscribeCustomer(userId, (data) => {
         console.log('[Echo] Customer received notification:', data);
-        
+
         // Nếu là tin nhắn của chính mình gửi (từ tab khác) thì bỏ qua
         if (data.sender_type === 'khach_hang') {
           return;
         }
 
         const isChat = data.loai === 'tin_nhan';
-        
+
         if (isChat) {
           if (this.$toast) {
             const msgContent = data.content || data.noi_dung || "Bạn có tin nhắn mới";
             const senderName = data.sender_name || "Môi giới";
-            
-            this.$toast.info(`${senderName}: ${msgContent}`, { 
-              position: 'top-right', 
+
+            this.$toast.info(`${senderName}: ${msgContent}`, {
+              position: 'top-right',
               duration: 7000,
               onClick: () => {
                 this.showChatPanel = true;
@@ -605,12 +617,14 @@ export default {
       this.showMenu = false;
       this.showNotifPanel = false;
       this.showChatPanel = false;
+      this.showAppointmentNotifPanel = false;
     },
 
     toggleMenu(e) {
       e?.stopPropagation();
       this.showNotifPanel = false;
       this.showChatPanel = false;
+      this.showAppointmentNotifPanel = false;
       if (this.menuTimer) clearTimeout(this.menuTimer);
       this.menuTimer = setTimeout(() => {
         this.showMenu = !this.showMenu;
@@ -723,10 +737,10 @@ export default {
 
           this.notifications = res.data.data.map((item) => {
             const bds = item.batDongSan || item.bat_dong_san || item.property || {};
-            
+
             // Tìm ảnh đại diện từ nhiều nguồn khả thi
             let avatarUrl = "";
-            
+
             // 1. Ưu tiên anh_dai_dien_url trực tiếp
             if (isValidUrl(bds.anh_dai_dien_url)) {
               avatarUrl = bds.anh_dai_dien_url;
@@ -739,7 +753,7 @@ export default {
                 if (img) avatarUrl = img.url;
               }
             }
-            
+
             // 3. Thử anh_dai_dien object
             if (!avatarUrl && bds.anh_dai_dien && isValidUrl(bds.anh_dai_dien.url)) {
               avatarUrl = bds.anh_dai_dien.url;
@@ -777,7 +791,7 @@ export default {
       if (this.appointmentPollInterval) {
         clearInterval(this.appointmentPollInterval);
       }
-      
+
       this.appointmentPollInterval = setInterval(() => {
         if (this.isLoggedIn) {
           this.fetchAppointmentNotifications();
@@ -788,50 +802,54 @@ export default {
     async fetchAppointmentNotifications() {
       const token = localStorage.getItem("khach_hang_auth_token");
       if (!token) return;
-      
+
       // Prevent concurrent requests
       if (this.appointmentIsFetching) return;
-      
+
       try {
         this.appointmentIsFetching = true;
-        
+
         const res = await api.get('/khach-hang/lich-hen/danh-sach');
         if (res.data?.status && res.data.data) {
-          const appointments = res.data.data;
-          
+          const appointments = Array.isArray(res.data.data)
+            ? res.data.data
+            : (res.data.data?.appointments || []);
+
           // Check for status changes to show toast notifications
           if (this.appointmentNotifs.length > 0) {
             appointments.forEach(newItem => {
               const oldItem = this.appointmentNotifs.find(o => o.id === newItem.id);
               if (oldItem && oldItem.trang_thai !== newItem.trang_thai) {
-                if (oldItem.trang_thai === 'cho_xac_nhan') {
-                  if (newItem.trang_thai === 'da_xac_nhan') {
-                    this.$toast?.success(`✅ Lịch hẹn ${newItem.ngay_hen} lúc ${newItem.gio_hen} đã được xác nhận!`, { duration: 5000 });
-                  } else if (newItem.trang_thai === 'huy') {
-                    this.$toast?.error(`❌ Lịch hẹn ${newItem.ngay_hen} lúc ${newItem.gio_hen} đã bị từ chối. ${newItem.ly_do_huy || ''}`, { duration: 5000 });
-                  }
+                if (
+                  oldItem.trang_thai === 'cho_xac_nhan' &&
+                  newItem.trang_thai === 'da_xac_nhan'
+                ) {
+                  this.$toast?.success(
+                    `✅ Lịch hẹn ${newItem.ngay_hen} lúc ${newItem.gio_hen} đã được xác nhận!`,
+                    { duration: 5000 }
+                  );
                 }
               }
             });
           }
-          
+
           // Update appointment notifications with unread count
           this.appointmentNotifs = appointments.map(item => ({
             id: item.id,
             tieu_de: item.status_label || (
-              item.trang_thai === 'cho_xac_nhan' ? '⏰ Chờ xác nhận' : 
-              item.trang_thai === 'da_xac_nhan' ? '✅ Đã xác nhận' :
-              item.trang_thai === 'hoan_thanh' ? '🎉 Hoàn thành' : '❌ Đã hủy'
+              item.trang_thai === 'cho_xac_nhan' ? '⏰ Chờ xác nhận' :
+                item.trang_thai === 'da_xac_nhan' ? '✅ Đã xác nhận' :
+                  item.trang_thai === 'hoan_thanh' ? '🎉 Hoàn thành' : '❌ Đã hủy'
             ),
-            noi_dung: item.bat_dong_san?.tieu_de 
+            noi_dung: item.bat_dong_san?.tieu_de
               ? `${item.bat_dong_san.tieu_de} - ${item.ngay_hen} ${item.gio_hen}`
               : `${item.ngay_hen || 'N/A'} ${item.gio_hen || ''}`,
-            thoi_gian: item.updated_at || item.created_at || new Date().toISOString(),
+            thoi_gian: item.created_at || null,
             da_doc: item.trang_thai !== 'cho_xac_nhan',
             loai: 'lich_hen',
             trang_thai: item.trang_thai,
           }));
-          
+
           // Count unread (cho_xac_nhan only)
           this.appointmentNotifUnreadCount = this.appointmentNotifs.filter(
             n => n.trang_thai === 'cho_xac_nhan'
@@ -844,27 +862,85 @@ export default {
       }
     },
 
+    // formatTime(dateStr) {
+    //   if (!dateStr) return "Vừa xong";
+    //   const now = new Date();
+    //   const created = new Date(dateStr);
+    //   const diff = Math.floor((now - created) / 1000);
+
+    //   if (diff < 60) return "Vừa xong";
+    //   if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+    //   if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+    //   return created.toLocaleDateString("vi-VN");
+    // },
+    parseDateTime(value) {
+      if (!value) return null;
+
+      if (value instanceof Date) {
+        return isNaN(value.getTime()) ? null : value;
+      }
+
+      if (typeof value !== "string") {
+        const d = new Date(value);
+        return isNaN(d.getTime()) ? null : d;
+      }
+
+      const raw = value.trim();
+
+      // Dạng BE hiện tại: 13/05/2026 08:00
+      const viMatch = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2}))?/);
+      if (viMatch) {
+        const [, day, month, year, hour = "0", minute = "0"] = viMatch;
+
+        const d = new Date(
+          Number(year),
+          Number(month) - 1,
+          Number(day),
+          Number(hour),
+          Number(minute)
+        );
+
+        return isNaN(d.getTime()) ? null : d;
+      }
+
+      // Dạng ISO nếu sau này BE có đổi
+      const d = new Date(raw.replace(" ", "T"));
+      return isNaN(d.getTime()) ? null : d;
+    },
+
     formatTime(dateStr) {
-      if (!dateStr) return "Vừa xong";
+      const created = this.parseDateTime(dateStr);
+
+      if (!created) return "Không rõ thời gian";
+
       const now = new Date();
-      const created = new Date(dateStr);
-      const diff = Math.floor((now - created) / 1000);
+      let diff = Math.floor((now - created) / 1000);
+
+      if (diff < 0) diff = 0;
 
       if (diff < 60) return "Vừa xong";
       if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
       if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
-      return created.toLocaleDateString("vi-VN");
+
+      const days = Math.floor(diff / 86400);
+      if (days < 7) return `${days} ngày trước`;
+
+      return created.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
     },
 
     getImageUrl(url) {
       if (!url) return this.defaultImage;
       if (typeof url !== "string") return this.defaultImage;
       if (url.startsWith("http")) return url;
-      
-      const base = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:8000';
+
+      const base = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000';
       const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
       const finalUrl = cleanUrl.startsWith('storage/') ? cleanUrl : `storage/${cleanUrl}`;
-      
+
       return `${base}/${finalUrl}`;
     },
 
@@ -905,7 +981,7 @@ export default {
     handleNotifClick(item) {
       if (item.swipeOffset < -80) return;
       this.showNotifPanel = false;
-      
+
       // 📅 Navigate to appointment page for appointment notifications
       if (item.loai === 'lich_hen' || item.text?.includes('Lịch hẹn') || item.text?.includes('đã đặt lịch')) {
         this.$router.push('/khach-hang/lich-hen');
@@ -999,6 +1075,7 @@ export default {
       this.showChatPanel = !this.showChatPanel;
       this.showMenu = false;
       this.showNotifPanel = false;
+      this.showAppointmentNotifPanel = false;
 
       if (this.showChatPanel && this.isLoggedIn) {
         this.loadConversations();
@@ -1220,7 +1297,7 @@ export default {
 
 .sub {
   font-weight: 600;
-  color: #3b82f6;
+  color: #1e293b;
   font-size: 12px;
 }
 
@@ -1275,29 +1352,6 @@ export default {
 
 .saved-trigger-wrapper {
   position: relative;
-}
-
-.btn-darkmode {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: #f1f5f9;
-  border: 1.5px solid #e2e8f0;
-  color: #64748b;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  flex-shrink: 0;
-}
-.btn-darkmode:hover {
-  background: #e0e7ff;
-  border-color: #818cf8;
-  color: #4f46e5;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.2);
 }
 
 .btn-saved {
@@ -1420,7 +1474,7 @@ export default {
 .btn-login {
   padding: 10px 22px;
   border-radius: 999px;
-  background: #3b82f6;
+  background: #1e293b;
   color: white;
   border: none;
   font-weight: 600;
@@ -1656,6 +1710,52 @@ export default {
       rgba(59, 130, 246, 0.15),
       rgba(37, 99, 235, 0.15));
   padding-left: 24px;
+}
+
+.theme-toggle-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.theme-toggle-item:hover {
+  background: #f8fafc;
+}
+
+.theme-icon-new {
+  color: #64748b;
+}
+
+.theme-switch-new {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  flex-shrink: 0;
+  transition: all 0.22s ease;
+}
+
+.theme-switch-new.active {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.theme-switch-dot-new {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+  transition: transform 0.22s ease;
+}
+
+.theme-switch-new.active .theme-switch-dot-new {
+  transform: translateX(18px);
 }
 
 .item-badge-new {
@@ -2423,5 +2523,269 @@ export default {
 .btn-modal:active {
   transform: scale(0.98);
   transition: transform 0.1s ease;
+}
+
+
+/* =========================================================
+   ✅ HEADER POPUP COMPACT FIX
+   - Đồng bộ kích thước popup: Lịch hẹn / Tin đã lưu / Chat
+   - Đồng bộ kích thước icon action trên header
+   - Gọn hơn, không còn popup cái to cái nhỏ
+   ========================================================= */
+.notif-trigger-wrapper,
+.saved-trigger-wrapper,
+.chat-trigger-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.btn-notif,
+.btn-saved,
+.btn-chat {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  color: #475569 !important;
+  box-shadow: none !important;
+}
+
+.btn-notif:hover,
+.btn-saved:hover,
+.btn-chat:hover {
+  background: #eff6ff !important;
+  border-color: #93c5fd !important;
+  color: #2563eb !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.18) !important;
+}
+
+.btn-notif .icon,
+.btn-saved .icon {
+  font-size: 20px !important;
+}
+
+.btn-chat .chat-icon {
+  font-size: 18px !important;
+  line-height: 1;
+}
+
+.notif-badge,
+.chat-badge {
+  top: -6px !important;
+  right: -6px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  padding: 0 6px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  border: 2px solid #fff !important;
+}
+
+.header-popup,
+.notif-panel,
+.chat-panel {
+  position: absolute !important;
+  top: calc(100% + 12px) !important;
+  right: 0 !important;
+  width: 380px !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: 520px !important;
+  background: #ffffff !important;
+  border-radius: 18px !important;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.16) !important;
+  border: 1px solid #e5e7eb !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  z-index: 9999 !important;
+}
+
+.header-popup::before,
+.notif-panel::before,
+.chat-panel::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  right: 22px;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-left: 1px solid #e5e7eb;
+  border-top: 1px solid #e5e7eb;
+  transform: rotate(45deg);
+}
+
+.notif-header,
+.chat-header {
+  min-height: 64px !important;
+  padding: 16px 20px !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-bottom: 1px solid #eef2f7 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-shrink: 0 !important;
+}
+
+.notif-title,
+.chat-title {
+  margin: 0 !important;
+  color: #111827 !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+}
+
+.chat-close {
+  width: 30px !important;
+  height: 30px !important;
+  color: #64748b !important;
+  background: #f1f5f9 !important;
+  border-radius: 999px !important;
+}
+
+.chat-close:hover {
+  color: #2563eb !important;
+  background: #dbeafe !important;
+}
+
+.header-popup-list,
+.notif-list,
+.chat-list {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 8px 0 !important;
+  background: #ffffff !important;
+  max-height: 360px !important;
+}
+
+.header-popup-footer,
+.notif-footer,
+.chat-footer {
+  padding: 14px 20px 16px !important;
+  border-top: 1px solid #eef2f7 !important;
+  background: #ffffff !important;
+  flex-shrink: 0 !important;
+}
+
+.notif-btn-primary,
+.chat-view-all {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 46px !important;
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  text-decoration: none !important;
+  border: none !important;
+}
+
+.notif-btn-primary:hover,
+.chat-view-all:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28) !important;
+}
+
+.appointment-panel .notif-item-wrapper.unread {
+  background: #f0fdf4 !important;
+  border-left: 3px solid #10b981 !important;
+}
+
+.appointment-panel .notif-item {
+  align-items: flex-start !important;
+  padding: 16px 20px !important;
+}
+
+.notif-detail {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.45 !important;
+  margin: 4px 0 8px !important;
+}
+
+.notif-text,
+.bds-title,
+.broker-name,
+.last-message {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .actions {
+    gap: 8px !important;
+  }
+
+  .header-popup,
+  .notif-panel,
+  .chat-panel {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    top: 76px !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: calc(100vh - 96px) !important;
+  }
+
+  .header-popup-list,
+  .notif-list,
+  .chat-list {
+    max-height: calc(100vh - 220px) !important;
+  }
+
+  .header-popup::before,
+  .notif-panel::before,
+  .chat-panel::before {
+    display: none !important;
+  }
+}
+
+/* ===== DARK MODE FOR USER DROPDOWN ===== */
+:global(.dark) .dropdown-menu-new {
+  background: #0f172a;
+  border-color: #334155;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+:global(.dark) .dropdown-item-new {
+  color: #e2e8f0;
+}
+
+:global(.dark) .dropdown-item-new:hover,
+:global(.dark) .theme-toggle-item:hover {
+  background: #1e293b;
+  color: #93c5fd;
+}
+
+:global(.dark) .dropdown-divider-new {
+  background: linear-gradient(to right, transparent, #334155, transparent);
+}
+
+:global(.dark) .dropdown-footer-new {
+  background: #0f172a;
+}
+
+:global(.dark) .theme-switch-new {
+  background: #334155;
+}
+
+:global(.dark) .theme-switch-new.active {
+  background: linear-gradient(135deg, #2563eb, #60a5fa);
 }
 </style>

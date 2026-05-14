@@ -25,9 +25,6 @@
         </div>
 
         <div class="relative z-10">
-          <div class="flex -space-x-2 mb-3">
-            <div v-for="i in 3" :key="i" class="w-8 h-8 rounded-full border-2 border-emerald-900 bg-gray-400"></div>
-          </div>
           <p class="text-[11px] text-emerald-300 uppercase tracking-widest font-bold">
             Hơn 2.000 môi giới đang sử dụng
           </p>
@@ -51,8 +48,7 @@
 
           <form @submit.prevent="handleLogin" class="space-y-5">
             <div class="space-y-2">
-              <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email / Số điện
-                thoại</label>
+              <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email</label>
               <div class="relative group">
                 <span class="absolute left-5 top-1/2 -translate-y-1/2 text-lg">📧</span>
                 <input v-model="email" type="email" placeholder="Nhập email của bạn"
@@ -73,12 +69,6 @@
                   class="w-full pl-14 pr-6 py-4 bg-gray-50 !rounded-full focus:ring-2 focus:ring-emerald-600 border-none text-sm font-medium transition-all shadow-sm"
                   required />
               </div>
-            </div>
-
-            <div class="flex items-center">
-              <input v-model="rememberMe" type="checkbox" id="remember"
-                class="w-4 h-4 text-emerald-600 border-gray-300 !rounded focus:ring-emerald-500" />
-              <label for="remember" class="ml-2 text-[11px] font-medium text-gray-500">Ghi nhớ đăng nhập</label>
             </div>
 
             <div class="pt-2">

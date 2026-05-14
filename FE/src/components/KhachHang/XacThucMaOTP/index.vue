@@ -1,35 +1,24 @@
 ﻿<template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100 p-6">
-    <div
-      class="flex w-full max-w-6xl bg-white rounded-[40px] shadow-2xl overflow-hidden min-h-[650px]"
-    >
+    <div class="flex w-full max-w-6xl bg-white rounded-[40px] shadow-2xl overflow-hidden min-h-[650px]">
       <!-- Left Panel (Hình ảnh) -->
-      <div
-        class="hidden md:flex md:w-1/2 relative bg-indigo-950 text-white p-12 flex-col justify-between"
-      >
+      <div class="hidden md:flex md:w-1/2 relative bg-indigo-950 text-white p-12 flex-col justify-between">
         <div class="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"
-            class="w-full h-full object-cover opacity-30"
-          />
-          <div
-            class="absolute inset-0 bg-gradient-to-br from-indigo-900/80 to-indigo-950"
-          ></div>
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"
+            class="w-full h-full object-cover opacity-30" />
+          <div class="absolute inset-0 bg-gradient-to-br from-indigo-900/80 to-indigo-950"></div>
         </div>
 
         <div class="relative z-10">
           <div
-            class="mb-6 inline-block px-4 py-1 bg-white/10 border border-white/20 rounded-full text-[10px] tracking-widest font-semibold uppercase"
-          >
+            class="mb-6 inline-block px-4 py-1 bg-white/10 border border-white/20 rounded-full text-[10px] tracking-widest font-semibold uppercase">
             Bảo mật tài khoản
           </div>
           <h2 class="text-5xl font-bold leading-tight mb-6 tracking-tighter">
             Xác thực <span class="text-indigo-300 italic">mã OTP</span><br />
             của bạn
           </h2>
-          <p
-            class="text-indigo-200 text-sm max-w-md leading-relaxed font-light"
-          >
+          <p class="text-indigo-200 text-sm max-w-md leading-relaxed font-light">
             Chúng tôi đã gửi mã 6 số đến email của bạn. Mã có hiệu lực trong 5
             phút.
           </p>
@@ -37,23 +26,17 @@
 
         <div class="relative z-10">
           <div class="flex items-center gap-2 text-[11px] text-indigo-300">
-            <span
-              class="w-2 h-2 rounded-full bg-green-400 animate-pulse"
-            ></span>
+            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
             <span>Mã được mã hóa end-to-end</span>
           </div>
         </div>
       </div>
 
       <!-- Right Panel (Form) -->
-      <div
-        class="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-white"
-      >
+      <div class="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-white">
         <div class="w-full max-w-[400px] mx-auto">
           <div class="mb-8 text-left">
-            <h5
-              class="text-indigo-900 font-black text-[10px] uppercase tracking-[0.2em] mb-4"
-            >
+            <h5 class="text-indigo-900 font-black text-[10px] uppercase tracking-[0.2em] mb-4">
               Architectural Curator
             </h5>
             <h3 class="text-4xl font-black text-gray-900 mb-2 tracking-tighter">
@@ -68,36 +51,23 @@
           <!-- OTP Input -->
           <form @submit.prevent="xacThucMa" class="space-y-6">
             <div class="space-y-3">
-              <label
-                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1"
-              >
+              <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
                 Mã xác nhận (6 số)
               </label>
 
               <!-- 6 ô input riêng biệt -->
               <div class="flex gap-2 justify-center">
-                <input
-                  v-for="(digit, index) in 6"
-                  :key="index"
-                  ref="otpInputs"
-                  v-model="otpArray[index]"
-                  type="text"
-                  maxlength="1"
-                  @input="handleInput($event, index)"
-                  @keydown.delete="handleBackspace($event, index)"
+                <input v-for="(digit, index) in 6" :key="index" ref="otpInputs" v-model="otpArray[index]" type="text"
+                  maxlength="1" @input="handleInput($event, index)" @keydown.delete="handleBackspace($event, index)"
                   @keyup="handleKeyup($event, index)"
                   class="w-12 h-14 text-center text-xl font-bold border-2 border-gray-200 rounded-xl focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 transition-all outline-none"
-                  :class="{ 'border-red-400 bg-red-50': error }"
-                />
+                  :class="{ 'border-red-400 bg-red-50': error }" />
               </div>
 
               <!-- Hidden input để lấy full code -->
               <input type="hidden" v-model="otpCode" />
 
-              <p
-                v-if="error"
-                class="text-red-500 text-xs text-center font-medium"
-              >
+              <p v-if="error" class="text-red-500 text-xs text-center font-medium">
                 {{ error }}
               </p>
             </div>
@@ -108,37 +78,24 @@
                 Gửi lại mã sau:
                 <span class="font-bold text-indigo-600">{{ countdown }}s</span>
               </span>
-              <button
-                v-else
-                type="button"
-                @click="guiLaiMa"
-                :disabled="isLoading"
-                class="text-indigo-600 text-xs font-black uppercase tracking-wider hover:underline disabled:opacity-50"
-              >
+              <button v-else type="button" @click="guiLaiMa" :disabled="isLoading"
+                class="text-indigo-600 text-xs font-black uppercase tracking-wider hover:underline disabled:opacity-50">
                 ↻ Gửi lại mã
               </button>
             </div>
 
             <!-- Button -->
             <div class="pt-4">
-              <button
-                type="submit"
-                :disabled="isLoading || otpCode.length < 6"
-                class="w-full !bg-indigo-950 hover:!bg-black !text-white font-bold py-4 !rounded-full shadow-xl shadow-indigo-100 transition-all disabled:opacity-70 disabled:cursor-not-allowed uppercase tracking-[0.15em] text-xs"
-              >
+              <button type="submit" :disabled="isLoading || otpCode.length < 6"
+                class="w-full !bg-indigo-950 hover:!bg-black !text-white font-bold py-4 !rounded-full shadow-xl shadow-indigo-100 transition-all disabled:opacity-70 disabled:cursor-not-allowed uppercase tracking-[0.15em] text-xs">
                 {{ isLoading ? "Đang xác thực..." : "Xác nhận & Tiếp tục" }}
               </button>
             </div>
           </form>
 
           <!-- Back Link -->
-          <p
-            class="text-center text-[11px] text-gray-400 mt-6 font-medium uppercase tracking-wider"
-          >
-            <router-link
-              to="/khach-hang/quen-mat-khau"
-              class="hover:text-indigo-600 transition-colors"
-            >
+          <p class="text-center text-[11px] text-gray-400 mt-6 font-medium uppercase tracking-wider">
+            <router-link to="/khach-hang/quen-mat-khau" class="hover:text-indigo-600 transition-colors">
               ← Quay lại nhập email
             </router-link>
           </p>
@@ -328,6 +285,7 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 input[type="text"] {
   -moz-appearance: textfield;
 }

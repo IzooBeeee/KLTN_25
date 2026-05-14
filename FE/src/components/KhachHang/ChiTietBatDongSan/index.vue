@@ -9,7 +9,8 @@
           <span class="material-symbols-outlined text-blue-600 animate-pulse text-3xl">home</span>
         </div>
       </div>
-      <p class="mt-6 text-[#0a0e27] font-['Be_Vietnam_Pro'] font-bold tracking-widest uppercase text-xs animate-pulse"></p>
+      <p class="mt-6 text-[#0a0e27] font-['Be_Vietnam_Pro'] font-bold tracking-widest uppercase text-xs animate-pulse">
+      </p>
     </div>
 
     <!-- Error State -->
@@ -20,7 +21,7 @@
         </div>
         <h2 class="text-2xl font-bold text-[#0a0e27] mb-4">Tuyệt phẩm này đã được sở hữu</h2>
         <p class="text-gray-500 mb-8 leading-relaxed">{{ error }}</p>
-        <router-link to="/khach-hang/danh-sach-bat-dong-san" 
+        <router-link to="/khach-hang/danh-sach-bat-dong-san"
           class="inline-flex items-center gap-2 px-8 py-4 bg-[#0a0e27] text-white rounded-2xl font-bold hover:-translate-y-1 transition-all shadow-xl shadow-blue-900/20">
           Khám phá bộ sưu tập khác
         </router-link>
@@ -33,24 +34,35 @@
       <section class="container mx-auto max-w-[1400px] px-4 pt-6 pb-10">
         <!-- Breadcrumb Float -->
         <div class="flex items-center gap-2 mb-6 px-2 overflow-x-auto no-scrollbar whitespace-nowrap">
-          <router-link to="/" class="text-xs font-bold text-gray-400 hover:text-blue-600 uppercase tracking-widest transition-colors">Trang chủ</router-link>
+          <router-link to="/"
+            class="text-xs font-bold text-gray-400 hover:text-blue-600 uppercase tracking-widest transition-colors">Trang
+            chủ</router-link>
           <span class="text-gray-300">/</span>
-          <router-link to="/khach-hang/danh-sach-bat-dong-san" class="text-xs font-bold text-gray-400 hover:text-blue-600 uppercase tracking-widest transition-colors">Bất động sản</router-link>
+          <router-link to="/khach-hang/danh-sach-bat-dong-san"
+            class="text-xs font-bold text-gray-400 hover:text-blue-600 uppercase tracking-widest transition-colors">Bất
+            động sản</router-link>
           <span class="text-gray-300">/</span>
-          <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">{{ property.loai?.ten_loai || 'Chi tiết' }}</span>
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">{{ property.loai?.ten_loai ||
+            'Chi tiết' }}</span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 lg:grid-rows-2 gap-3 h-[400px] md:h-[600px] lg:h-[750px]">
           <!-- Big Featured Image -->
-          <div class="detail-gallery-card lg:col-span-2 lg:row-span-2 relative rounded-[28px] md:rounded-[44px] overflow-hidden group cursor-zoom-in" @click="openGallery(0)">
-            <img :src="mainImage" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt="Main View">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            
+          <div
+            class="detail-gallery-card lg:col-span-2 lg:row-span-2 relative rounded-[28px] md:rounded-[44px] overflow-hidden group cursor-zoom-in"
+            @click="openGallery(0)">
+            <img :src="mainImage"
+              class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+              alt="Main View">
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+            </div>
+
             <!-- Favorite Floating -->
-            <button @click.stop="toggleFavorite(property.id, $event)" 
+            <button @click.stop="toggleFavorite(property.id, $event)"
               class="absolute top-6 right-6 w-12 h-12 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 z-20 shadow-lg"
               :class="isPropertyFavorite ? 'bg-gradient-to-br from-pink-500 to-rose-500 shadow-rose-500/30' : 'bg-white/95 text-gray-800 hover:bg-white'">
-              <span class="material-symbols-outlined text-2xl transition-all duration-300" 
+              <span class="material-symbols-outlined text-2xl transition-all duration-300"
                 :style="{ fontVariationSettings: isPropertyFavorite ? `'FILL' 1` : `'FILL' 0` }"
                 :class="isPropertyFavorite ? 'text-white' : 'text-gray-400 hover:text-rose-500'">
                 favorite
@@ -58,24 +70,33 @@
             </button>
 
             <!-- Price & Title Badge -->
-            <div class="absolute bottom-10 left-10 right-10 z-10 pointer-events-none transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 hidden md:block">
-              <h1 class="text-white text-3xl font-black font-['Be_Vietnam_Pro'] leading-tight mb-2 drop-shadow-lg">{{ property.tieu_de }}</h1>
-              <p class="text-white/80 flex items-center gap-2"><span class="material-symbols-outlined text-sm">location_on</span> {{ property?.dia_chi?.quan?.ten }}, {{ property?.dia_chi?.tinh?.ten }}</p>
+            <div
+              class="absolute bottom-10 left-10 right-10 z-10 pointer-events-none transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 hidden md:block">
+              <h1 class="text-white text-3xl font-black font-['Be_Vietnam_Pro'] leading-tight mb-2 drop-shadow-lg">{{
+                property.tieu_de }}</h1>
+              <p class="text-white/80 flex items-center gap-2"><span
+                  class="material-symbols-outlined text-sm">location_on</span> {{ property?.dia_chi?.quan?.ten }}, {{
+                    property?.dia_chi?.tinh?.ten }}</p>
             </div>
           </div>
 
           <!-- Secondary Images -->
-          <div v-for="(img, i) in displayImages" :key="i" 
-            class="detail-gallery-card relative rounded-[28px] md:rounded-[44px] overflow-hidden group cursor-pointer hidden md:block" 
+          <div v-for="(img, i) in displayImages" :key="i"
+            class="detail-gallery-card relative rounded-[28px] md:rounded-[44px] overflow-hidden group cursor-pointer hidden md:block"
             @click="openGallery(i + 1)">
-            <img :src="getImageUrl(img.url)" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Detail View">
+            <img :src="getImageUrl(img.url)"
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              alt="Detail View">
             <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </div>
 
           <!-- The "View All" Card -->
-          <div class="detail-gallery-card detail-gallery-card--album relative rounded-[28px] md:rounded-[44px] overflow-hidden group cursor-pointer bg-blue-600 hidden lg:flex items-center justify-center text-white" 
+          <div
+            class="detail-gallery-card detail-gallery-card--album relative rounded-[28px] md:rounded-[44px] overflow-hidden group cursor-pointer bg-blue-600 hidden lg:flex items-center justify-center text-white"
             @click="openGallery(0)">
-            <img v-if="images[3]" :src="getImageUrl(images[3].url)" class="absolute inset-0 w-full h-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-110" alt="More View">
+            <img v-if="images[3]" :src="getImageUrl(images[3].url)"
+              class="absolute inset-0 w-full h-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-110"
+              alt="More View">
             <div class="relative z-10 text-center">
               <p class="text-4xl font-black mb-1">+{{ images.length }}</p>
               <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Khám phá album</p>
@@ -87,10 +108,10 @@
       <!-- 💎 MAIN CONTENT GRID -->
       <section class="container mx-auto max-w-[1400px] px-4 pb-24">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
+
           <!-- LEFT: Details & Features (8 cols) -->
           <div class="lg:col-span-8 space-y-12">
-            
+
             <!-- Header Mobile Info -->
             <div class="lg:hidden mb-8">
               <h1 class="text-3xl font-black text-[#0a0e27] mb-4 leading-tight">{{ property.tieu_de }}</h1>
@@ -99,33 +120,42 @@
 
             <!-- 🧊 Luxury Stats Bar -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div class="stat-soft-card glass-stat-card p-6 rounded-[32px] border border-gray-50 flex flex-col items-center text-center group">
-                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-500">
+              <div
+                class="stat-soft-card glass-stat-card p-6 rounded-[32px] border border-gray-50 flex flex-col items-center text-center group">
+                <div
+                  class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-500">
                   <span class="material-symbols-outlined text-3xl">square_foot</span>
                 </div>
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Diện tích</p>
                 <p class="text-xl font-black text-[#0a0e27]">{{ property.dien_tich }} m²</p>
               </div>
-              <div class="stat-soft-card glass-stat-card p-6 rounded-[32px] border border-gray-50 flex flex-col items-center text-center group">
-                <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-500">
+              <div
+                class="stat-soft-card glass-stat-card p-6 rounded-[32px] border border-gray-50 flex flex-col items-center text-center group">
+                <div
+                  class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-500">
                   <span class="material-symbols-outlined text-3xl">bed</span>
                 </div>
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Phòng ngủ</p>
                 <p class="text-xl font-black text-[#0a0e27]">{{ property.so_phong_ngu || '—' }}</p>
               </div>
-              <div class="stat-soft-card glass-stat-card p-6 rounded-[32px] border border-gray-50 flex flex-col items-center text-center group">
-                <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 group-hover:bg-amber-600 group-hover:text-white transition-colors duration-500">
+              <div
+                class="stat-soft-card glass-stat-card p-6 rounded-[32px] border border-gray-50 flex flex-col items-center text-center group">
+                <div
+                  class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 group-hover:bg-amber-600 group-hover:text-white transition-colors duration-500">
                   <span class="material-symbols-outlined text-3xl">bathtub</span>
                 </div>
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Phòng tắm</p>
                 <p class="text-xl font-black text-[#0a0e27]">{{ property.so_phong_tam || '—' }}</p>
               </div>
-              <div class="stat-soft-card glass-stat-card p-6 rounded-[32px] border border-gray-50 flex flex-col items-center text-center group">
-                <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors duration-500">
+              <div
+                class="stat-soft-card glass-stat-card p-6 rounded-[32px] border border-gray-50 flex flex-col items-center text-center group">
+                <div
+                  class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors duration-500">
                   <span class="material-symbols-outlined text-3xl">compass_calibration</span>
                 </div>
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Trạng thái</p>
-                <p class="text-xl font-black" :class="property.trang_thai_id === 3 ? 'text-amber-600' : 'text-[#0a0e27]'">
+                <p class="text-xl font-black"
+                  :class="property.trang_thai_id === 3 ? 'text-amber-600' : 'text-[#0a0e27]'">
                   {{ property.trang_thai?.ten_trang_thai || 'Đang bán' }}
                 </p>
               </div>
@@ -140,7 +170,8 @@
                   </div>
                   <h2 class="text-2xl font-black font-['Be_Vietnam_Pro'] text-[#0a0e27]">Đặc điểm bất động sản</h2>
                 </div>
-                <div class="prose prose-blue max-w-none text-gray-600 leading-[1.8] text-[16px] mb-10" v-html="property.mo_ta"></div>
+                <div class="prose prose-blue max-w-none text-gray-600 leading-[1.8] text-[16px] mb-10"
+                  v-html="property.mo_ta"></div>
 
                 <!-- 📊 Detailed Specifications Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12 pt-10 border-t border-gray-100">
@@ -170,11 +201,13 @@
                   </div>
                   <div class="flex justify-between items-center py-2 border-b border-gray-50">
                     <span class="text-gray-400 font-medium text-sm">Khu vực</span>
-                    <span class="text-[#0a0e27] font-bold text-sm">{{ property.dia_chi?.quan?.ten }}, {{ property.dia_chi?.tinh?.ten }}</span>
+                    <span class="text-[#0a0e27] font-bold text-sm">{{ property.dia_chi?.quan?.ten }}, {{
+                      property.dia_chi?.tinh?.ten }}</span>
                   </div>
                   <div class="flex justify-between items-center py-2 border-b border-gray-50">
                     <span class="text-gray-400 font-medium text-sm">Địa chỉ</span>
-                    <span class="text-[#0a0e27] font-bold text-sm text-right max-w-[200px] line-clamp-1">{{ property.dia_chi?.dia_chi_chi_tiet }}</span>
+                    <span class="text-[#0a0e27] font-bold text-sm text-right max-w-[200px] line-clamp-1">{{
+                      property.dia_chi?.dia_chi_chi_tiet }}</span>
                   </div>
                 </div>
               </div>
@@ -183,7 +216,8 @@
                 <h3 class="text-xl font-black font-['Be_Vietnam_Pro'] text-[#0a0e27] mb-8">Tiện ích đỉnh cao</h3>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
                   <div v-for="(feat, i) in featuresList" :key="i" class="flex items-center gap-4 group">
-                    <div class="w-6 h-6 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <div
+                      class="w-6 h-6 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
                       <span class="material-symbols-outlined text-[14px]">done</span>
                     </div>
                     <span class="text-gray-700 font-medium text-[15px]">{{ feat }}</span>
@@ -205,49 +239,63 @@
 
           <!-- RIGHT: Agent & Actions (4 cols) -->
           <div class="lg:col-span-4 space-y-8">
-            
+
             <!-- Price Sticky Card (Desktop Only) -->
-            <div class="price-card hidden lg:block bg-[#0a0e27] rounded-[40px] p-10 text-white relative overflow-hidden group">
-              <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+            <div
+              class="price-card hidden lg:block bg-[#0a0e27] rounded-[40px] p-10 text-white relative overflow-hidden group">
+              <div
+                class="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl">
+              </div>
               <p class="text-[11px] font-bold uppercase tracking-[0.2em] opacity-60 mb-3">Giá trị tài sản</p>
               <h2 class="text-4xl font-black font-['Be_Vietnam_Pro'] mb-2">{{ formatPriceFull(property.gia) }}</h2>
-              <p class="text-blue-400 font-bold mb-8">~ {{ (property.gia / (property.dien_tich || 1)).toLocaleString() }} đ/m²</p>
+              <p class="text-blue-400 font-bold mb-8">~ {{ (property.gia / (property.dien_tich || 1)).toLocaleString()
+              }} đ/m²</p>
               <div class="flex gap-2">
-                <span class="px-3 py-1.5 rounded-full bg-white/10 text-[10px] font-bold uppercase tracking-widest border border-white/5">Sẵn sàng bàn giao</span>
-                <span class="px-3 py-1.5 rounded-full bg-white/10 text-[10px] font-bold uppercase tracking-widest border border-white/5">Pháp lý minh bạch</span>
+                <span
+                  class="px-3 py-1.5 rounded-full bg-white/10 text-[10px] font-bold uppercase tracking-widest border border-white/5">Sẵn
+                  sàng bàn giao</span>
+                <span
+                  class="px-3 py-1.5 rounded-full bg-white/10 text-[10px] font-bold uppercase tracking-widest border border-white/5">Pháp
+                  lý minh bạch</span>
               </div>
             </div>
 
             <!-- Professional Agent Card -->
-            <div class="agent-contact-card bg-white rounded-[40px] p-8 md:p-10 border border-gray-100 relative sticky top-10">
+            <div
+              class="agent-contact-card bg-white rounded-[40px] p-8 md:p-10 border border-gray-100 relative sticky top-10">
               <div class="text-center mb-10">
-                <div class="relative w-28 h-28 mx-auto mb-6 p-1.5 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-400 to-emerald-400">
+                <div
+                  class="relative w-28 h-28 mx-auto mb-6 p-1.5 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-400 to-emerald-400">
                   <div class="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
-                    <img v-if="broker?.avatar" :src="getImageUrl(broker.avatar)" class="w-full h-full object-cover" alt="Agent">
-                    <span v-else class="text-3xl font-black text-blue-600 uppercase">{{ getInitials(brokerName) }}</span>
+                    <img v-if="broker?.avatar" :src="getImageUrl(broker.avatar)" class="w-full h-full object-cover"
+                      alt="Agent">
+                    <span v-else class="text-3xl font-black text-blue-600 uppercase">{{ getInitials(brokerName)
+                    }}</span>
                   </div>
-                  <div class="absolute bottom-1 right-1 w-7 h-7 bg-emerald-500 border-4 border-white rounded-full"></div>
+                  <div class="absolute bottom-1 right-1 w-7 h-7 bg-emerald-500 border-4 border-white rounded-full">
+                  </div>
                 </div>
                 <h3 class="text-2xl font-black font-['Be_Vietnam_Pro'] text-[#0a0e27] mb-1">{{ brokerName }}</h3>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Chuyên gia tư vấn cao cấp</p>
               </div>
 
               <div class="agent-action-stack space-y-5">
-                <a :href="'tel:' + (broker?.so_dien_thoai || '')" 
-                  class="detail-action detail-action--call flex items-center justify-center gap-3 w-full py-5 text-white rounded-full font-black active:scale-95 group">
+                <a :href="'tel:' + (broker?.so_dien_thoai || '')"
+                  class="detail-action detail-action--call flex items-center justify-center gap-3 w-full text-white rounded-full font-black active:scale-95 group">
                   <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">call</span>
                   {{ broker?.so_dien_thoai || 'Gọi ngay' }}
                 </a>
-                
-                <button @click="startChat" 
-                  class="detail-action detail-action--chat flex items-center justify-center gap-3 w-full py-5 rounded-full font-black active:scale-95 group">
+
+                <button @click="startChat"
+                  class="detail-action detail-action--chat flex items-center justify-center gap-3 w-full rounded-full font-black active:scale-95 group">
                   <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">forum</span>
                   Nhắn tin tư vấn
                 </button>
 
                 <button @click="openBookingModal"
-                  class="detail-action detail-action--booking flex items-center justify-center gap-3 w-full py-5 text-white rounded-full font-black active:scale-95 group">
-                  <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">calendar_month</span>
+                  class="mt-3 detail-action detail-action--booking flex items-center justify-center gap-3 w-full text-white rounded-full font-black active:scale-95 group">
+                  <span
+                    class="material-symbols-outlined group-hover:rotate-12 transition-transform">calendar_month</span>
                   Đặt lịch xem nhà
                 </button>
 
@@ -255,7 +303,8 @@
                   <div class="text-center">
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Đánh giá</p>
                     <div class="flex gap-0.5 text-amber-400">
-                      <span v-for="s in 5" :key="s" class="material-symbols-outlined text-[16px] fill-current">star</span>
+                      <span v-for="s in 5" :key="s"
+                        class="material-symbols-outlined text-[16px] fill-current">star</span>
                     </div>
                   </div>
                   <div class="w-px h-8 bg-gray-100"></div>
@@ -276,9 +325,11 @@
           <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div class="max-w-xl">
               <p class="text-blue-600 font-bold uppercase tracking-[0.3em] text-[10px] mb-4">Có thể bạn quan tâm</p>
-              <h2 class="text-4xl font-black font-['Be_Vietnam_Pro'] text-[#0a0e27] leading-tight">Tuyệt phẩm tương tự trong khu vực</h2>
+              <h2 class="text-4xl font-black font-['Be_Vietnam_Pro'] text-[#0a0e27] leading-tight">Tuyệt phẩm tương tự
+                trong khu vực</h2>
             </div>
-            <router-link to="/khach-hang/danh-sach-bat-dong-san" class="px-8 py-4 bg-white border border-gray-100 rounded-2xl font-bold text-sm hover:shadow-lg transition-all flex items-center gap-2">
+            <router-link to="/khach-hang/danh-sach-bat-dong-san"
+              class="px-8 py-4 bg-white border border-gray-100 rounded-2xl font-bold text-sm hover:shadow-lg transition-all flex items-center gap-2">
               Xem tất cả bộ sưu tập <span class="material-symbols-outlined">east</span>
             </router-link>
           </div>
@@ -287,21 +338,32 @@
             <div v-for="bds in similarProperties" :key="bds.id" @click="viewProperty(bds.id)"
               class="similar-property-card luxury-card group cursor-pointer bg-white rounded-[36px] overflow-hidden border border-gray-50">
               <div class="relative h-[320px] overflow-hidden">
-                <img :src="bds.image" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" :alt="bds.tieu_de">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div class="absolute top-6 left-6 px-4 py-2 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-[#0a0e27]">{{ bds.loai?.ten_loai || 'BĐS' }}</div>
-                <div class="absolute bottom-6 left-6 right-6 text-white transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                  <p class="font-bold flex items-center gap-2 text-sm mb-1"><span class="material-symbols-outlined text-sm">location_on</span> {{ bds.location }}</p>
+                <img :src="bds.image"
+                  class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                  :alt="bds.tieu_de">
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+                <div
+                  class="absolute top-6 left-6 px-4 py-2 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-[#0a0e27]">
+                  {{ bds.loai?.ten_loai || 'BĐS' }}</div>
+                <div
+                  class="absolute bottom-6 left-6 right-6 text-white transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                  <p class="font-bold flex items-center gap-2 text-sm mb-1"><span
+                      class="material-symbols-outlined text-sm">location_on</span> {{ bds.location }}</p>
                 </div>
               </div>
               <div class="p-8">
-                <h3 class="text-xl font-black font-['Be_Vietnam_Pro'] text-[#0a0e27] mb-6 line-clamp-2 leading-relaxed group-hover:text-blue-600 transition-colors">{{ bds.tieu_de }}</h3>
+                <h3
+                  class="text-xl font-black font-['Be_Vietnam_Pro'] text-[#0a0e27] mb-6 line-clamp-2 leading-relaxed group-hover:text-blue-600 transition-colors">
+                  {{ bds.tieu_de }}</h3>
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Giá chỉ từ</p>
                     <p class="text-2xl font-black text-[#0a0e27]">{{ formatPriceFull(bds.gia) }}</p>
                   </div>
-                  <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+                  <div
+                    class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                     <span class="material-symbols-outlined">arrow_outward</span>
                   </div>
                 </div>
@@ -318,7 +380,8 @@
         <div class="glass-toast detail-toast flex items-center gap-3 shadow-2xl border border-white/20"
           :class="getToastClass(toast.type)">
           <div class="detail-toast__icon rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md">
-            <span class="material-symbols-outlined text-white text-[20px]">{{ toast.icon || getToastIcon(toast.type) }}</span>
+            <span class="material-symbols-outlined text-white text-[20px]">{{ toast.icon || getToastIcon(toast.type)
+            }}</span>
           </div>
           <p class="detail-toast__message text-white font-semibold leading-tight flex-1">{{ toast.message }}</p>
           <button @click="hideToast" class="detail-toast__close text-white/60 hover:text-white transition-colors">
@@ -330,30 +393,38 @@
 
     <!-- 🖼 FULLSCREEN GALLERY -->
     <transition name="gallery-fade">
-      <div v-if="showGallery" class="fixed inset-0 z-[10001] bg-black/98 flex flex-col items-center justify-center backdrop-blur-2xl" @click.self="closeGallery">
+      <div v-if="showGallery"
+        class="fixed inset-0 z-[10001] bg-black/98 flex flex-col items-center justify-center backdrop-blur-2xl"
+        @click.self="closeGallery">
         <div class="absolute top-8 right-8 flex gap-4">
-          <button @click="closeGallery" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all active:scale-95">
+          <button @click="closeGallery"
+            class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all active:scale-95">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-        
+
         <div class="relative w-full max-w-6xl px-6 flex items-center justify-center">
-          <button @click="prevImage" class="absolute left-0 w-16 h-16 rounded-full bg-white/5 text-white flex items-center justify-center hover:bg-white/10 transition-all z-20">
+          <button @click="prevImage"
+            class="absolute left-0 w-16 h-16 rounded-full bg-white/5 text-white flex items-center justify-center hover:bg-white/10 transition-all z-20">
             <span class="material-symbols-outlined text-4xl">chevron_left</span>
           </button>
-          
-          <img :src="getImageUrl(images[currentImageIndex]?.url)" class="max-w-full max-h-[80vh] object-contain shadow-2xl rounded-lg" :alt="'Album ' + (currentImageIndex + 1)">
-          
-          <button @click="nextImage" class="absolute right-0 w-16 h-16 rounded-full bg-white/5 text-white flex items-center justify-center hover:bg-white/10 transition-all z-20">
+
+          <img :src="getImageUrl(images[currentImageIndex]?.url)"
+            class="max-w-full max-h-[80vh] object-contain shadow-2xl rounded-lg"
+            :alt="'Album ' + (currentImageIndex + 1)">
+
+          <button @click="nextImage"
+            class="absolute right-0 w-16 h-16 rounded-full bg-white/5 text-white flex items-center justify-center hover:bg-white/10 transition-all z-20">
             <span class="material-symbols-outlined text-4xl">chevron_right</span>
           </button>
         </div>
 
         <div class="mt-10 flex flex-col items-center gap-4">
-          <p class="text-white/60 font-black tracking-[0.4em] uppercase text-[10px]">Ảnh {{ currentImageIndex + 1 }} / {{ images.length }}</p>
+          <p class="text-white/60 font-black tracking-[0.4em] uppercase text-[10px]">Ảnh {{ currentImageIndex + 1 }} /
+            {{
+              images.length }}</p>
           <div class="flex gap-2 max-w-2xl overflow-x-auto py-4 px-10 no-scrollbar">
-            <div v-for="(img, idx) in images" :key="idx" 
-              @click="currentImageIndex = idx"
+            <div v-for="(img, idx) in images" :key="idx" @click="currentImageIndex = idx"
               class="w-16 h-16 rounded-xl overflow-hidden cursor-pointer transition-all duration-300 flex-shrink-0"
               :class="currentImageIndex === idx ? 'ring-4 ring-blue-600 scale-110 opacity-100' : 'opacity-40 hover:opacity-100'">
               <img :src="getImageUrl(img.url)" class="w-full h-full object-cover">
@@ -364,13 +435,8 @@
     </transition>
 
     <!-- 📅 Booking Modal -->
-    <DatLichModal
-      v-if="showBookingModal"
-      :propertyId="property?.id"
-      :propertyTitle="property?.tieu_de"
-      @close="showBookingModal = false"
-      @success="onBookingSuccess"
-    />
+    <DatLichModal v-if="showBookingModal" :propertyId="property?.id" :propertyTitle="property?.tieu_de"
+      @close="showBookingModal = false" @success="onBookingSuccess" />
   </div>
 </template>
 
@@ -413,9 +479,9 @@ export default {
   },
   computed: {
     images() { return this.property?.hinhAnh || this.property?.hinh_anh || []; },
-    mainImage() { 
+    mainImage() {
       if (this.property?.anh_dai_dien_url) return this.getImageUrl(this.property.anh_dai_dien_url);
-      return this.images.length > 0 ? this.getImageUrl(this.images[0].url) : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200'; 
+      return this.images.length > 0 ? this.getImageUrl(this.images[0].url) : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200';
     },
     displayImages() { return this.images.slice(1, 3); },
     featuresList() {
@@ -523,16 +589,16 @@ export default {
             return { ...it, image: this.getImageUrl(img), location: loc };
           });
         }
-      } catch {}
+      } catch { }
     },
     getImageUrl(url) {
       if (!url) return 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200';
       if (url.startsWith('http')) return url;
-      
-      const base = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:8000';
+
+      const base = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000';
       const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
       const finalUrl = cleanUrl.startsWith('storage/') ? cleanUrl : `storage/${cleanUrl}`;
-      
+
       return `${base}/${finalUrl}`;
     },
     formatPriceFull(gia) { if (!gia && gia !== 0) return 'Liên hệ'; return new Intl.NumberFormat('vi-VN').format(gia) + ' VNĐ'; },
@@ -551,9 +617,9 @@ export default {
     initMap() {
       const lat = this.property?.dia_chi?.latitude || this.property?.dia_chi?.lat;
       const lng = this.property?.dia_chi?.longitude || this.property?.dia_chi?.lng;
-      
+
       console.log('📍 Initializing Map with:', { lat, lng });
-      
+
       if (!lat || !lng) {
         console.warn('Không có tọa độ bản đồ cho BĐS này');
         return;
@@ -617,8 +683,14 @@ export default {
     linear-gradient(180deg, #fbfdff 0%, #f3f7fc 100%);
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 .glass-card {
   background: rgba(255, 255, 255, 0.85);
@@ -710,7 +782,6 @@ export default {
 }
 
 .agent-contact-card::before {
-  content: "";
   position: absolute;
   inset: 0 0 auto;
   height: 6px;
@@ -832,22 +903,51 @@ export default {
 }
 
 /* Animations */
-.luxury-toast-enter-active { animation: toastIn 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
-.luxury-toast-leave-active { animation: toastOut 0.22s ease-in; }
+.luxury-toast-enter-active {
+  animation: toastIn 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-toast-leave-active {
+  animation: toastOut 0.22s ease-in;
+}
 
 @keyframes toastIn {
-  from { opacity: 0; transform: translateX(22px) scale(0.96); }
-  to { opacity: 1; transform: translateX(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateX(22px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
+
 @keyframes toastOut {
-  to { opacity: 0; transform: translateX(22px) scale(0.96); }
+  to {
+    opacity: 0;
+    transform: translateX(22px) scale(0.96);
+  }
 }
 
-.gallery-fade-enter-active, .gallery-fade-leave-active { transition: opacity 0.5s; }
-.gallery-fade-enter-from, .gallery-fade-leave-to { opacity: 0; }
+.gallery-fade-enter-active,
+.gallery-fade-leave-active {
+  transition: opacity 0.5s;
+}
 
-.prose :deep(p) { margin-bottom: 1.5rem; }
-.prose :deep(strong) { color: #0a0e27; font-weight: 800; }
+.gallery-fade-enter-from,
+.gallery-fade-leave-to {
+  opacity: 0;
+}
+
+.prose :deep(p) {
+  margin-bottom: 1.5rem;
+}
+
+.prose :deep(strong) {
+  color: #0a0e27;
+  font-weight: 800;
+}
 
 /* Custom Map Marker */
 :deep(.custom-marker) {
@@ -877,20 +977,53 @@ export default {
 }
 
 @keyframes marker-pulse {
-  0% { transform: scale(0.5); opacity: 1; }
-  100% { transform: scale(2.5); opacity: 0; }
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
 }
 
 @media (max-width: 1024px) {
-  .luxury-hero-gallery { height: auto; }
+  .luxury-hero-gallery {
+    height: auto;
+  }
 }
 
-.animate-heart-pulse { animation: heartPulse 0.6s ease-in-out; }
-.bg-gradient-to-r.from-pink-500 { box-shadow: 0 8px 32px rgba(236, 72, 153, 0.4); }
-@media(prefers-reduced-motion:reduce){ 
-  *,*::before,*::after{ animation-duration:0.01ms!important; transition-duration:0.01ms!important; } 
-  .animate-heart-pulse { animation: none !important; } 
+.animate-heart-pulse {
+  animation: heartPulse 0.6s ease-in-out;
 }
-button:disabled { opacity: 0.5; cursor: not-allowed; }
-button:disabled:hover { background: transparent; border-color: #e5e7eb; color: #9ca3af; }
+
+.bg-gradient-to-r.from-pink-500 {
+  box-shadow: 0 8px 32px rgba(236, 72, 153, 0.4);
+}
+
+@media(prefers-reduced-motion:reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-heart-pulse {
+    animation: none !important;
+  }
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background: transparent;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+}
 </style>

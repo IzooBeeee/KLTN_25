@@ -17,7 +17,12 @@
           <label
             class="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 border-2 border-white rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 transition shadow-lg"
             title="Đổi ảnh đại diện">
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
             <input type="file" accept="image/*" class="hidden" @change="onAvatarChange" />
           </label>
         </div>
@@ -26,7 +31,7 @@
             <h1 class="text-2xl font-black text-gray-900">{{ profile.ten || 'Chưa cập nhật' }}</h1>
             <span class="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">Môi Giới</span>
           </div>
-          <p class="text-sm text-gray-400 mb-1">{{ profile.mo_ta || 'Chuyên viên tư vấn cao cấp' }}</p>
+          <p class="text-start text-gray-400 mb-1">{{ profile.mo_ta || 'Chuyên viên tư vấn cao cấp' }}</p>
           <div class="flex items-center justify-center sm:justify-start gap-4 text-xs text-gray-400">
             <span>MG-{{ profile.id }}</span>
             <span>•</span>
@@ -37,7 +42,9 @@
         </div>
         <button @click="saveProfile" :disabled="loading"
           class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-200 hover:-translate-y-0.5 transition-all disabled:opacity-60">
-          <svg v-if="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <svg v-if="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
           <span v-if="loading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
           {{ loading ? 'Đang lưu...' : 'Lưu thay đổi' }}
         </button>
@@ -52,7 +59,10 @@
           <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-9 h-9 bg-green-100 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
               <h3 class="text-sm font-bold text-gray-700">Tổng tiền đã mua gói</h3>
             </div>
@@ -65,7 +75,8 @@
             <div class="mb-4">
               <div class="flex justify-between text-xs text-gray-500 mb-1.5">
                 <span>Tin đã sử dụng</span>
-                <span class="font-semibold">{{ stats.tinDaDang || 0 }} / {{ (stats.tinDaDang || 0) + (stats.tinConLai || 0) }}</span>
+                <span class="font-semibold">{{ stats.tinDaDang || 0 }} / {{ (stats.tinDaDang || 0) + (stats.tinConLai ||
+                  0) }}</span>
               </div>
               <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div class="h-full rounded-full transition-all duration-500"
@@ -91,7 +102,10 @@
             <h3 class="text-sm font-bold text-red-600 mb-3">Vùng nguy hiểm</h3>
             <button @click="confirmLogoutAll"
               class="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-red-400 text-red-500 text-sm font-bold rounded-xl hover:bg-red-50 transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
               Đăng xuất tất cả thiết bị
             </button>
           </div>
@@ -105,7 +119,10 @@
           <div class="bg-white rounded-2xl shadow-sm p-6">
             <div class="flex items-center gap-3 mb-6">
               <div class="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
               </div>
               <h2 class="text-base font-bold text-gray-800">Thông tin cá nhân</h2>
             </div>
@@ -115,35 +132,41 @@
                 <input type="text" v-model="profile.ten" placeholder="Nhập họ và tên"
                   class="w-full px-4 py-2.5 bg-gray-50 border rounded-xl text-sm outline-none transition focus:ring-2 focus:border-transparent"
                   :class="errors.ten ? 'border-red-400 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-500'" />
-                <p v-if="errors.ten" class="text-xs text-red-500 mt-1">{{ Array.isArray(errors.ten) ? errors.ten[0] : errors.ten }}</p>
+                <p v-if="errors.ten" class="text-xs text-red-500 mt-1">{{ Array.isArray(errors.ten) ? errors.ten[0] :
+                  errors.ten }}</p>
               </div>
               <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Email</label>
                 <input type="email" v-model="profile.email" placeholder="email@example.com"
                   class="w-full px-4 py-2.5 bg-gray-50 border rounded-xl text-sm outline-none transition focus:ring-2 focus:border-transparent"
                   :class="errors.email ? 'border-red-400 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-500'" />
-                <p v-if="errors.email" class="text-xs text-red-500 mt-1">{{ Array.isArray(errors.email) ? errors.email[0] : errors.email }}</p>
+                <p v-if="errors.email" class="text-xs text-red-500 mt-1">{{ Array.isArray(errors.email) ?
+                  errors.email[0] : errors.email }}</p>
               </div>
               <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Số điện thoại</label>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Số điện
+                  thoại</label>
                 <input type="tel" v-model="profile.so_dien_thoai" placeholder="+84 xxx xxx xxx"
                   class="w-full px-4 py-2.5 bg-gray-50 border rounded-xl text-sm outline-none transition focus:ring-2 focus:border-transparent"
                   :class="errors.so_dien_thoai ? 'border-red-400 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-500'" />
-                <p v-if="errors.so_dien_thoai" class="text-xs text-red-500 mt-1">{{ Array.isArray(errors.so_dien_thoai) ? errors.so_dien_thoai[0] : errors.so_dien_thoai }}</p>
+                <p v-if="errors.so_dien_thoai" class="text-xs text-red-500 mt-1">{{ Array.isArray(errors.so_dien_thoai)
+                  ? errors.so_dien_thoai[0] : errors.so_dien_thoai }}</p>
               </div>
               <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Link Zalo</label>
                 <input type="text" v-model="profile.zalo_link" placeholder="https://zalo.me/..."
                   class="w-full px-4 py-2.5 bg-gray-50 border rounded-xl text-sm outline-none transition focus:ring-2 focus:border-transparent"
                   :class="errors.zalo_link ? 'border-red-400 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-500'" />
-                <p v-if="errors.zalo_link" class="text-xs text-red-500 mt-1">{{ Array.isArray(errors.zalo_link) ? errors.zalo_link[0] : errors.zalo_link }}</p>
+                <p v-if="errors.zalo_link" class="text-xs text-red-500 mt-1">{{ Array.isArray(errors.zalo_link) ?
+                  errors.zalo_link[0] : errors.zalo_link }}</p>
               </div>
               <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Mô tả</label>
                 <textarea v-model="profile.mo_ta" placeholder="Mô tả ngắn gọn về bạn..." rows="3"
                   class="w-full px-4 py-2.5 bg-gray-50 border rounded-xl text-sm outline-none transition focus:ring-2 focus:border-transparent resize-none"
                   :class="errors.mo_ta ? 'border-red-400 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-500'"></textarea>
-                <p v-if="errors.mo_ta" class="text-xs text-red-500 mt-1">{{ Array.isArray(errors.mo_ta) ? errors.mo_ta[0] : errors.mo_ta }}</p>
+                <p v-if="errors.mo_ta" class="text-xs text-red-500 mt-1">{{ Array.isArray(errors.mo_ta) ?
+                  errors.mo_ta[0] : errors.mo_ta }}</p>
               </div>
             </div>
           </div>
@@ -152,36 +175,53 @@
           <div class="bg-white rounded-2xl shadow-sm p-6">
             <div class="flex items-center gap-3 mb-6">
               <div class="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
               </div>
               <h2 class="text-base font-bold text-gray-800">Thay đổi mật khẩu</h2>
             </div>
             <div class="space-y-4">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Mật khẩu hiện tại</label>
+                  <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Mật khẩu hiện
+                    tại</label>
                   <div class="relative">
-                    <input :type="showCurrentPassword ? 'text' : 'password'" v-model="passwordForm.old_password" placeholder="••••••••"
+                    <input :type="showCurrentPassword ? 'text' : 'password'" v-model="passwordForm.old_password"
+                      placeholder="••••••••"
                       class="w-full px-4 py-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition" />
                     <button type="button" @click="showCurrentPassword = !showCurrentPassword"
                       class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                      <svg v-if="!showCurrentPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                      <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                      <svg v-if="!showCurrentPassword" class="w-4 h-4" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                      </svg>
                     </button>
                   </div>
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Mật khẩu mới</label>
+                  <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Mật khẩu
+                    mới</label>
                   <input type="password" v-model="passwordForm.password" placeholder="Mật khẩu mới"
                     class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition" />
                 </div>
               </div>
               <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Xác nhận mật khẩu</label>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Xác nhận mật
+                  khẩu</label>
                 <input type="password" v-model="passwordForm.re_password" placeholder="Nhập lại mật khẩu"
                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition" />
               </div>
-              <p class="text-xs text-gray-400 bg-amber-50 p-3 rounded-xl">Mật khẩu nên bao gồm ít nhất 8 ký tự, kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt.</p>
+              <p class="text-xs text-gray-400 bg-amber-50 p-3 rounded-xl">Mật khẩu nên bao gồm ít nhất 8 ký tự, kết hợp
+                chữ hoa, chữ thường, số và ký tự đặc biệt.</p>
               <button @click="changePassword"
                 class="flex items-center gap-2 px-5 py-2.5 border-2 border-amber-400 text-amber-600 text-sm font-bold rounded-xl hover:bg-amber-50 transition">
                 Cập nhật mật khẩu
@@ -193,42 +233,59 @@
       </div>
     </div>
 
-  <!-- Security Alert Modal -->
-  <Teleport to="body">
-    <div v-if="showLogoutAllModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div class="bg-gradient-to-r from-red-500 to-red-600 p-6 text-white">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+    <!-- Security Alert Modal -->
+    <Teleport to="body">
+      <div v-if="showLogoutAllModal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+          <div class="bg-gradient-to-r from-red-500 to-red-600 p-6 text-white">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-black">Xác nhận đăng xuất tất cả</h3>
             </div>
-            <h3 class="text-lg font-black">Xác nhận đăng xuất tất cả</h3>
           </div>
-        </div>
-        <div class="p-6">
-          <p class="font-semibold text-gray-700 mb-3">Hành động này sẽ:</p>
-          <ul class="space-y-2 mb-4">
-            <li class="flex items-center gap-2 text-sm text-gray-600">
-              <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
-              Đăng xuất khỏi <strong>TẤT CẢ</strong> thiết bị đang đăng nhập
-            </li>
-            <li class="flex items-center gap-2 text-sm text-gray-600">
-              <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
-              Bạn sẽ cần đăng nhập lại trên mọi thiết bị
-            </li>
-          </ul>
-          <p class="text-sm text-red-600 font-bold mb-5">Bạn có chắc chắn muốn tiếp tục?</p>
-          <div class="flex gap-3">
-            <button @click="closeModal" class="flex-1 py-3 border-2 border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition text-sm">Hủy</button>
-            <button @click="logoutAll" class="flex-1 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-200 hover:-translate-y-0.5 transition-all text-sm flex items-center justify-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-              Đăng xuất tất cả
-            </button>
+          <div class="p-6">
+            <p class="font-semibold text-gray-700 mb-3">Hành động này sẽ:</p>
+            <ul class="space-y-2 mb-4">
+              <li class="flex items-center gap-2 text-sm text-gray-600">
+                <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clip-rule="evenodd" />
+                </svg>
+                Đăng xuất khỏi <strong>TẤT CẢ</strong> thiết bị đang đăng nhập
+              </li>
+              <li class="flex items-center gap-2 text-sm text-gray-600">
+                <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clip-rule="evenodd" />
+                </svg>
+                Bạn sẽ cần đăng nhập lại trên mọi thiết bị
+              </li>
+            </ul>
+            <p class="text-sm text-red-600 font-bold mb-5">Bạn có chắc chắn muốn tiếp tục?</p>
+            <div class="flex gap-3">
+              <button @click="closeModal"
+                class="flex-1 py-3 border-2 border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition text-sm">Hủy</button>
+              <button @click="logoutAll"
+                class="flex-1 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-200 hover:-translate-y-0.5 transition-all text-sm flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Đăng xuất tất cả
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </Teleport>
+    </Teleport>
   </div>
 </template>
 <script>

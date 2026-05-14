@@ -15,7 +15,7 @@
       </div>
 
       <!-- Header -->
-      <div class="bg-white border-b border-gray-100">
+      <div class="bg-white border-gray-100">
         <div class="container mx-auto max-w-7xl px-6 py-8">
           <h1 class="font-['Be_Vietnam_Pro'] text-[32px] md:text-[36px] font-bold text-[#0a0e27] mb-2">
             Danh sách bất động sản
@@ -25,8 +25,8 @@
       </div>
 
       <!-- Search & Filters -->
-      <div class="bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm">
-        <div class="container mx-auto max-w-7xl px-6 py-4">
+      <div class="bg-white border-b border-gray-200 shadow-sm">
+        <div class="container mx-auto max-w-7xl px-6">
           <!-- Main Search Bar -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
             <!-- Location -->
@@ -162,12 +162,12 @@
           </p>
           <div class="flex items-center gap-2">
             <button @click="toggleView('grid')"
-              :class="{ 'bg-blue-600 text-white': viewMode === 'grid', 'bg-gray-100 text-gray-600': viewMode !== 'grid' }"
-              class="p-2 rounded-lg transition-all">
+              :class="{ 'bg-[#0a0e27] text-white': viewMode === 'grid', 'bg-gray-100 text-gray-600': viewMode !== 'grid' }"
+              class="rounded-lg transition-all">
               <span class="material-symbols-outlined text-[20px]">grid_view</span>
             </button>
             <button @click="toggleView('list')"
-              :class="{ 'bg-blue-600 text-white': viewMode === 'list', 'bg-gray-100 text-gray-600': viewMode !== 'list' }"
+              :class="{ 'bg-[#0a0e27] text-white': viewMode === 'list', 'bg-gray-100 text-gray-600': viewMode !== 'list' }"
               class="p-2 rounded-lg transition-all">
               <span class="material-symbols-outlined text-[20px]">view_list</span>
             </button>
@@ -194,9 +194,8 @@
               class="property-list-card group bg-white rounded-[28px] overflow-hidden cursor-pointer border border-gray-100">
               <!-- Image -->
               <div class="property-list-media relative h-[240px] overflow-hidden">
-                <img :src="bds.image"
-                  class="property-list-img w-full h-full object-cover"
-                  :alt="bds.tieu_de" @error="handleImageError" loading="lazy" />
+                <img :src="bds.image" class="property-list-img w-full h-full object-cover" :alt="bds.tieu_de"
+                  @error="handleImageError" loading="lazy" />
 
                 <!-- Badge Loại BĐS -->
                 <div
@@ -308,46 +307,37 @@
         <!-- Pagination -->
         <!-- Pagination -->
         <div v-if="totalPages > 1 && !loading" class="mt-12 flex items-center justify-center">
-  <nav class="flex items-center gap-1.5 p-1.5 bg-white/70 backdrop-blur-xl rounded-full border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)]" aria-label="Pagination">
-    
-    <!-- Previous -->
-    <button
-      @click="changePage(currentPage - 1)"
-      :disabled="currentPage === 1"
-      class="w-11 h-11 flex items-center justify-center text-gray-500 hover:bg-white/80 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 flex-shrink-0"
-      style="border-radius: 50% !important;"
-    >
-      <span class="material-symbols-outlined text-xl">chevron_left</span>
-    </button>
+          <nav
+            class="flex items-center gap-1.5 p-1.5 bg-white/70 backdrop-blur-xl rounded-full border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)]"
+            aria-label="Pagination">
 
-    <!-- Page Numbers -->
-    <button
-      v-for="page in visiblePages"
-      :key="page"
-      @click="changePage(page)"
-      :class="[
-        page === currentPage
-          ? 'bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 text-blue-600 shadow-[0_8px_25px_rgba(37,99,235,0.4)] ring-2 ring-white/50 scale-110'
-          : 'text-gray-600 hover:bg-white/80 hover:text-blue-600 hover:shadow-md'
-      ]"
-      class="w-11 h-11 text-sm font-bold transition-all duration-300 flex items-center justify-center flex-shrink-0 leading-none"
-      style="border-radius: 50% !important;"
-    >
-      {{ page }}
-    </button>
+            <!-- Previous -->
+            <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1"
+              class="w-11 h-11 flex items-center justify-center text-gray-500 hover:bg-white/80 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 flex-shrink-0"
+              style="border-radius: 50% !important;">
+              <span class="material-symbols-outlined text-xl">chevron_left</span>
+            </button>
 
-    <!-- Next -->
-    <button
-      @click="changePage(currentPage + 1)"
-      :disabled="currentPage === totalPages"
-      class="w-11 h-11 flex items-center justify-center text-gray-500 hover:bg-white/80 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 flex-shrink-0"
-      style="border-radius: 50% !important;"
-    >
-      <span class="material-symbols-outlined text-xl">chevron_right</span>
-    </button>
+            <!-- Page Numbers -->
+            <button v-for="page in visiblePages" :key="page" @click="changePage(page)" :class="[
+              page === currentPage
+                ? 'bg-[#0a0e27] via-indigo-600 to-cyan-500 text-white shadow-[0_8px_25px_rgba(37,99,235,0.4)] ring-2 ring-white/50 scale-110'
+                : 'text-gray-600 hover:bg-white/80 hover:text-blue-600 hover:shadow-md'
+            ]"
+              class="w-11 h-11 text-sm font-bold transition-all duration-300 flex items-center justify-center flex-shrink-0 leading-none"
+              style="border-radius: 50% !important;">
+              {{ page }}
+            </button>
 
-  </nav>
-</div>
+            <!-- Next -->
+            <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages"
+              class="w-11 h-11 flex items-center justify-center text-gray-500 hover:bg-white/80 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 flex-shrink-0"
+              style="border-radius: 50% !important;">
+              <span class="material-symbols-outlined text-xl">chevron_right</span>
+            </button>
+
+          </nav>
+        </div>
       </div>
     </div>
 
@@ -367,8 +357,7 @@
             {{ toast.message }}
           </span>
 
-          <button @click="hideToast" class="property-toast__close"
-            aria-label="Đóng thông báo">
+          <button @click="hideToast" class="property-toast__close" aria-label="Đóng thông báo">
             <span class="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
@@ -614,7 +603,7 @@ export default {
           const raw = res.data.data?.data || res.data.data || [];
           this.properties = raw.map(it => {
             let img = this.defaultImage;
-            
+
             // 🔥 Priority mapping
             if (it.anh_dai_dien_url) {
               img = this.getImageUrl(it.anh_dai_dien_url);
@@ -665,7 +654,7 @@ export default {
         if (r.data?.status) this.danhSachQuan = r.data.data || [];
       } catch (e) { console.error('Load quận error:', e); }
     },
-    getImageUrl(url) { if (!url) return this.defaultImage; if (url.startsWith('http')) return url; const base = import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:8000'; return `${base}/storage/${url}`; },
+    getImageUrl(url) { if (!url) return this.defaultImage; if (url.startsWith('http')) return url; const base = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000'; return `${base}/storage/${url}`; },
 
     changePage(p) { if (p < 1 || p > this.totalPages) return; this.currentPage = p; this.loadProperties(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
     toggleView(m) { this.viewMode = m; },
@@ -680,11 +669,11 @@ export default {
       if (k === 'dien_tich') { const lb = { '0-50': 'Dưới 50m²', '50-100': '50 - 100m²', '100-200': '100 - 200m²', '200-999999': 'Trên 200m²' }; return lb[v] || v; }
       return v;
     },
-    formatPriceFull(g) { 
-      if (!g) return 'Liên hệ'; 
-      if (g >= 1_000_000_000) return Math.floor(g / 1_000_000_000) + ' Tỷ'; 
-      if (g >= 1_000_000) return Math.floor(g / 1_000_000) + ' Triệu'; 
-      return new Intl.NumberFormat('vi-VN').format(g) + ' đ'; 
+    formatPriceFull(g) {
+      if (!g) return 'Liên hệ';
+      if (g >= 1_000_000_000) return Math.floor(g / 1_000_000_000) + ' Tỷ';
+      if (g >= 1_000_000) return Math.floor(g / 1_000_000) + ' Triệu';
+      return new Intl.NumberFormat('vi-VN').format(g) + ' đ';
     }
   },
   watch: {

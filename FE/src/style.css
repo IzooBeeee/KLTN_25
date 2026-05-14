@@ -27,10 +27,37 @@ html {
 body {
   margin: 0;
   font-family: "Be Vietnam Pro", sans-serif;
-  color: #1d2335;
+  color: var(--app-text);
   background:
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.92), transparent 22%),
     linear-gradient(180deg, #f6f8fc 0%, #eef3fb 100%);
+}
+
+html.dark body {
+  background: #0f172a !important;
+  color: var(--app-text) !important;
+}
+
+:root {
+  --app-bg: #f6f8fc;
+  --app-card: #ffffff;
+  --app-card-soft: #f8fafc;
+  --app-text: #1d2335;
+  --app-text-strong: #0f172a;
+  --app-text-muted: #64748b;
+  --app-border: #e5e7eb;
+  --app-header: rgba(255, 255, 255, 0.98);
+}
+
+html.dark {
+  --app-bg: #0f172a;
+  --app-card: #1e293b;
+  --app-card-soft: #0f172a;
+  --app-text: #e2e8f0;
+  --app-text-strong: #f8fafc;
+  --app-text-muted: #94a3b8;
+  --app-border: #334155;
+  --app-header: rgba(15, 23, 42, 0.97);
 }
 
 a {
@@ -146,6 +173,8 @@ html.dark .bg-gray-100 {
   background-color: #1e293b !important;
 }
 
+
+
 /* ── Sections & wrappers ── */
 html.dark section,
 html.dark .section,
@@ -159,8 +188,21 @@ html.dark .main-content {
 html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
   color: #f1f5f9 !important;
 }
-html.dark p, html.dark span:not([class*="badge"]):not([class*="btn"]):not([class*="tag"]) {
+html.dark p {
   color: inherit;
+}
+
+html.dark .text-main,
+html.dark .title,
+html.dark .section-title {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-muted,
+html.dark .text-secondary,
+html.dark .subtitle,
+html.dark .desc {
+  color: #94a3b8 !important;
 }
 html.dark .text-muted, html.dark .text-secondary {
   color: #64748b !important;
@@ -359,3 +401,261 @@ html.dark .dl-textarea { background: #0f172a !important; border-color: #334155 !
 html.dark .dl-time-btn { background: #0f172a !important; border-color: #334155 !important; color: #94a3b8 !important; }
 html.dark .dl-footer { border-color: #334155 !important; }
 html.dark .dl-btn--secondary { background: #334155 !important; color: #e2e8f0 !important; }
+html.dark .dropdown-menu-new {
+  background: #ffffff !important;
+  border-color: #bfdbfe !important;
+  color: #1f2937 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.dark .dropdown-item-new {
+  color: #374151 !important;
+}
+
+html.dark .dropdown-item-new:hover {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+}
+
+html.dark .dropdown-footer-new {
+  background: #ffffff !important;
+}
+
+html.dark .item-label-new {
+  color: inherit !important;
+}
+
+html.dark .logout-btn-new {
+  background: #ffffff !important;
+  color: #ef4444 !important;
+  border-color: #fecaca !important;
+}
+html.dark .btn-notif {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-notif .icon {
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-notif:hover,
+html.dark .btn-saved:hover,
+html.dark .btn-chat:hover {
+  background: #263349 !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+html.dark .user-wrapper {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+html.dark .user-name,
+html.dark .arrow {
+  color: #1e40af !important;
+}
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-gray-400 {
+  color: #94a3b8 !important;
+}
+html.dark .dropdown-menu-new,
+html.dark .avatar-large-new,
+html.dark .logout-btn-new {
+  background: #ffffff !important;
+}
+/* ===== DARK MODE FIXES - ADDITIONAL ===== */
+
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-notif {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-notif .icon {
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-notif:hover,
+html.dark .btn-saved:hover,
+html.dark .btn-chat:hover {
+  background: #263349 !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+html.dark .dropdown-menu-new {
+  background: #ffffff !important;
+  border-color: #bfdbfe !important;
+  color: #1f2937 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.dark .dropdown-item-new {
+  color: #374151 !important;
+}
+
+html.dark .dropdown-item-new:hover {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+}
+
+html.dark .dropdown-footer-new,
+html.dark .avatar-large-new,
+html.dark .logout-btn-new {
+  background: #ffffff !important;
+}
+
+html.dark .item-label-new {
+  color: inherit !important;
+}
+
+html.dark .logout-btn-new {
+  color: #ef4444 !important;
+  border-color: #fecaca !important;
+}
+
+html.dark .user-wrapper {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+html.dark .user-name,
+html.dark .arrow {
+  color: #1e40af !important;
+}
+/* ===== FIX PROPERTY LIST CARD DARK MODE ===== */
+html.dark .property-list-card {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+  border-color: #334155 !important;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark .property-list-card h1,
+html.dark .property-list-card h2,
+html.dark .property-list-card h3,
+html.dark .property-list-card h4,
+html.dark .property-list-card h5,
+html.dark .property-list-card h6 {
+  color: #f8fafc !important;
+}
+
+html.dark .property-list-card p,
+html.dark .property-list-card .text-gray-500,
+html.dark .property-list-card .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+html.dark .property-list-card .border-gray-100 {
+  border-color: #334155 !important;
+}
+
+html.dark .property-list-card .text-blue-600 {
+  color: #60a5fa !important;
+}
+html.dark .property-list-card [class*="text-[#0a0e27]"] {
+  color: #f8fafc !important;
+}
+/* ===== FIX HOME FEATURED PROJECTS DARK MODE ===== */
+
+/* Nền các section trang chủ */
+html.dark .home-section,
+html.dark .featured-section,
+html.dark .project-section,
+html.dark .du-an-section,
+html.dark .property-section {
+  background: #0f172a !important;
+}
+
+/* Card dự án / BĐS ở trang chủ */
+html.dark .project-card,
+html.dark .featured-card,
+html.dark .featured-project-card,
+html.dark .home-property-card,
+html.dark .property-list-card,
+html.dark .property-card,
+html.dark .bds-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Phần nội dung dưới ảnh trong card */
+html.dark .project-card-content,
+html.dark .featured-card-content,
+html.dark .property-card-content,
+html.dark .property-list-card .p-6,
+html.dark .bds-card-content {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+
+/* Tiêu đề card */
+html.dark .project-card h1,
+html.dark .project-card h2,
+html.dark .project-card h3,
+html.dark .project-card h4,
+html.dark .project-card h5,
+html.dark .project-card h6,
+html.dark .featured-card h1,
+html.dark .featured-card h2,
+html.dark .featured-card h3,
+html.dark .featured-card h4,
+html.dark .featured-card h5,
+html.dark .featured-card h6,
+html.dark .property-list-card h1,
+html.dark .property-list-card h2,
+html.dark .property-list-card h3,
+html.dark .property-list-card h4,
+html.dark .property-list-card h5,
+html.dark .property-list-card h6 {
+  color: #f8fafc !important;
+}
+
+/* Bắt các màu text hard-code / Tailwind arbitrary */
+html.dark [class*="text-[#0a0e27]"],
+html.dark [class*="text-[#1d2335]"],
+html.dark [class*="text-gray-900"],
+html.dark [class*="text-gray-800"],
+html.dark [class*="text-gray-700"] {
+  color: #f8fafc !important;
+}
+
+html.dark [class*="text-gray-600"],
+html.dark [class*="text-gray-500"],
+html.dark [class*="text-gray-400"] {
+  color: #94a3b8 !important;
+}
+
+/* Border trong card */
+html.dark .border-gray-100,
+html.dark .border-gray-200 {
+  border-color: #334155 !important;
+}
+
+/* Icon địa chỉ */
+html.dark .material-symbols-outlined {
+  color: inherit;
+}

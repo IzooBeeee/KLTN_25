@@ -417,7 +417,7 @@ export default {
 
 .search-box input:focus {
     outline: none;
-    border-color: #10b981;
+    border-color: #1e293b;
     box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
 
@@ -441,7 +441,7 @@ export default {
 
 .broker-card:hover {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border-color: #10b981;
+    border-color: #1e293b;
     transform: translateY(-3px);
 }
 
@@ -478,7 +478,7 @@ export default {
 }
 
 .contact-item i {
-    color: #10b981;
+    color: #1e293b;
     font-size: 1.1rem;
     margin-top: 2px;
     flex-shrink: 0;
@@ -490,7 +490,7 @@ export default {
     background: #f9fafb;
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
-    border-left: 3px solid #10b981;
+    border-left: 3px solid #1e293b;
 }
 
 .phone-link {
@@ -501,7 +501,7 @@ export default {
 }
 
 .phone-link:hover {
-    color: #10b981;
+    color: #1e293b;
 }
 
 .btn-email {
@@ -523,8 +523,8 @@ export default {
 
 .btn-email:hover {
     background: #f0fdf4;
-    border-color: #10b981;
-    color: #10b981;
+    border-color: #1e293b;
+    color: #1e293b;
     transform: translateY(-1px);
 }
 
@@ -615,8 +615,8 @@ export default {
 
 .btn-page:hover:not(:disabled) {
     background: #f0fdf4;
-    border-color: #10b981;
-    color: #10b981;
+    border-color: #1e293b;
+    color: #1e293b;
     transform: translateY(-1px);
 }
 
@@ -741,7 +741,7 @@ export default {
 .form-input:focus,
 .form-textarea:focus {
     outline: none;
-    border-color: #10b981;
+    border-color: #1e293b;
     box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
 
