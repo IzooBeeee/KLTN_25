@@ -17,52 +17,7 @@ class TinhThanhSeeder extends Seeder
                 'ten' => 'Đà Nẵng',
                 'created_at' => now(),
                 'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Hà Nội',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'TP. Hồ Chí Minh',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Bình Dương',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Đồng Nai',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Bà Rịa - Vũng Tàu',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Long An',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Tiền Giang',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Cần Thơ',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'ten' => 'Kiên Giang',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            ]
         ]);
     }
 }

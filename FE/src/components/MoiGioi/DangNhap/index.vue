@@ -192,7 +192,7 @@ export default {
 
           // ✅ REDIRECT
           setTimeout(() => {
-            this.$router.replace("/moi-gioi/trang-chu");
+            this.$router.replace("/moi-gioi/dashboard");
           }, 300);
         } else {
           toaster.error(res.data.message || "Sai tài khoản hoặc mật khẩu");
@@ -239,7 +239,7 @@ export default {
         console.log("✅ Token valid:", res.data);
 
         if (res.data.status === "success" || res.data.status === true) {
-          this.$router.replace("/moi-gioi/trang-chu");
+          this.$router.replace("/moi-gioi/dashboard");
         }
       } catch (error) {
         console.error("❌ Token invalid:", error);

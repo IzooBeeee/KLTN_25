@@ -1,19 +1,19 @@
 ﻿<template>
   <aside class="admin-sidebar">
     <div class="admin-sidebar__brand">
-      <p class="admin-sidebar__brand-name">Architectural Curator</p>
-      <p class="admin-sidebar__brand-subtitle">Real Estate Authority</p>
+      <span class="logo-icon">
+        <img src="../../../assets/images/logo/logo_web.png" alt="Logo" class="logo-img" />
+      </span>
+      <div class="logo-text">
+        <span class="brand">Smart Estate</span>
+        <span class="sub">Da Nang 2026</span>
+      </div>
     </div>
 
     <nav class="admin-sidebar__nav" aria-label="Menu quản trị">
       <div class="admin-sidebar__group">
-        <RouterLink
-          v-for="item in primaryItems"
-          :key="item.id"
-          :to="item.route"
-          class="admin-sidebar__link"
-          :class="{ 'is-active': route.path.startsWith(item.route) }"
-        >
+        <RouterLink v-for="item in primaryItems" :key="item.id" :to="item.route" class="admin-sidebar__link"
+          :class="{ 'is-active': route.path.startsWith(item.route) }">
           <span class="material-symbols-outlined">{{ item.icon }}</span>
           <span class="admin-sidebar__label">{{ item.label }}</span>
         </RouterLink>
@@ -22,13 +22,8 @@
       <div class="admin-sidebar__divider"></div>
 
       <div class="admin-sidebar__group">
-        <RouterLink
-          v-for="item in secondaryItems"
-          :key="item.id"
-          :to="item.route"
-          class="admin-sidebar__link"
-          :class="{ 'is-active': route.path.startsWith(item.route) }"
-        >
+        <RouterLink v-for="item in secondaryItems" :key="item.id" :to="item.route" class="admin-sidebar__link"
+          :class="{ 'is-active': route.path.startsWith(item.route) }">
           <span class="material-symbols-outlined">{{ item.icon }}</span>
           <span class="admin-sidebar__label">{{ item.label }}</span>
         </RouterLink>
@@ -123,7 +118,8 @@ const secondaryItems = [
   background: linear-gradient(180deg, #efefee 0%, #ececea 100%);
   border-right: 1px solid rgba(27, 35, 126, 0.04);
   overflow-y: auto;
-  transition: all 0.3s ease; /* Thêm hiệu ứng mượt khi resize */
+  transition: all 0.3s ease;
+  /* Thêm hiệu ứng mượt khi resize */
 }
 
 .admin-sidebar::-webkit-scrollbar {
@@ -235,5 +231,38 @@ const secondaryItems = [
   .admin-sidebar__nav {
     gap: 12px;
   }
+}
+
+.logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand {
+  font-weight: 800;
+  color: #1a237e;
+  font-size: 20px;
+}
+
+.sub {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 15px;
+}
+
+.admin-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  padding-left: 4px;
 }
 </style>

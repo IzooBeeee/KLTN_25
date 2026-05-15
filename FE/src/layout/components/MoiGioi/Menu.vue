@@ -1,8 +1,13 @@
 ﻿<template>
   <aside class="broker-sidebar">
     <div class="broker-sidebar__brand">
-      <p class="broker-sidebar__brand-name">BrokerHub</p>
-      <p class="broker-sidebar__brand-subtitle">Professional Real Estate</p>
+      <span class="logo-icon">
+        <img src="../../../assets/images/logo/logo_web_moi_gioi.png" alt="Logo" class="logo-img" />
+      </span>
+      <div class="logo-text">
+        <span class="brand">Smart Estate</span>
+        <span class="sub">Da Nang 2026</span>
+      </div>
     </div>
 
     <nav class="broker-sidebar__nav" aria-label="Menu môi giới">
@@ -380,5 +385,38 @@ Upgrade Card .broker-sidebar__upgrade-card {
 
 .broker-sidebar__link--upgrade .material-symbols-outlined {
   color: white !important;
+}
+
+.logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand {
+  font-weight: 800;
+  color: #059669;
+  font-size: 20px;
+}
+
+.sub {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 15px;
+}
+
+.broker-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  padding-left: 4px;
 }
 </style>

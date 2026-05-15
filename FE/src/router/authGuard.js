@@ -66,7 +66,7 @@ function getLoginPath(path) {
 function getHomePath(role) {
   const map = {
     admin: "/admin/dashboard",
-    "moi-gioi": "/moi-gioi/trang-chu",
+    "moi-gioi": "/moi-gioi/dashboard",
     "khach-hang": "/khach-hang/trang-chu",
   };
   return map[role] || "/";

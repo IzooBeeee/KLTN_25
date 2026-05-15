@@ -5,11 +5,11 @@
         <!-- Logo -->
         <router-link to="/" class="logo">
           <span class="logo-icon">
-            <img src="../../../assets/images/logo/logo-2.png" alt="Logo" class="logo-img" />
+            <img src="../../../assets/images/logo/logo_web.png" alt="Logo" class="logo-img" />
           </span>
           <div class="logo-text">
-            <span class="brand">SmartEstate</span>
-            <span class="sub">2026</span>
+            <span class="brand">Smart Estate</span>
+            <span class="sub">Da Nang 2026</span>
           </div>
         </router-link>
 

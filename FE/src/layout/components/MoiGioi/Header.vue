@@ -189,7 +189,7 @@
                   </div> -->
 
                   <!-- Thống kê -->
-                  <!-- <router-link to="/moi-gioi/trang-chu" class="dropdown-item-new" role="menuitem"
+                  <!-- <router-link to="/moi-gioi/dashboard" class="dropdown-item-new" role="menuitem"
                     @click="showMenu = false">
                     <span class="item-icon-new">📊</span>
                     <span class="item-label-new">Thống kê hiệu suất</span>

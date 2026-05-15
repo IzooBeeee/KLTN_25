@@ -234,7 +234,7 @@ export default {
           toaster.success("Đăng ký thành công! Chào mừng bạn 🎉");
 
           // Redirect to broker dashboard
-          this.$router.push("/moi-gioi/trang-chu");
+          this.$router.push("/moi-gioi/dashboard");
         } else {
           toaster.error(response.data.message || 'Đăng ký thất bại');
         }

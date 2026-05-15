@@ -217,12 +217,12 @@ const routes = [
     name: "MoiGioiDatLaiMatKhau",
     meta: { layout: "blank", guest: true }
   },
-  {
-    path: "/moi-gioi/trang-chu",
-    component: () => import("../components/MoiGioi/TrangChu/index.vue"),
-    name: "MoiGioiTrangChu",
-    meta: { layout: "moi-gioi", roles: ["moi-gioi"] }  // ✅ Thêm roles
-  },
+  // {
+  //   path: "/moi-gioi/dashboard",
+  //   component: () => import("../components/MoiGioi/TrangChu/index.vue"),
+  //   name: "MoiGioiTrangChu",
+  //   meta: { layout: "moi-gioi", roles: ["moi-gioi"] }  // ✅ Thêm roles
+  // },
   {
     path: "/moi-gioi/dashboard",
     component: () => import("../components/MoiGioi/Dashboard/index.vue"),
@@ -310,7 +310,7 @@ function getLoginPath(path) {
 function getHomePath(role) {
   const map = {
     admin: "/admin/dashboard",
-    "moi-gioi": "/moi-gioi/trang-chu",
+    "moi-gioi": "/moi-gioi/dashboard",
     "khach-hang": "/khach-hang/trang-chu",
   };
   return map[role] || "/";
