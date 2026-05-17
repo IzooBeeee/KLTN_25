@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class DiaChi extends Model
+{
+    protected $table = 'dia_chis';
+
+    protected $fillable = [
+        'tinh_id',
+        'quan_id',
+        'phuong_xa_id',
+        'dia_chi_chi_tiet',
+        'latitude',
+        'longitude',
+    ];
+
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+    ];
+
+    public function tinh(): BelongsTo
+    {
+        return $this->belongsTo(TinhThanh::class, 'tinh_id');
+    }
+
+    public function quan(): BelongsTo
+    {
+        return $this->belongsTo(QuanHuyen::class, 'quan_id');
+    }
+
+    public function batDongSans(): HasMany
+    {
+        return $this->hasMany(BatDongSan::class, 'dia_chi_id');
+    }
+
+    public function phuongXa(): BelongsTo
+    {
+        return $this->belongsTo(PhuongXa::class, 'phuong_xa_id');
+    }
+}

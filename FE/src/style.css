@@ -1,0 +1,661 @@
+/* ===== 1. GOOGLE FONTS (GIỮ NGUYÊN) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400;500;600&display=swap');
+
+@layer theme, base, components, utilities;
+/* Keep Bootstrap's base styles intact and only enable Tailwind theme + utilities. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* ===== 3. CUSTOM CSS - GIỮ NGUYÊN TOÀN BỘ PHẦN DƯỚI ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Be Vietnam Pro", sans-serif;
+  color: var(--app-text);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.92), transparent 22%),
+    linear-gradient(180deg, #f6f8fc 0%, #eef3fb 100%);
+}
+
+html.dark body {
+  background: #0f172a !important;
+  color: var(--app-text) !important;
+}
+
+:root {
+  --app-bg: #f6f8fc;
+  --app-card: #ffffff;
+  --app-card-soft: #f8fafc;
+  --app-text: #1d2335;
+  --app-text-strong: #0f172a;
+  --app-text-muted: #64748b;
+  --app-border: #e5e7eb;
+  --app-header: rgba(255, 255, 255, 0.98);
+}
+
+html.dark {
+  --app-bg: #0f172a;
+  --app-card: #1e293b;
+  --app-card-soft: #0f172a;
+  --app-text: #e2e8f0;
+  --app-text-strong: #f8fafc;
+  --app-text-muted: #94a3b8;
+  --app-border: #334155;
+  --app-header: rgba(15, 23, 42, 0.97);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+.btn,
+[role="button"],
+a {
+  transition:
+    color 0.28s ease,
+    background-color 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.32s ease,
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button:not(:disabled),
+[role="button"] {
+  cursor: pointer;
+}
+
+@layer base {
+  button {
+    border: 0;
+    background: transparent;
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+  line-height: 1;
+}
+
+/* ===================================================
+   DARK MODE GLOBAL OVERRIDES
+   Toggle bằng cách thêm class "dark" vào <html>
+=================================================== */
+
+/* ── Transition smooth khi toggle ── */
+html.dark,
+html.dark body,
+html.dark * {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ── Body ── */
+html.dark body {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+}
+
+/* ── Header / Navbar ── */
+html.dark .header {
+  background: rgba(15, 23, 42, 0.97) !important;
+  border-bottom-color: #1e293b !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4) !important;
+}
+html.dark .nav-link,
+html.dark .nav-label {
+  color: #94a3b8 !important;
+}
+html.dark .nav-link:hover .nav-label,
+html.dark .nav-link.router-link-active .nav-label {
+  color: #60a5fa !important;
+}
+html.dark .brand { color: #f1f5f9 !important; }
+html.dark .sub { color: #64748b !important; }
+html.dark .btn-post {
+  background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+}
+html.dark .btn-saved,
+html.dark .btn-chat {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+/* ── Cards / Panels / Sections ── */
+html.dark .card,
+html.dark .panel,
+html.dark .property-card,
+html.dark .prop-card,
+html.dark .bds-card,
+html.dark .feature-card,
+html.dark .stat-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+html.dark .card-body,
+html.dark .card-header,
+html.dark .card-footer {
+  background: transparent !important;
+  border-color: #334155 !important;
+}
+
+/* ── Whites & light grays ── */
+html.dark .bg-white,
+html.dark [class*="bg-white"],
+html.dark .bg-light,
+html.dark .bg-gray-50,
+html.dark .bg-gray-100 {
+  background-color: #1e293b !important;
+}
+
+
+
+/* ── Sections & wrappers ── */
+html.dark section,
+html.dark .section,
+html.dark .page-wrapper,
+html.dark .page-content,
+html.dark .main-content {
+  background: transparent !important;
+}
+
+/* ── Text ── */
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+  color: #f1f5f9 !important;
+}
+html.dark p {
+  color: inherit;
+}
+
+html.dark .text-main,
+html.dark .title,
+html.dark .section-title {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-muted,
+html.dark .text-secondary,
+html.dark .subtitle,
+html.dark .desc {
+  color: #94a3b8 !important;
+}
+html.dark .text-muted, html.dark .text-secondary {
+  color: #64748b !important;
+}
+html.dark .text-dark { color: #e2e8f0 !important; }
+html.dark .text-body { color: #cbd5e1 !important; }
+
+/* ── Borders ── */
+html.dark .border,
+html.dark [class*="border-"] {
+  border-color: #334155 !important;
+}
+html.dark hr { border-color: #1e293b !important; }
+
+/* ── Forms ── */
+html.dark input:not([type="range"]),
+html.dark select,
+html.dark textarea {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #475569 !important;
+}
+html.dark .form-control,
+html.dark .form-select {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+html.dark .form-control:focus,
+html.dark .form-select:focus {
+  background-color: #1e293b !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+  color: #e2e8f0 !important;
+}
+html.dark label,
+html.dark .form-label { color: #94a3b8 !important; }
+
+/* ── Buttons ── */
+html.dark .btn-outline-secondary {
+  color: #94a3b8 !important;
+  border-color: #475569 !important;
+}
+html.dark .btn-outline-secondary:hover {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+html.dark .btn-light {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+/* ── Dropdowns / Popups ── */
+html.dark .dropdown-menu,
+html.dark .notif-panel,
+html.dark .chat-panel,
+html.dark .user-dropdown {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+}
+html.dark .dropdown-item { color: #cbd5e1 !important; }
+html.dark .dropdown-item:hover { background: #263349 !important; color: #f1f5f9 !important; }
+html.dark .dropdown-divider { border-color: #334155 !important; }
+
+/* ── Modals ── */
+html.dark .modal-content {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+html.dark .modal-header,
+html.dark .modal-footer {
+  border-color: #334155 !important;
+}
+html.dark .modal-title { color: #f1f5f9 !important; }
+html.dark .btn-close { filter: invert(1); }
+
+/* ── Tables ── */
+html.dark table { color: #e2e8f0 !important; }
+html.dark thead th {
+  background: #0f172a !important;
+  color: #94a3b8 !important;
+  border-color: #334155 !important;
+}
+html.dark tbody tr { border-color: #1e293b !important; }
+html.dark tbody tr:hover { background: #263349 !important; }
+html.dark td, html.dark th { border-color: #1e293b !important; }
+
+/* ── Scrollbar ── */
+html.dark ::-webkit-scrollbar { width: 6px; height: 6px; }
+html.dark ::-webkit-scrollbar-track { background: #0f172a; }
+html.dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* ── Property listing page specific ── */
+html.dark .prop-image-overlay { background: linear-gradient(to top, rgba(0,0,0,0.8), transparent) !important; }
+html.dark .search-bar,
+html.dark .filter-bar { background: #1e293b !important; border-color: #334155 !important; }
+
+/* ── Hero sections: Keep dark gradient, just adjust text ── */
+html.dark .hero-section,
+html.dark .page-hero { filter: none !important; }
+
+/* ── Footer ── */
+html.dark footer,
+html.dark .footer {
+  background: #020617 !important;
+  border-top-color: #1e293b !important;
+}
+
+/* ── Tính Vay page ── */
+html.dark .tv-page { background: #0f172a !important; }
+html.dark .tv-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+html.dark .tv-bank-chip { background: #0f172a !important; border-color: #334155 !important; }
+html.dark .tv-bank-chip:hover,
+html.dark .tv-bank-chip.active { background: #1e3a5f !important; border-color: #3b82f6 !important; }
+html.dark .tv-bank-name { color: #e2e8f0 !important; }
+html.dark .tv-input-wrap { border-color: #334155 !important; }
+html.dark .tv-input-wrap input { color: #e2e8f0 !important; }
+html.dark .tv-unit { background: #0f172a !important; border-color: #334155 !important; color: #64748b !important; }
+html.dark .tv-tab { background: #0f172a !important; border-color: #334155 !important; color: #64748b !important; }
+html.dark .tv-tab.active { background: #1e3a5f !important; color: #60a5fa !important; }
+html.dark .tv-kpi { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .tv-table thead th { background: #0f172a !important; }
+html.dark .tv-table tbody tr:hover { background: #263349 !important; }
+html.dark .tv-tip { background: #1e293b !important; border-color: #334155 !important; color: #94a3b8 !important; }
+
+/* ── BĐS Map page ── */
+html.dark .bd-page { background: #0f172a !important; }
+
+/* ── Định giá AI page specific ── */
+html.dark .dinh-gia-wrap { background: #0f172a !important; }
+
+/* ── Môi giới Dashboard ── */
+html.dark .mg-dashboard { background: #0f172a !important; }
+html.dark .mg-stat-card { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .mg-stat__value { color: #f1f5f9 !important; }
+html.dark .mg-stat__label { color: #94a3b8 !important; }
+html.dark .mg-card { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .mg-card__title { color: #f1f5f9 !important; }
+html.dark .mg-card__link { color: #60a5fa !important; }
+html.dark .mg-bds-item { background: #0f172a !important; border-color: #334155 !important; }
+html.dark .mg-bds__title { color: #f1f5f9 !important; }
+html.dark .mg-bds__type { color: #94a3b8 !important; }
+html.dark .mg-spending__amount { color: #f1f5f9 !important; }
+html.dark .mg-quick-btn.secondary { background: #334155 !important; color: #e2e8f0 !important; border-color: #475569 !important; }
+html.dark .mg-plan--empty p { color: #94a3b8 !important; }
+
+/* ── ChatBot ── */
+html.dark .chatbot-window { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .chatbot-messages { background: #0f172a !important; }
+html.dark .chatbot-message .message-content { background: #1e293b !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+html.dark .chatbot-message.user .message-content { background: linear-gradient(135deg, #2563eb, #3b82f6) !important; }
+html.dark .chatbot-quick { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .chatbot-input { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .chatbot-input input { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+html.dark .quick-btn { background: #0f172a !important; border-color: #334155 !important; color: #94a3b8 !important; }
+html.dark .quick-btn:hover { background: #1e3a5f !important; border-color: #3b82f6 !important; color: #60a5fa !important; }
+
+/* ── SweetAlert2 dark ── */
+html.dark .swal2-popup {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+html.dark .swal2-title { color: #f1f5f9 !important; }
+html.dark .swal2-html-container { color: #cbd5e1 !important; }
+
+/* ── Lịch Hẹn ── */
+html.dark .lh-title { color: #f1f5f9 !important; }
+html.dark .lh-stat { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .lh-stat__label { color: #94a3b8 !important; }
+html.dark .lh-card { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .lh-card__title { color: #f1f5f9 !important; }
+html.dark .lh-card__type { color: #60a5fa !important; }
+html.dark .lh-card__address { color: #94a3b8 !important; }
+html.dark .lh-detail { color: #cbd5e1 !important; }
+html.dark .lh-detail i { color: #94a3b8 !important; }
+html.dark .lh-empty { background: #1e293b !important; }
+html.dark .lh-empty h3 { color: #f1f5f9 !important; }
+html.dark .lh-empty p { color: #94a3b8 !important; }
+html.dark .dl-modal { background: #1e293b !important; }
+html.dark .dl-header { border-color: #334155 !important; }
+html.dark .dl-header__title { color: #f1f5f9 !important; }
+html.dark .dl-header__subtitle { color: #94a3b8 !important; }
+html.dark .dl-input { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+html.dark .dl-textarea { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+html.dark .dl-time-btn { background: #0f172a !important; border-color: #334155 !important; color: #94a3b8 !important; }
+html.dark .dl-footer { border-color: #334155 !important; }
+html.dark .dl-btn--secondary { background: #334155 !important; color: #e2e8f0 !important; }
+html.dark .dropdown-menu-new {
+  background: #ffffff !important;
+  border-color: #bfdbfe !important;
+  color: #1f2937 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.dark .dropdown-item-new {
+  color: #374151 !important;
+}
+
+html.dark .dropdown-item-new:hover {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+}
+
+html.dark .dropdown-footer-new {
+  background: #ffffff !important;
+}
+
+html.dark .item-label-new {
+  color: inherit !important;
+}
+
+html.dark .logout-btn-new {
+  background: #ffffff !important;
+  color: #ef4444 !important;
+  border-color: #fecaca !important;
+}
+html.dark .btn-notif {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-notif .icon {
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-notif:hover,
+html.dark .btn-saved:hover,
+html.dark .btn-chat:hover {
+  background: #263349 !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+html.dark .user-wrapper {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+html.dark .user-name,
+html.dark .arrow {
+  color: #1e40af !important;
+}
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-gray-400 {
+  color: #94a3b8 !important;
+}
+html.dark .dropdown-menu-new,
+html.dark .avatar-large-new,
+html.dark .logout-btn-new {
+  background: #ffffff !important;
+}
+/* ===== DARK MODE FIXES - ADDITIONAL ===== */
+
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-notif {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-notif .icon {
+  color: #94a3b8 !important;
+}
+
+html.dark .btn-notif:hover,
+html.dark .btn-saved:hover,
+html.dark .btn-chat:hover {
+  background: #263349 !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+html.dark .dropdown-menu-new {
+  background: #ffffff !important;
+  border-color: #bfdbfe !important;
+  color: #1f2937 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.dark .dropdown-item-new {
+  color: #374151 !important;
+}
+
+html.dark .dropdown-item-new:hover {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+}
+
+html.dark .dropdown-footer-new,
+html.dark .avatar-large-new,
+html.dark .logout-btn-new {
+  background: #ffffff !important;
+}
+
+html.dark .item-label-new {
+  color: inherit !important;
+}
+
+html.dark .logout-btn-new {
+  color: #ef4444 !important;
+  border-color: #fecaca !important;
+}
+
+html.dark .user-wrapper {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+html.dark .user-name,
+html.dark .arrow {
+  color: #1e40af !important;
+}
+/* ===== FIX PROPERTY LIST CARD DARK MODE ===== */
+html.dark .property-list-card {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+  border-color: #334155 !important;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark .property-list-card h1,
+html.dark .property-list-card h2,
+html.dark .property-list-card h3,
+html.dark .property-list-card h4,
+html.dark .property-list-card h5,
+html.dark .property-list-card h6 {
+  color: #f8fafc !important;
+}
+
+html.dark .property-list-card p,
+html.dark .property-list-card .text-gray-500,
+html.dark .property-list-card .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+html.dark .property-list-card .border-gray-100 {
+  border-color: #334155 !important;
+}
+
+html.dark .property-list-card .text-blue-600 {
+  color: #60a5fa !important;
+}
+html.dark .property-list-card [class*="text-[#0a0e27]"] {
+  color: #f8fafc !important;
+}
+/* ===== FIX HOME FEATURED PROJECTS DARK MODE ===== */
+
+/* Nền các section trang chủ */
+html.dark .home-section,
+html.dark .featured-section,
+html.dark .project-section,
+html.dark .du-an-section,
+html.dark .property-section {
+  background: #0f172a !important;
+}
+
+/* Card dự án / BĐS ở trang chủ */
+html.dark .project-card,
+html.dark .featured-card,
+html.dark .featured-project-card,
+html.dark .home-property-card,
+html.dark .property-list-card,
+html.dark .property-card,
+html.dark .bds-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Phần nội dung dưới ảnh trong card */
+html.dark .project-card-content,
+html.dark .featured-card-content,
+html.dark .property-card-content,
+html.dark .property-list-card .p-6,
+html.dark .bds-card-content {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+
+/* Tiêu đề card */
+html.dark .project-card h1,
+html.dark .project-card h2,
+html.dark .project-card h3,
+html.dark .project-card h4,
+html.dark .project-card h5,
+html.dark .project-card h6,
+html.dark .featured-card h1,
+html.dark .featured-card h2,
+html.dark .featured-card h3,
+html.dark .featured-card h4,
+html.dark .featured-card h5,
+html.dark .featured-card h6,
+html.dark .property-list-card h1,
+html.dark .property-list-card h2,
+html.dark .property-list-card h3,
+html.dark .property-list-card h4,
+html.dark .property-list-card h5,
+html.dark .property-list-card h6 {
+  color: #f8fafc !important;
+}
+
+/* Bắt các màu text hard-code / Tailwind arbitrary */
+html.dark [class*="text-[#0a0e27]"],
+html.dark [class*="text-[#1d2335]"],
+html.dark [class*="text-gray-900"],
+html.dark [class*="text-gray-800"],
+html.dark [class*="text-gray-700"] {
+  color: #f8fafc !important;
+}
+
+html.dark [class*="text-gray-600"],
+html.dark [class*="text-gray-500"],
+html.dark [class*="text-gray-400"] {
+  color: #94a3b8 !important;
+}
+
+/* Border trong card */
+html.dark .border-gray-100,
+html.dark .border-gray-200 {
+  border-color: #334155 !important;
+}
+
+/* Icon địa chỉ */
+html.dark .material-symbols-outlined {
+  color: inherit;
+}
