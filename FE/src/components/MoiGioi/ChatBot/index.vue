@@ -131,9 +131,9 @@ async function callChatbotAPI(text) {
   console.log("[BrokerChat] currentUser", user);
   console.log("[BrokerChat] token exists", !!token);
   
-  const brokerId = user?.id;
+  const brokerId = user?.moi_gioi_id || user?.id;
   const userId = user?.id;
-  const moiGioiId = user?.id;
+  const moiGioiId = user?.moi_gioi_id || user?.id;
   
   const payload = {
     message:      text,
@@ -144,11 +144,16 @@ async function callChatbotAPI(text) {
     moi_gioi_id:  moiGioiId,
     user_id:      userId,
     token:        token,
-    access_token: token
+    access_token: token,
+    user:         user
   };
   
   console.log("[BrokerChat] payload", payload);
-  const response = await api.post('/chatbot', payload, { timeout: 30000 });
+  const config = { timeout: 30000 };
+  if (token) {
+    config.headers = { Authorization: `Bearer ${token}` };
+  }
+  const response = await api.post('/chatbot', payload, config);
   return response.data?.data || {};
 }
 

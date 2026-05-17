@@ -1,0 +1,1 @@
+var e=`recently_viewed_bds`,t=10;function n(n){if(n?.id)try{let i=r().filter(e=>e.id!==n.id),a={...n,viewed_at:new Date().toISOString()};i.unshift(a),localStorage.setItem(e,JSON.stringify(i.slice(0,t)))}catch{}}function r(){try{return JSON.parse(localStorage.getItem(e)||`[]`)}catch{return[]}}function i(){localStorage.removeItem(e)}export{r as n,n as r,i as t};

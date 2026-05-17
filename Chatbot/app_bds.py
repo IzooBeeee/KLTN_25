@@ -2367,57 +2367,54 @@ class BDSChatbot:
     def get_broker_id(self, payload: Dict[str, Any]) -> Any:
         user = payload.get("user") or {}
         return (
-            payload.get("broker_id")
-            or payload.get("moi_gioi_id")
-            or payload.get("moiGioiId")
+            payload.get("moi_gioi_id")
+            or payload.get("broker_id")
             or payload.get("user_id")
+            or payload.get("moiGioiId")
             or user.get("moi_gioi_id")
             or user.get("id")
         )
 
     def fetch_broker_appointments(self, payload: Dict[str, Any], status: Optional[str] = None, limit: int = 5) -> Tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
-        """Fetch broker appointments from Laravel API."""
-        token = get_auth_token(payload)
-
-        if not token:
-            return None, "missing_token"
-
-        base_url = os.getenv("BDS_API_BASE_URL") or os.getenv("LARAVEL_API_BASE_URL") or "http://127.0.0.1:8000/api"
-        url = base_url.rstrip("/") + "/lich-hen/danh-sach"
-
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/json",
-        }
+        """Fetch broker appointments from DB directly."""
+        broker_id = self.get_broker_id(payload)
+        if not broker_id:
+            session_id = (payload.get("session_id") or "guest_default")[:100]
+            mem = self.memory.get(session_id)
+            broker_id = getattr(mem, "user_id", None)
+            
+        if not broker_id:
+            return None, "missing_broker_id"
 
         try:
-            resp = requests.get(url, headers=headers, timeout=8)
-
-            if resp.status_code == 401:
-                logger.warning("broker appointments api unauthorized (401)")
-                return None, "unauthorized"
-
-            if resp.status_code >= 400:
-                logger.error("broker appointments api error status=%s body=%s", resp.status_code, resp.text[:500])
-                return None, "api_error"
-
-            data = resp.json()
-
-            if not data.get("status"):
-                logger.error("broker appointments api returned status false: %s", data)
-                return None, "api_error"
-
-            appointments = data.get("data", {}).get("appointments", []) or []
-
+            conn = self.data.connect()
+            cur = conn.cursor(dictionary=True)
+            
+            query = """
+                SELECT l.*, b.tieu_de as bat_dong_san_tieu_de 
+                FROM lich_hen_xem_nha l
+                LEFT JOIN bat_dong_sans b ON l.bat_dong_san_id = b.id
+                WHERE l.moi_gioi_id = %s
+            """
+            params = [broker_id]
+            
             if status == "pending":
-                appointments = [a for a in appointments if a.get("trang_thai") == "cho_xac_nhan"]
+                query += " AND l.trang_thai = 'cho_xac_nhan'"
             elif status == "confirmed":
-                appointments = [a for a in appointments if a.get("trang_thai") == "da_xac_nhan"]
-
-            return appointments[:limit], None
-
+                query += " AND l.trang_thai = 'da_xac_nhan'"
+                
+            query += " ORDER BY l.ngay_hen DESC, l.gio_hen DESC LIMIT %s"
+            params.append(limit)
+            
+            cur.execute(query, tuple(params))
+            rows = cur.fetchall()
+            cur.close()
+            conn.close()
+            
+            return rows, None
+            
         except Exception as exc:
-            logger.exception("fetch_broker_appointments_from_api failed: %s", exc)
+            logger.exception("fetch_broker_appointments_from_db failed: %s", exc)
             return None, "query_failed"
 
     def appointment_status_label(self, status: str) -> str:
@@ -2429,8 +2426,36 @@ class BDSChatbot:
         }.get(status, "Không xác định")
 
     def format_broker_appointments(self, rows: List[Dict[str, Any]], title: str) -> str:
-        """Format appointments from Laravel API response."""
-        return format_broker_appointment_api_items(rows, title)
+        """Format appointments from DB response."""
+        if not rows:
+            return title + "<br>Không có dữ liệu."
+            
+        text = f"{title}<br>"
+        for i, r in enumerate(rows, 1):
+            prop_title = r.get("bat_dong_san_tieu_de") or f"BĐS ID {r.get('bat_dong_san_id')}"
+            
+            ngay = r.get("ngay_hen")
+            if isinstance(ngay, datetime) or hasattr(ngay, 'strftime'):
+                ngay_str = ngay.strftime("%d/%m/%Y")
+            else:
+                ngay_str = str(ngay)
+                
+            gio = r.get("gio_hen")
+            if hasattr(gio, 'components'):
+                gio_str = f"{gio.components.hours:02d}:{gio.components.minutes:02d}"
+            elif hasattr(gio, 'seconds'):
+                m, s = divmod(gio.seconds, 60)
+                h, m = divmod(m, 60)
+                gio_str = f"{h:02d}:{m:02d}"
+            else:
+                gio_str = str(gio)
+                
+            status_val = r.get("trang_thai", "")
+            status_lbl = self.appointment_status_label(status_val)
+            
+            text += f"{i}. <b>{prop_title}</b> — {ngay_str} {gio_str}, trạng thái: {status_lbl}<br>"
+            
+        return text
 
     def broker_appointment_query_error(self, start: float) -> Dict[str, Any]:
         return self.wrap(
@@ -2488,14 +2513,14 @@ class BDSChatbot:
         session_id = (payload.get("session_id") or "guest_default")[:100]
         try:
             rows, err = self.fetch_broker_appointments(payload, status=None)
-            if err == "missing_token":
-                return self.broker_missing_token_response(start)
+            if err in ["missing_token", "missing_broker_id"]:
+                return self.broker_no_id_response(start)
             if err == "unauthorized":
                 return self.broker_unauthorized_response(start)
             if not rows:
                 return self.broker_no_appointments_response(status=None, start=start)
             
-            text = self.format_broker_appointments(rows, "Đây là các lịch hẹn xem nhà gần nhất của bạn:")
+            text = self.format_broker_appointments(rows, "Lịch khách hẹn xem nhà gần đây:")
             an = {"intent": "broker_appointments", "context": "broker", "entities": {}}
             quick = ["Lịch chờ xác nhận", "Lịch đã xác nhận", "Gói tin đăng BĐS giá bao nhiêu?"]
             self.memory.update(session_id, payload.get("message", ""), text, an, [])
@@ -2508,14 +2533,14 @@ class BDSChatbot:
         session_id = (payload.get("session_id") or "guest_default")[:100]
         try:
             rows, err = self.fetch_broker_appointments(payload, status="pending")
-            if err == "missing_token":
-                return self.broker_missing_token_response(start)
+            if err in ["missing_token", "missing_broker_id"]:
+                return self.broker_no_id_response(start)
             if err == "unauthorized":
                 return self.broker_unauthorized_response(start)
             if not rows:
                 return self.broker_no_appointments_response(status="pending", start=start)
             
-            text = self.format_broker_appointments(rows, "Bạn có các lịch chờ xác nhận:")
+            text = self.format_broker_appointments(rows, "Lịch chờ xác nhận:")
             an = {"intent": "broker_pending_appointments", "context": "broker", "entities": {}}
             quick = ["Lịch đã xác nhận", "Lịch khách hẹn xem nhà", "Gói tin đăng BĐS giá bao nhiêu?"]
             self.memory.update(session_id, payload.get("message", ""), text, an, [])
@@ -2528,14 +2553,14 @@ class BDSChatbot:
         session_id = (payload.get("session_id") or "guest_default")[:100]
         try:
             rows, err = self.fetch_broker_appointments(payload, status="confirmed")
-            if err == "missing_token":
-                return self.broker_missing_token_response(start)
+            if err in ["missing_token", "missing_broker_id"]:
+                return self.broker_no_id_response(start)
             if err == "unauthorized":
                 return self.broker_unauthorized_response(start)
             if not rows:
                 return self.broker_no_appointments_response(status="confirmed", start=start)
             
-            text = self.format_broker_appointments(rows, "Đây là các lịch đã xác nhận:")
+            text = self.format_broker_appointments(rows, "Lịch đã xác nhận:")
             an = {"intent": "broker_confirmed_appointments", "context": "broker", "entities": {}}
             quick = ["Lịch chờ xác nhận", "Lịch khách hẹn xem nhà", "Gói tin đăng BĐS giá bao nhiêu?"]
             self.memory.update(session_id, payload.get("message", ""), text, an, [])
